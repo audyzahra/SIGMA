@@ -1,0 +1,58 @@
+# =====================
+# Laravel Backend
+# =====================
+
+backend/web_sigma/vendor/
+
+backend/web_sigma/.env
+
+backend/web_sigma/storage/logs/*
+backend/web_sigma/storage/framework/cache/*
+backend/web_sigma/storage/framework/sessions/*
+backend/web_sigma/storage/framework/views/*
+
+backend/web_sigma/bootstrap/cache/*
+
+
+# =====================
+# Database
+# =====================
+
+# SQLite lokal
+*.sqlite
+*.sqlite3
+
+# Backup database
+*.sql
+
+
+# =====================
+# Flutter Frontend
+# =====================
+
+frontend/apk_sigma/.dart_tool/
+frontend/apk_sigma/.packages
+frontend/apk_sigma/pubspec.lock
+
+frontend/apk_sigma/build/
+
+
+# Android
+frontend/apk_sigma/android/.gradle/
+frontend/apk_sigma/android/local.properties
+
+
+# =====================
+# IDE
+# =====================
+
+.vscode/
+.idea/
+
+
+# =====================
+# OS
+# =====================
+
+.DS_Store
+Thumbs.db
