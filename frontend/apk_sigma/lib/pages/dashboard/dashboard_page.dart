@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../auth/auth_widgets.dart';
+import '../citizen/citizen_shell.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key, required this.role, required this.name});
@@ -19,8 +20,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    final items = _isOfficer
-        ? const [
+    if (!_isOfficer) {
+      return CitizenShell(name: widget.name);
+    }
+
+    const items = [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),
               label: 'Beranda',
@@ -32,24 +36,6 @@ class _DashboardPageState extends State<DashboardPage> {
             NavigationDestination(
               icon: Icon(Icons.map_outlined),
               label: 'Peta',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              label: 'Profil',
-            ),
-          ]
-        : const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              label: 'Beranda',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.map_outlined),
-              label: 'Peta',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.description_outlined),
-              label: 'Laporan',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),

@@ -5,11 +5,14 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
 
@@ -44,28 +47,33 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $permission) {
 
-            Permission::create([
+            Permission::firstOrCreate([
                 'name' => $permission,
+                'guard_name' => 'web',
             ]);
 
         }
 
         // ROLE
 
-        $superAdmin = Role::create([
+        $superAdmin = Role::firstOrCreate([
             'name' => 'super_admin',
+            'guard_name' => 'web',
         ]);
 
-        $government = Role::create([
+        $government = Role::firstOrCreate([
             'name' => 'government',
+            'guard_name' => 'web',
         ]);
 
-        $officer = Role::create([
+        $officer = Role::firstOrCreate([
             'name' => 'officer',
+            'guard_name' => 'web',
         ]);
 
-        $citizen = Role::create([
+        $citizen = Role::firstOrCreate([
             'name' => 'citizen',
+            'guard_name' => 'web',
         ]);
 
         // Permission role
