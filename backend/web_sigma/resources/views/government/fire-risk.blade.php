@@ -1,0 +1,8 @@
+@extends('layouts.government')
+@section('title', 'Risiko Karhutla | SIGMA')
+@section('content')
+@php($regions = config('sigma_data.regions'))
+<section class="page-heading"><div><p class="breadcrumb">Beranda › Risiko Karhutla</p><h1>Analisis Risiko Karhutla</h1><p>Analisis tingkat risiko kebakaran di setiap wilayah.</p></div><button class="button button-light" data-toast="Analisis risiko diperbarui">Perbarui Analisis</button></section>
+<div class="government-grid risk-grid"><section class="panel"><div class="map-placeholder monitoring-map"><div class="map-controls">+<hr>−</div><div class="island island-one"></div><div class="island island-two"><i></i><i></i></div><div class="island island-three"></div><div class="island island-four"></div><div class="map-legend"><span class="success">● Rendah</span><span class="warning">● Sedang</span><span class="orange-text">● Tinggi</span><span class="danger">● Ekstrem</span></div></div></section><aside class="panel detail-panel"><h3>Detail Wilayah</h3><label>Pilih Wilayah<select data-region-select>@foreach($regions as $region)<option value="{{ $region['id'] }}">{{ $region['name'] }}</option>@endforeach</select></label><div class="score-ring"><b data-risk-score>87</b><span>/100</span></div><p class="score-label">Risiko <b class="danger" data-risk-level>Ekstrem</b></p><div class="parameter"><span>Suhu</span><b data-risk-temperature>32°C</b></div><div class="parameter"><span>Kelembapan</span><b data-risk-humidity>40%</b></div><div class="parameter"><span>Kecepatan Angin</span><b data-risk-wind>20 km/jam</b></div><div class="parameter"><span>Curah Hujan</span><b data-risk-rainfall>10 mm</b></div></aside></div>
+<script>window.sigmaRegions=@json($regions);</script>
+@endsection

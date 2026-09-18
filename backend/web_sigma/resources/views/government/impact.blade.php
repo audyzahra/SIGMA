@@ -1,0 +1,6 @@
+@extends('layouts.government')
+@section('title', 'Analisis Dampak | SIGMA')
+@section('content')
+<section class="page-heading"><div><p class="breadcrumb">Beranda › Analisis Dampak</p><h1>Analisis Dampak</h1><p>Analisis potensi dampak kejadian terhadap masyarakat dan lingkungan.</p></div><button class="button button-light" data-toast="Layer dampak diperbarui">⌖ Tampilkan Layer</button></section>
+<div class="government-grid risk-grid"><section class="panel"><div class="map-placeholder impact-map"><div class="map-controls">＋<hr>−</div><div class="impact-rings"><i></i><i></i><i></i><b>♨</b></div><div class="impact-marker marker-one">♙</div><div class="impact-marker marker-two">⌂</div><div class="impact-marker marker-three">♧</div></div></section><aside class="panel impact-detail"><h3>Dampak Potensial</h3>@foreach([['♙','15.000','Penduduk'],['⌂','3','Permukiman'],['▰','2','Sekolah'],['♠','500 Ha','Area Hutan']] as [$icon,$number,$label])<div class="impact-metric"><span>{{ $icon }}</span><div><b>{{ $number }}</b><small>{{ $label }}</small></div></div>@endforeach<div class="impact-score"><span>Impact Score</span><b>92 <small>/100</small></b><strong>Sangat Berdampak</strong></div></aside></div>
+@endsection

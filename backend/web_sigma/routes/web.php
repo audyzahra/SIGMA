@@ -28,4 +28,11 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
 
 Route::get('/government/dashboard', function () {
     return view('government.dashboard');
-})->middleware(['auth', 'role:government']);
+})->middleware(['auth', 'role:government'])->name('government.dashboard');
+
+Route::middleware(['auth', 'role:government'])->prefix('government')->name('government.')->group(function () {
+    Route::view('/fire-risk', 'government.fire-risk')->name('fire-risk');
+    Route::view('/impact', 'government.impact')->name('impact');
+    Route::view('/priority', 'government.priority')->name('priority');
+    Route::view('/recommendation', 'government.recommendation')->name('recommendation');
+});
