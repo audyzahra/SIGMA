@@ -1,0 +1,1 @@
+<div class="table-wrap"><table class="data-table">{{ $slot }}</table></div>

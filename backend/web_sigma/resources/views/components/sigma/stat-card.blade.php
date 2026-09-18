@@ -1,0 +1,1 @@
+<article class="stat-card {{ $accent ?? '' }}"><div><p>{{ $label }}</p><strong>{{ $value }}</strong>@if(isset($caption))<small>{!! $caption !!}</small>@endif</div><span class="stat-icon">{{ $icon ?? '◈' }}</span></article>

@@ -1,0 +1,1 @@
+<div class="pagination"><span>Menampilkan 1 - 6 dari data terdaftar</span><div><button disabled>‹</button><button class="current">1</button><button data-toast="Halaman 2 ditampilkan">2</button><button data-toast="Halaman 3 ditampilkan">3</button><button data-toast="Halaman berikutnya ditampilkan">›</button></div></div>

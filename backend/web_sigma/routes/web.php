@@ -13,7 +13,18 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 
 Route::get('/super-admin/dashboard', function () {
     return view('super_admin.dashboard');
-})->middleware(['auth', 'role:super_admin']);
+})->middleware(['auth', 'role:super_admin'])->name('super-admin.dashboard');
+
+Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::view('/users', 'super_admin.users')->name('users');
+    Route::view('/roles', 'super_admin.roles')->name('roles');
+    Route::view('/organizations', 'super_admin.organizations')->name('organizations');
+    Route::view('/regions', 'super_admin.regions')->name('regions');
+    Route::view('/data-source', 'super_admin.data_source')->name('data-source');
+    Route::view('/ai-model', 'super_admin.ai_model')->name('ai-model');
+    Route::view('/settings', 'super_admin.settings')->name('settings');
+    Route::view('/audit', 'super_admin.audit')->name('audit');
+});
 
 Route::get('/government/dashboard', function () {
     return view('government.dashboard');
