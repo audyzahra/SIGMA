@@ -10,56 +10,91 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        /*
+        |--------------------------------------------------------------------------
+        | SUPER ADMIN
+        |--------------------------------------------------------------------------
+        */
 
-        // SUPER ADMIN
+        $superAdmin = User::firstOrCreate(
+            [
+                'email' => 'superadmin@sigma.id',
+            ],
+            [
+                'name' => 'Super Admin SIGMA',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
-        $superAdmin = User::create([
-            'name' => 'Super Admin SIGMA',
-            'email' => 'superadmin@sigma.id',
-            'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+        $superAdmin->syncRoles([
+            'super_admin',
         ]);
 
-        $superAdmin->assignRole('super_admin');
 
+        /*
+        |--------------------------------------------------------------------------
+        | PEMERINTAH
+        |--------------------------------------------------------------------------
+        */
 
+        $government = User::firstOrCreate(
+            [
+                'email' => 'pemerintah@sigma.id',
+            ],
+            [
+                'name' => 'Pemerintah SIGMA',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // PEMERINTAH
-
-        $government = User::create([
-            'name' => 'Pemerintah SIGMA',
-            'email' => 'pemerintah@sigma.id',
-            'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+        $government->syncRoles([
+            'government',
         ]);
 
-        $government->assignRole('government');
 
+        /*
+        |--------------------------------------------------------------------------
+        | PETUGAS
+        |--------------------------------------------------------------------------
+        */
 
+        $officer = User::firstOrCreate(
+            [
+                'email' => 'petugas@sigma.id',
+            ],
+            [
+                'name' => 'Petugas SIGMA',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // PETUGAS DEFAULT
-
-        $officer = User::create([
-            'name' => 'Petugas SIGMA',
-            'email' => 'petugas@sigma.id',
-            'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+        $officer->syncRoles([
+            'officer',
         ]);
 
-        $officer->assignRole('officer');
 
+        /*
+        |--------------------------------------------------------------------------
+        | MASYARAKAT
+        |--------------------------------------------------------------------------
+        */
 
+        $citizen = User::firstOrCreate(
+            [
+                'email' => 'masyarakat@sigma.id',
+            ],
+            [
+                'name' => 'Masyarakat SIGMA',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // MASYARAKAT DEFAULT
-
-        $citizen = User::create([
-            'name' => 'Masyarakat SIGMA',
-            'email' => 'masyarakat@sigma.id',
-            'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+        $citizen->syncRoles([
+            'citizen',
         ]);
-
-        $citizen->assignRole('citizen');
-
     }
 }
