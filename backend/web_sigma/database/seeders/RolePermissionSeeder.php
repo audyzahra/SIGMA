@@ -11,11 +11,6 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        /*
-        |--------------------------------------------------------------------------
-        | PERMISSIONS
-        |--------------------------------------------------------------------------
-        */
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
@@ -50,7 +45,6 @@ class RolePermissionSeeder extends Seeder
 
         ];
 
-
         foreach ($permissions as $permission) {
 
             Permission::firstOrCreate([
@@ -60,61 +54,35 @@ class RolePermissionSeeder extends Seeder
 
         }
 
+        // ROLE
 
-<<<<<<< Updated upstream
-=======
-        /*
-        |--------------------------------------------------------------------------
-        | ROLES
-        |--------------------------------------------------------------------------
-        */
-
->>>>>>> Stashed changes
         $superAdmin = Role::firstOrCreate([
             'name' => 'super_admin',
             'guard_name' => 'web',
         ]);
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         $government = Role::firstOrCreate([
             'name' => 'government',
             'guard_name' => 'web',
         ]);
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         $officer = Role::firstOrCreate([
             'name' => 'officer',
             'guard_name' => 'web',
         ]);
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         $citizen = Role::firstOrCreate([
             'name' => 'citizen',
             'guard_name' => 'web',
         ]);
 
+        // Permission role
 
-        /*
-        |--------------------------------------------------------------------------
-        | PERMISSION ROLE
-        |--------------------------------------------------------------------------
-        */
-
-        $superAdmin->syncPermissions(
+        $superAdmin->givePermissionTo(
             Permission::all()
         );
 
-
-        $government->syncPermissions([
+        $government->givePermissionTo([
             'dashboard.view',
             'map.view',
             'map.manage',
@@ -123,8 +91,7 @@ class RolePermissionSeeder extends Seeder
             'notification.send',
         ]);
 
-
-        $officer->syncPermissions([
+        $officer->givePermissionTo([
             'dashboard.view',
             'map.view',
             'incident.create',
@@ -132,11 +99,11 @@ class RolePermissionSeeder extends Seeder
             'report.create',
         ]);
 
-
-        $citizen->syncPermissions([
+        $citizen->givePermissionTo([
             'incident.create',
             'report.create',
             'map.view',
         ]);
+
     }
 }
