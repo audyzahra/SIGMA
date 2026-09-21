@@ -1,0 +1,1 @@
+@extends('layouts.super_admin') @section('content')<section class="page-heading"><h1>Tambah Model AI</h1></section><form class="panel" method="POST" action="{{ route('super-admin.ai-models.store') }}">@csrf @include('super_admin.ai_models.form')<button class="button button-primary">Simpan</button></form>@endsection

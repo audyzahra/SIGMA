@@ -1,9 +1,31 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>@yield('title', 'SIGMA Command Center')</title>@vite(['resources/css/app.css', 'resources/js/app.js'])</head>
-<body>
-@php($navigation = [['super-admin.dashboard','Dashboard','▦'],['super-admin.users','Manajemen Pengguna','♙'],['super-admin.roles','Role & Permission','◈'],['super-admin.organizations','Organisasi','▤'],['super-admin.regions','Manajemen Wilayah','⌖'],['super-admin.data-source','Sumber Data','◉'],['super-admin.ai-model','Model AI','✦'],['super-admin.settings','Konfigurasi Sistem','⚙'],['super-admin.audit','Audit Trail','◌']])
-<div class="app-shell"><aside class="sidebar" id="sidebar"><a class="brand" href="{{ route('super-admin.dashboard') }}"><img src="{{ asset('images/logo.jpeg') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla Command</small></span></a><div class="institution"><i></i> INSTITUSI PUSAT</div><p class="menu-label">MENU OPERASIONAL</p><nav>@foreach($navigation as [$route,$label,$icon])<a href="{{ route($route) }}" class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}"><span>{{ $icon }}</span>{{ $label }}</a>@endforeach</nav><div class="profile-card"><span class="avatar">RP</span><span><b>Ir. Raditya Pratama</b><small>Super Admin Pusat</small></span><div><a href="#" data-toast="Pengaturan profil siap dikonfigurasi">⚙ Pengaturan</a><button type="button" data-modal="logout-modal">⇥ Keluar</button></div></div></aside>
-<div class="main-wrap"><header class="topbar"><button class="mobile-menu" type="button" data-sidebar-toggle>☰</button><div class="header-brand"><img src="{{ asset('images/logo.jpeg') }}" alt="Logo SIGMA"><span>Command Center Karhutla Nasional</span></div><div class="topbar-meta"><span class="system-status">● Sistem Normal</span><span>◷ Selasa, 24 Okt 2024 • 10:45 WIB</span><button type="button" class="icon-button" data-toast="Tidak ada notifikasi baru">♧</button><span class="avatar small">RP</span></div></header><main class="page-content">@yield('content')</main></div></div>
-<x-sigma.modal id="logout-modal" title="Keluar dari SIGMA"><p>Apakah Anda yakin ingin mengakhiri sesi Super Admin?</p><form method="POST" action="{{ route('logout') }}" class="modal-actions">@csrf <button type="button" class="button button-light" data-modal-close>Batal</button><button class="button button-primary">Keluar</button></form></x-sigma.modal><div id="toast" class="toast" role="status"></div>
-<script>document.querySelectorAll('[data-modal]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.modal)?.classList.add('is-open')));document.querySelectorAll('[data-modal-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.modal-backdrop').classList.remove('is-open')));document.querySelectorAll('[data-toast]').forEach(b=>b.addEventListener('click',()=>{const t=document.getElementById('toast');t.textContent=b.dataset.toast;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}));document.querySelectorAll('[data-sidebar-toggle]').forEach(b=>b.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open')))</script>
-</body></html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'SIGMA Command Center')</title>
+    @vite(['resources/css/app.css', 'resources/css/super-admin.css', 'resources/js/app.js'])
+</head>
+<body class="super-admin-layout">
+    @php($navigation = [['super-admin.dashboard', 'super-admin.dashboard', 'Dashboard', '⌂'], ['super-admin.manage-users.index', 'super-admin.manage-users.*', 'Manajemen Pengguna', '♙'], ['super-admin.role-permissions.index', 'super-admin.role-permissions.*', 'Role & Permission', '◇'], ['super-admin.organizations.index', 'super-admin.organizations.*', 'Organisasi', '▣'], ['super-admin.regions.index', 'super-admin.regions.*', 'Manajemen Wilayah', '⌖'], ['super-admin.data-sources.index', 'super-admin.data-sources.*', 'Sumber Data', '◉'], ['super-admin.ai-models.index', 'super-admin.ai-models.*', 'Model AI', '✦'], ['super-admin.configurations.index', 'super-admin.configurations.*', 'Konfigurasi Sistem', '⚙'], ['super-admin.audit-logs.index', 'super-admin.audit-logs.*', 'Audit Trail', '◌']])
+    <div class="super-admin-shell">
+        <aside class="super-admin-sidebar" id="super-admin-sidebar">
+            <a class="super-admin-brand" href="{{ route('super-admin.dashboard') }}"><img src="{{ asset('images/logo.jpeg') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla Command</small></span></a>
+            <div class="super-admin-institution"><i></i> INSTITUSI PUSAT</div>
+            <p class="super-admin-menu-label">MENU OPERASIONAL</p>
+            <nav class="super-admin-nav" aria-label="Navigasi Super Admin">
+                @foreach($navigation as [$route, $activePattern, $label, $icon])
+                    <a href="{{ route($route) }}" class="super-admin-nav-item {{ request()->routeIs($activePattern) ? 'is-active' : '' }}"><span class="super-admin-nav-icon" aria-hidden="true">{{ $icon }}</span><span class="super-admin-nav-label">{{ $label }}</span></a>
+                @endforeach
+            </nav>
+            <div class="super-admin-profile"><span class="avatar">SA</span><span><b>{{ auth()->user()->name ?? 'Super Admin' }}</b><small>Super Admin Pusat</small></span><button type="button" data-modal="logout-modal">Keluar</button></div>
+        </aside>
+        <div class="super-admin-main">
+            <header class="super-admin-header"><button class="super-admin-menu-toggle" type="button" data-sidebar-toggle aria-label="Buka menu">☰</button><div class="header-brand"><img src="{{ asset('images/logo.jpeg') }}" alt="Logo SIGMA"><span>Command Center Karhutla Nasional</span></div><div class="topbar-meta"><span class="system-status">Sistem Normal</span><span>{{ now()->translatedFormat('d M Y H:i') }} WIB</span></div></header>
+            <main class="super-admin-content">@if(session('success'))<div class="alert success">{{ session('success') }}</div>@endif @if($errors->any())<div class="alert danger">{{ $errors->first() }}</div>@endif @yield('content')</main>
+        </div>
+    </div>
+    <x-sigma.modal id="logout-modal" title="Keluar dari SIGMA"><p>Apakah Anda yakin ingin mengakhiri sesi Super Admin?</p><form method="POST" action="{{ route('logout') }}" class="modal-actions">@csrf <button type="button" class="button button-light" data-modal-close>Batal</button><button class="button button-primary">Keluar</button></form></x-sigma.modal>
+    <script>document.querySelectorAll('[data-modal]').forEach(button=>button.addEventListener('click',()=>document.getElementById(button.dataset.modal)?.classList.add('is-open')));document.querySelectorAll('[data-modal-close]').forEach(button=>button.addEventListener('click',()=>button.closest('.modal-backdrop').classList.remove('is-open')));document.querySelectorAll('[data-sidebar-toggle]').forEach(button=>button.addEventListener('click',()=>document.getElementById('super-admin-sidebar').classList.toggle('is-open')))</script>
+</body>
+</html>
