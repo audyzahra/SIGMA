@@ -16,6 +16,7 @@ use App\Http\Controllers\Web\SuperAdmin\RolePermissionController;
 use App\Http\Controllers\Web\SuperAdmin\SystemConfigurationController;
 use App\Http\Controllers\Web\SuperAdmin\UserManagementController;
 use App\Http\Controllers\Web\SuperAdminDashboardController;
+use App\Http\Controllers\Web\SuperAdmin\AspirationController as SuperAdminAspirationController;
 use App\Models\SystemProfile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -110,6 +111,20 @@ Route::middleware(['auth', 'role:super_admin'])
                 'index',
                 'show'
             ]);
+
+        Route::get('aspirations', 
+            [SuperAdminAspirationController::class, 'index']
+        )->name('aspirations.index');
+
+
+        Route::get('aspirations/{hash}',
+            [SuperAdminAspirationController::class, 'show']
+        )->name('aspirations.show');
+
+        Route::patch(
+            'aspirations/{aspiration}/status',
+            [SuperAdminAspirationController::class,'updateStatus']
+        )->name('aspirations.status');
     });
 
 
