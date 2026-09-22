@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'pages/auth/role_selection_page.dart';
+import 'presentation/officer/officer_shell.dart';
 
 void main() {
   runApp(const SigmaApp());
@@ -35,6 +36,9 @@ class SigmaApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
+      routes: {
+        '/officer/home': (_) => const OfficerShell(name: 'Budi Pratama'),
+      },
       home: const RoleSelectionPage(),
     );
   }

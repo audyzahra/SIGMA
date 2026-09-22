@@ -1,0 +1,1 @@
+@extends('layouts.super_admin') @section('content')<section class="page-heading"><h1>{{ $configuration->key }}</h1></section><section class="panel info-card"><b>Tipe</b><strong>{{ $configuration->type }}</strong><b>Nilai</b><strong>{{ $configuration->value }}</strong><b>Deskripsi</b><strong>{{ $configuration->description ?? '—' }}</strong></section>@endsection

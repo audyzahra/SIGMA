@@ -1,0 +1,17 @@
+.super-admin-layout .super-admin-nav-item {
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+.super-admin-layout .super-admin-nav-item.is-active {
+    border-left-color: var(--red);
+    background: transparent;
+    color: var(--red);
+}
+
+.super-admin-layout .super-admin-nav-item:hover,
+.super-admin-layout .super-admin-nav-item.is-active:hover {
+    border-color: var(--red);
+    background: var(--red);
+    color: #fff;
+}
