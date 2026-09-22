@@ -7,7 +7,7 @@
     <section class="w-full max-w-3xl rounded-2xl bg-white p-8 shadow-xl shadow-slate-200/70">
         <div class="mb-8 flex items-center gap-4">
             <img
-                src="{{ asset('images/logo.jpeg') }}"
+                src="{{ asset('images/logo.png') }}"
                 alt="Logo SIGMA"
                 class="h-14 w-14 rounded-2xl object-cover shadow-sm"
             >

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'pages/auth/role_selection_page.dart';
 import 'presentation/officer/officer_shell.dart';
+import 'core/theme/sigma_theme.dart';
 
 void main() {
   runApp(const SigmaApp());
@@ -15,27 +16,7 @@ class SigmaApp extends StatelessWidget {
     return MaterialApp(
       title: 'SIGMA Disaster Intelligence',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFC62828)),
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFFC62828), width: 2),
-          ),
-        ),
-        useMaterial3: true,
-      ),
+      theme: SigmaTheme.light,
       routes: {
         '/officer/home': (_) => const OfficerShell(name: 'Budi Pratama'),
       },

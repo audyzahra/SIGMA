@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../citizen/citizen_shell.dart';
+import '../../features/citizen/citizen_shell.dart';
 import '../../presentation/officer/officer_shell.dart';
 
 class DashboardPage extends StatefulWidget {

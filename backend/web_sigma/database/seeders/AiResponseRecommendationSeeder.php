@@ -18,31 +18,58 @@ class AiResponseRecommendationSeeder extends Seeder
 
         $incidents = Incident::orderBy('id')->get();
 
+        $recommendations = [
+            [
+                'type' => 'deploy_team',
+                'text' => 'Mengerahkan tim penanggulangan ke lokasi kejadian untuk melakukan verifikasi dan penanganan awal.',
+                'summary' => 'Tim pemadam perlu dikerahkan untuk melakukan verifikasi dan penanganan awal di lokasi kejadian.',
+            ],
+
+            [
+                'type' => 'aerial_patrol',
+                'text' => 'Melakukan patroli udara menggunakan drone atau helikopter untuk memantau perkembangan kejadian dan area sekitar.',
+                'summary' => 'Patroli udara digunakan untuk memperoleh pemantauan kondisi lokasi dan area terdampak dari udara.',
+            ],
+
+            [
+                'type' => 'community_alert',
+                'text' => 'Mendistribusikan peringatan kepada masyarakat di wilayah sekitar lokasi kejadian agar meningkatkan kewaspadaan.',
+                'summary' => 'Peringatan masyarakat diperlukan untuk meningkatkan kewaspadaan di sekitar lokasi kejadian.',
+            ],
+
+            [
+                'type' => 'water_source_check',
+                'text' => 'Melakukan pengecekan sumber air terdekat untuk memastikan ketersediaan air bagi proses penanganan kebakaran.',
+                'summary' => 'Ketersediaan sumber air perlu diperiksa untuk mendukung proses pemadaman.',
+            ],
+        ];
+
         foreach ($incidents as $incident) {
 
-            AiResponseRecommendation::firstOrCreate(
-                [
-                    'incident_id' => $incident->id,
-                    'recommendation_type' => 'deploy_team',
-                ],
-                [
-                    'recommendation_text' =>
-                        'Mengerahkan tim penanggulangan ke lokasi kejadian untuk melakukan verifikasi dan penanganan awal.',
+            foreach ($recommendations as $recommendation) {
 
-                    'risk_summary' =>
-                        'Rekomendasi berdasarkan tingkat keparahan incident yang terdeteksi.',
+                AiResponseRecommendation::updateOrCreate(
+                    [
+                        'incident_id' => $incident->id,
+                        'recommendation_type' => $recommendation['type'],
+                    ],
+                    [
+                        'recommendation_text' => $recommendation['text'],
 
-                    'confidence_score' => 85.00,
+                        'risk_summary' => $recommendation['summary'],
 
-                    'model_version' => '1.0.0',
+                        'confidence_score' => 85.00,
 
-                    'decision_status' => 'pending',
+                        'model_version' => '1.0.0',
 
-                    'approved_by' => null,
+                        'decision_status' => 'pending',
 
-                    'generated_at' => now(),
-                ]
-            );
+                        'approved_by' => null,
+
+                        'generated_at' => now(),
+                    ]
+                );
+            }
         }
     }
 }
