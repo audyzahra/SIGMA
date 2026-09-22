@@ -1,8 +1,43 @@
 @extends('layouts.super_admin')
 @section('title', 'Dashboard | SIGMA')
 @section('content')
-<section class="hero"><div><p class="eyebrow">COMMAND DECK â€¢ NASIONAL</p><h1><span></span>Selamat Datang, Super Admin SIGMA</h1><p>Monitoring pusat sistem intelijen geospasial mitigasi karhutla.</p></div><div class="hero-actions"><a class="button button-primary" href="{{ route('super-admin.export.audit') }}">Export Laporan</a></div></section>
-<div class="stats-grid"><x-sigma.stat-card label="Total Pengguna" value="{{ number_format($userCount) }}" icon="👥" caption="<b class='success'>{{ number_format($activeUserCount) }} aktif</b>"/><x-sigma.stat-card label="Organisasi Terdaftar" value="{{ number_format($organizationCount) }}" icon="🏢" accent="orange" caption="{{ number_format($activeOrganizationCount) }} aktif"/><x-sigma.stat-card label="Wilayah Terdaftar" value="{{ number_format($regionCount) }}" icon="📍" caption="{{ $regionLevels->get('province', 0) }} provinsi • {{ $regionLevels->get('regency', 0) }} kabupaten"/><x-sigma.stat-card label="Status Sistem" value="{{ $systemStatus }}" icon="🛡" accent="green" caption="Bersumber dari konfigurasi sistem"/></div>
+<section class="hero"><div><p class="eyebrow">COMMAND DECK â€¢ NASIONAL</p><h1>Selamat Datang, Super Admin SIGMA</h1><p>Monitoring pusat sistem intelijen geospasial mitigasi karhutla.</p></div><div class="hero-actions"><a class="button button-primary" href="{{ route('super-admin.export.audit') }}">Export Laporan</a></div></section>
+<div class="stats-grid">
+
+    <x-sigma.stat-card
+        label="Total Pengguna"
+        value="{{ number_format($userCount) }}"
+        icon="users"
+        accent="blue"
+        caption="<b class='success'>{{ number_format($activeUserCount) }} aktif</b>"
+    />
+
+    <x-sigma.stat-card
+        label="Organisasi Terdaftar"
+        value="{{ number_format($organizationCount) }}"
+        icon="building"
+        accent="orange"
+        caption="{{ number_format($activeOrganizationCount) }} aktif"
+    />
+
+    <x-sigma.stat-card
+        label="Wilayah Terdaftar"
+        value="{{ number_format($regionCount) }}"
+        icon="map"
+        accent="blue"
+        caption="{{ $regionLevels->get('province', 0) }} provinsi • {{ $regionLevels->get('regency', 0) }} kabupaten"
+    />
+
+    <x-sigma.stat-card
+        label="Status Sistem"
+        value="{{ $systemStatus }}"
+        icon="shield"
+        accent="green"
+        caption="Bersumber dari konfigurasi sistem"
+    />
+
+</div>
+
 <div class="dashboard-grid"><section class="panel risk-panel"><div class="panel-title"><div><h3>Monitoring Risiko Kebakaran</h3><p>Distribusi berdasarkan data fire risk terbaru</p></div></div><div class="risk-list">@foreach(['low' => 'Rendah / Aman', 'medium' => 'Sedang / Siaga', 'high' => 'Tinggi / Rawan', 'extreme' => 'Ekstrem / Kritis'] as $level => $label)<div><b>{{ $riskCounts->get($level, 0) }}</b><span>{{ $label }}</span></div>@endforeach</div>@if($extremeRisks->isNotEmpty())<div class="alert-callout"><span><b>Wilayah risiko ekstrem</b><br>{{ $extremeRisks->pluck('region.name')->filter()->join(', ') }}</span></div>@else<div class="alert-callout"><span>Belum ada data risiko ekstrem.</span></div>@endif</section><section class="panel"><div class="panel-title"><div><h3>Aktivitas Sistem</h3><p>Jumlah aktivitas dari audit trail selama tujuh hari terakhir</p></div></div><div class="risk-list">@foreach(range(6, 0) as $daysAgo)@php($date = now()->subDays($daysAgo))<div><b>{{ $auditActivityByDay->get($date->toDateString(), 0) }}</b><span>{{ $date->translatedFormat('D, d M') }}</span></div>@endforeach</div></section></div>
 <div class="dashboard-bottom"><section class="panel"><div class="panel-title"><div><h3>Aktivitas Terbaru</h3><p>Log eksekusi dan perubahan sistem</p></div><a href="{{ route('super-admin.audit-logs.index') }}">Lihat Audit →</a></div><div class="activity">@forelse($recentActivities as $activity)<div><b>{{ $activity->description ?: $activity->action.' '.$activity->module }}</b><span>{{ $activity->user?->name ?? 'Sistem' }} • {{ $activity->created_at->diffForHumans() }}</span></div>@empty<div><span>Belum ada aktivitas sistem.</span></div>@endforelse</div></section><section class="panel health"><div class="panel-title"><div><h3>Kesehatan Sistem</h3><p>Status dari konfigurasi aktif</p></div></div><div class="health-row"><span>Konfigurasi Sistem</span><b>{{ $systemStatus }}</b></div></section></div>
 @endsection
