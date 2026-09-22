@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CitizenReport extends Model
 {
-
     protected $fillable = [
         'user_id',
         'incident_id',
@@ -16,16 +15,13 @@ class CitizenReport extends Model
         'photo',
         'video',
         'description',
-        'verification_status'
+        'verification_status',
     ];
-
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];
-
-
 
     public function user()
     {
@@ -34,14 +30,12 @@ class CitizenReport extends Model
         );
     }
 
-
     public function incident()
     {
         return $this->belongsTo(
             Incident::class
         );
     }
-
 
     public function aiVerification()
     {
@@ -50,14 +44,12 @@ class CitizenReport extends Model
         );
     }
 
-
     public function voiceReport()
     {
         return $this->hasOne(
             VoiceReport::class
         );
     }
-
 
     public function statusHistories()
     {
@@ -66,12 +58,10 @@ class CitizenReport extends Model
         );
     }
 
-
     public function reward()
     {
         return $this->hasOne(
             ReportReward::class
         );
     }
-
 }

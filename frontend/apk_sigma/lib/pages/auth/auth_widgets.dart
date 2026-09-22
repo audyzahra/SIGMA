@@ -15,7 +15,7 @@ class SigmaHeader extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(22),
           child: Image.asset(
-            'assets/images/logo.jpeg',
+            'assets/images/logo.png',
             width: 112,
             height: 112,
             fit: BoxFit.cover,

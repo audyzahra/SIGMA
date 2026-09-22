@@ -10,7 +10,7 @@
     @php($navigation = [['super-admin.dashboard', 'super-admin.dashboard', 'Dashboard', '⌂'], ['super-admin.manage-users.index', 'super-admin.manage-users.*', 'Manajemen Pengguna', '♙'], ['super-admin.role-permissions.index', 'super-admin.role-permissions.*', 'Role & Permission', '◇'], ['super-admin.organizations.index', 'super-admin.organizations.*', 'Organisasi', '▣'], ['super-admin.regions.index', 'super-admin.regions.*', 'Manajemen Wilayah', '⌖'], ['super-admin.data-sources.index', 'super-admin.data-sources.*', 'Sumber Data', '◉'], ['super-admin.ai-models.index', 'super-admin.ai-models.*', 'Model AI', '✦'], ['super-admin.configurations.index', 'super-admin.configurations.*', 'Konfigurasi Sistem', '⚙'], ['super-admin.audit-logs.index', 'super-admin.audit-logs.*', 'Audit Trail', '◌']])
     <div class="super-admin-shell">
         <aside class="super-admin-sidebar" id="super-admin-sidebar">
-            <a class="super-admin-brand" href="{{ route('super-admin.dashboard') }}"><img src="{{ asset('images/logo.jpeg') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla Command</small></span></a>
+            <a class="super-admin-brand" href="{{ route('super-admin.dashboard') }}"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla Command</small></span></a>
             <div class="super-admin-institution"><i></i> INSTITUSI PUSAT</div>
             <p class="super-admin-menu-label">MENU OPERASIONAL</p>
             <nav class="super-admin-nav" aria-label="Navigasi Super Admin">
@@ -21,7 +21,7 @@
             <div class="super-admin-profile"><span class="avatar">SA</span><span><b>{{ auth()->user()->name ?? 'Super Admin' }}</b><small>Super Admin Pusat</small></span><button type="button" data-modal="logout-modal">Keluar</button></div>
         </aside>
         <div class="super-admin-main">
-            <header class="super-admin-header"><button class="super-admin-menu-toggle" type="button" data-sidebar-toggle aria-label="Buka menu">☰</button><div class="header-brand"><img src="{{ asset('images/logo.jpeg') }}" alt="Logo SIGMA"><span>Command Center Karhutla Nasional</span></div><div class="topbar-meta"><span class="system-status">Sistem Normal</span><span>{{ now()->translatedFormat('d M Y H:i') }} WIB</span></div></header>
+            <header class="super-admin-header"><button class="super-admin-menu-toggle" type="button" data-sidebar-toggle aria-label="Buka menu">☰</button><div class="header-brand"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span>Command Center Karhutla Nasional</span></div><div class="topbar-meta"><span class="system-status">Sistem Normal</span><span>{{ now()->translatedFormat('d M Y H:i') }} WIB</span></div></header>
             <main class="super-admin-content">@if(session('success'))<div class="alert success">{{ session('success') }}</div>@endif @if($errors->any())<div class="alert danger">{{ $errors->first() }}</div>@endif @yield('content')</main>
         </div>
     </div>

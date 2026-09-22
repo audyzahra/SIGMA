@@ -11,4 +11,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/admin/petugas', [AuthController::class, 'createPetugas'])->middleware('role:super_admin');
+
+    require __DIR__.'/api/citizen.php';
 });
