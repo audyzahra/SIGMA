@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+
+# Environment
+.env
+
+# AI Model
+trained_models/*.pkl
+trained_models/*.pt
+
+# Dataset besar
+dataset/*.csv
+dataset/*.zip
+
+# Logs
+logs/*.log
+
+# IDE
+.vscode/
+.idea/
