@@ -1,0 +1,173 @@
+/* ==========================================
+   GOVERNMENT - CITIZEN REPORT INDEX
+========================================== */
+
+
+/*
+|--------------------------------------------------------------------------
+| Report Filter
+|--------------------------------------------------------------------------
+*/
+
+.report-filter {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Report Table
+|--------------------------------------------------------------------------
+*/
+
+.report-table {
+    overflow-x: auto;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Pelapor
+|--------------------------------------------------------------------------
+*/
+
+.report-user {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.report-user b {
+    color: #1e293b;
+}
+
+.report-user small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Report Location
+|--------------------------------------------------------------------------
+*/
+
+.report-location {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.report-location b {
+    color: #1e293b;
+}
+
+.report-location small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Report Date
+|--------------------------------------------------------------------------
+*/
+
+.report-date {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.report-date small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Status Badge
+|--------------------------------------------------------------------------
+*/
+
+.report-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 16px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Pending */
+
+.report-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+
+/* Verified */
+
+.report-status.verified {
+    background: #dcfce7;
+    color: #166534;
+}
+
+
+/* Rejected */
+
+.report-status.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Empty State
+|--------------------------------------------------------------------------
+*/
+
+.report-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Responsive
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 768px) {
+
+
+    .report-filter {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .report-table {
+
+        overflow-x: auto;
+
+    }
+
+}

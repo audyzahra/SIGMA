@@ -6,6 +6,8 @@ use App\Http\Controllers\Web\Government\FireRiskController;
 use App\Http\Controllers\Web\Government\ImpactController;
 use App\Http\Controllers\Web\Government\PriorityController;
 use App\Http\Controllers\Web\Government\RecommendationController;
+use App\Http\Controllers\Web\Government\CitizenReportController;
+
 use App\Http\Controllers\Web\public_sigma\AspirationController;
 use App\Http\Controllers\Web\SuperAdmin\AIModelController;
 use App\Http\Controllers\Web\SuperAdmin\AuditLogController;
@@ -178,8 +180,35 @@ Route::middleware(['auth', 'role:government'])
             RecommendationController::class,
             'index'
         ])->name('recommendation');
-    });
 
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Laporan Masyarakat
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            'reports',
+            [CitizenReportController::class, 'index']
+        )->name('reports.index');
+
+        Route::get(
+            'reports/{report}',
+            [CitizenReportController::class, 'show']
+        )->name('reports.show');
+
+        Route::patch(
+            'reports/{report}/verify',
+            [CitizenReportController::class, 'verify']
+        )->name('reports.verify');
+
+        Route::patch(
+            'reports/{report}/reject',
+            [CitizenReportController::class, 'reject']
+        )->name('reports.reject');
+    });
 
 /*
 |--------------------------------------------------------------------------

@@ -1,8 +1,78 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>@yield('title', 'SIGMA Pemerintah')</title>@vite(['resources/css/app.css', 'resources/js/app.js'])</head>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@yield('title', 'SIGMA Pemerintah')</title>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @stack('styles')
+</head>
+
+
 <body>
-@php($navigation = [['government.dashboard','Dashboard','▦'],['government.fire-risk','Risiko Karhutla','♨'],['government.impact','Analisis Dampak','◉'],['government.priority','Prioritas Penanganan','⌁'],['government.recommendation','Rekomendasi','▣']])
-<div class="app-shell"><aside class="sidebar" id="sidebar"><a class="brand" href="{{ route('government.dashboard') }}"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla Command</small></span></a><div class="institution"><i></i> PEMERINTAH</div><p class="menu-label">MENU MONITORING</p><nav>@foreach($navigation as [$route,$label,$icon])<a href="{{ route($route) }}" class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}"><span>{{ $icon }}</span>{{ $label }}</a>@endforeach</nav><div class="profile-card"><span class="avatar">PS</span><span><b>Pemerintah SIGMA</b><small>Pemerintah</small></span><div><a href="#" data-toast="Profil Pemerintah SIGMA">⚙ Pengaturan</a><button type="button" data-modal="logout-modal">⇥ Keluar</button></div></div></aside><div class="main-wrap"><header class="topbar"><button class="mobile-menu" type="button" data-sidebar-toggle>☰</button><div class="header-brand"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span>Command Center Karhutla Nasional</span></div><div class="topbar-meta"><span class="system-status">● Sistem Normal</span><span>◷ Selasa, 24 Okt 2024 • 10:45 WIB</span><button type="button" class="icon-button" data-toast="Tidak ada notifikasi baru">♧</button><span class="avatar small">PS</span></div></header><main class="page-content">@yield('content')</main></div></div>
-<x-sigma.modal id="logout-modal" title="Keluar dari SIGMA"><p>Apakah Anda yakin ingin mengakhiri sesi Pemerintah?</p><form method="POST" action="{{ route('logout') }}" class="modal-actions">@csrf <button type="button" class="button button-light" data-modal-close>Batal</button><button class="button button-primary">Keluar</button></form></x-sigma.modal><div id="toast" class="toast" role="status"></div>
-<script>document.querySelectorAll('[data-modal]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.modal)?.classList.add('is-open')));document.querySelectorAll('[data-modal-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.modal-backdrop').classList.remove('is-open')));document.querySelectorAll('[data-toast]').forEach(b=>b.addEventListener('click',()=>{const t=document.getElementById('toast');t.textContent=b.dataset.toast;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}));document.querySelectorAll('[data-sidebar-toggle]').forEach(b=>b.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open')))</script>
-</body></html>
+    @php($navigation = [
+        ['government.dashboard', 'Dashboard', '▦'],
+        ['government.fire-risk', 'Risiko Karhutla', '♨'],
+        ['government.impact', 'Analisis Dampak', '◉'],
+        ['government.priority', 'Prioritas Penanganan', '⌁'],
+        ['government.recommendation', 'Rekomendasi', '▣'],
+        ['government.reports.index', 'Laporan Masyarakat', '▤'],
+    ])
+
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"><a class="brand" href="{{ route('government.dashboard') }}"><img
+                    src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla
+                        Command</small></span></a>
+            <div class="institution"><i></i> PEMERINTAH</div>
+            <p class="menu-label">MENU MONITORING</p>
+            <nav>
+                @foreach ($navigation as [$route, $label, $icon])
+                    <a href="{{ route($route) }}"
+                        class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}"><span>{{ $icon }}</span>{{ $label }}</a>
+                @endforeach
+            </nav>
+            <div class="profile-card"><span class="avatar">PS</span><span><b>Pemerintah
+                        SIGMA</b><small>Pemerintah</small></span>
+                <div><a href="#" data-toast="Profil Pemerintah SIGMA">⚙ Pengaturan</a><button type="button"
+                        data-modal="logout-modal">⇥ Keluar</button></div>
+            </div>
+        </aside>
+        <div class="main-wrap">
+            <header class="topbar"><button class="mobile-menu" type="button" data-sidebar-toggle>☰</button>
+                <div class="header-brand"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span>Command
+                        Center Karhutla Nasional</span></div>
+                <div class="topbar-meta"><span class="system-status">● Sistem Normal</span><span>◷ Selasa, 24 Okt 2024 •
+                        10:45 WIB</span><button type="button" class="icon-button"
+                        data-toast="Tidak ada notifikasi baru">♧</button><span class="avatar small">PS</span></div>
+            </header>
+            <main class="page-content">@yield('content')</main>
+        </div>
+    </div>
+    <x-sigma.modal id="logout-modal" title="Keluar dari SIGMA">
+        <p>Apakah Anda yakin ingin mengakhiri sesi Pemerintah?</p>
+        <form method="POST" action="{{ route('logout') }}" class="modal-actions">@csrf <button type="button"
+                class="button button-light" data-modal-close>Batal</button><button
+                class="button button-primary">Keluar</button></form>
+    </x-sigma.modal>
+    <div id="toast" class="toast" role="status"></div>
+    <script>
+        document.querySelectorAll('[data-modal]').forEach(b => b.addEventListener('click', () => document.getElementById(b
+            .dataset.modal)?.classList.add('is-open')));
+        document.querySelectorAll('[data-modal-close]').forEach(b => b.addEventListener('click', () => b.closest(
+            '.modal-backdrop').classList.remove('is-open')));
+        document.querySelectorAll('[data-toast]').forEach(b => b.addEventListener('click', () => {
+            const t = document.getElementById('toast');
+            t.textContent = b.dataset.toast;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2600)
+        }));
+        document.querySelectorAll('[data-sidebar-toggle]').forEach(b => b.addEventListener('click', () => document
+            .getElementById('sidebar').classList.toggle('open')))
+    </script>
+</body>
+
+</html>
