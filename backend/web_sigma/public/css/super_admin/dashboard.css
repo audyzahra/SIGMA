@@ -1,0 +1,162 @@
+/* =========================================
+   SIGMA SUPER ADMIN - DASHBOARD STAT CARD
+   ========================================= */
+
+.stat-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px;
+
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+/* Hover Card */
+
+.stat-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+
+/* Content */
+
+.stat-content {
+    min-width: 0;
+}
+
+
+.stat-content p {
+    margin: 0 0 7px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.stat-content strong {
+    display: block;
+
+    color: #0f172a;
+
+    font-size: 28px;
+
+    line-height: 1.1;
+
+    font-weight: 800;
+}
+
+
+.stat-content small {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   ICON
+   ========================================= */
+
+.stat-icon {
+    flex: 0 0 auto;
+
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    transition:
+        transform 0.25s ease,
+        border-radius 0.25s ease;
+}
+
+
+.stat-icon svg {
+    width: 27px;
+    height: 27px;
+}
+
+
+/* Icon Hover */
+
+.stat-card:hover .stat-icon {
+    transform:
+        scale(1.08)
+        rotate(-3deg);
+
+    border-radius: 17px;
+}
+
+
+/* =========================================
+   BLUE
+   ========================================= */
+
+.stat-card.blue .stat-icon {
+    color: #2563eb;
+
+    background: #eff6ff;
+}
+
+
+/* =========================================
+   ORANGE
+   ========================================= */
+
+.stat-card.orange .stat-icon {
+    color: #f97316;
+
+    background: #fff7ed;
+}
+
+
+/* =========================================
+   GREEN
+   ========================================= */
+
+.stat-card.green .stat-icon {
+    color: #16a34a;
+
+    background: #f0fdf4;
+}
+
+
+/* =========================================
+   RED
+   ========================================= */
+
+.stat-card.red .stat-icon {
+    color: #dc2626;
+
+    background: #fef2f2;
+}

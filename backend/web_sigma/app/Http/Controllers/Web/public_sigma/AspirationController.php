@@ -52,10 +52,10 @@ class AspirationController extends Controller
         Aspiration::create($validated);
 
         return redirect()
-            ->to(url()->previous() . '#aspirasi')
-            ->with(
-                'success',
-                'Informasi berhasil dikirim. Terima kasih atas partisipasi Anda.'
-            );
+        ->back()
+        ->with(
+            'success',
+            'Informasi berhasil dikirim. Terima kasih atas partisipasi Anda.'
+        );
     }
 }

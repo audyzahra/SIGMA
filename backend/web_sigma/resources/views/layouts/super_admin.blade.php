@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SIGMA Command Center')</title>
     @vite(['resources/css/app.css', 'resources/css/super-admin.css', 'resources/js/app.js'])
+    {{-- CSS khusus Dashboard Super Admin --}}
+    <link rel="stylesheet" href="{{ asset('css/super_admin/dashboard.css') }}">
 </head>
 <body class="super-admin-layout">
-    @php($navigation = [['super-admin.dashboard', 'super-admin.dashboard', 'Dashboard', '⌂'], ['super-admin.manage-users.index', 'super-admin.manage-users.*', 'Manajemen Pengguna', '♙'], ['super-admin.role-permissions.index', 'super-admin.role-permissions.*', 'Role & Permission', '◇'], ['super-admin.organizations.index', 'super-admin.organizations.*', 'Organisasi', '▣'], ['super-admin.regions.index', 'super-admin.regions.*', 'Manajemen Wilayah', '⌖'], ['super-admin.data-sources.index', 'super-admin.data-sources.*', 'Sumber Data', '◉'], ['super-admin.ai-models.index', 'super-admin.ai-models.*', 'Model AI', '✦'], ['super-admin.configurations.index', 'super-admin.configurations.*', 'Konfigurasi Sistem', '⚙'], ['super-admin.audit-logs.index', 'super-admin.audit-logs.*', 'Audit Trail', '◌']])
+    @php($navigation = [['super-admin.dashboard', 'super-admin.dashboard', 'Dashboard', '⌂'], ['super-admin.manage-users.index', 'super-admin.manage-users.*', 'Manajemen Pengguna', '♙'], ['super-admin.role-permissions.index', 'super-admin.role-permissions.*', 'Role & Permission', '◇'], ['super-admin.organizations.index', 'super-admin.organizations.*', 'Organisasi', '▣'], ['super-admin.regions.index', 'super-admin.regions.*', 'Manajemen Wilayah', '⌖'], ['super-admin.data-sources.index', 'super-admin.data-sources.*', 'Sumber Data', '◉'], ['super-admin.ai-models.index', 'super-admin.ai-models.*', 'Model AI', '✦'], ['super-admin.configurations.index', 'super-admin.configurations.*', 'Konfigurasi Sistem', '⚙'], ['super-admin.audit-logs.index', 'super-admin.audit-logs.*', 'Audit Trail', '◌'], ['super-admin.aspirations.index', 'super-admin.aspirations.*', 'Aspirasi Masyarakat', '✉']])
     <div class="super-admin-shell">
         <aside class="super-admin-sidebar" id="super-admin-sidebar">
             <a class="super-admin-brand" href="{{ route('super-admin.dashboard') }}"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla Command</small></span></a>
