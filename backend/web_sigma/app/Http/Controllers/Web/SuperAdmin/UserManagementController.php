@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\SuperAdmin;
 
+use App\Helpers\EncryptHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\SuperAdminAuditService;
@@ -14,7 +15,13 @@ class UserManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with('roles')->when($request->search, fn ($q, $v) => $q->where(fn ($q) => $q->where('name', 'like', "%$v%")->orWhere('email', 'like', "%$v%")))->when($request->role, fn ($q, $v) => $q->role($v))->latest()->paginate(15)->withQueryString();
+        $users = User::with('roles')->when($request->search, fn($q, $v)
+        => $q->where(fn($q) => $q->where('name', 'like', "%$v%")
+            ->orWhere('email', 'like', "%$v%")))
+            ->when($request->role, fn($q, $v) => $q->role($v))
+            ->latest()
+            ->paginate($request->get('per_page', 5))
+            ->withQueryString();
 
         return view('super_admin.manage_users.index', compact('users'));
     }
@@ -34,42 +41,98 @@ class UserManagementController extends Controller
         return redirect()->route('super-admin.manage-users.index')->with('success', 'Pengguna dibuat.');
     }
 
-    public function show(User $user)
+    public function show(string $user)
     {
+        $id = EncryptHelper::decrypt($user);
+
+        $user = User::findOrFail($id);
+
         return view('super_admin.manage_users.show', compact('user'));
     }
 
-    public function edit(User $user)
+    public function edit(string $user)
     {
-        return view('super_admin.manage_users.edit', ['user' => $user, 'roles' => Role::orderBy('name')->get()]);
+        $id = EncryptHelper::decrypt($user);
+
+        $user = User::findOrFail($id);
+
+        return view('super_admin.manage_users.edit', [
+            'user' => $user,
+            'roles' => Role::orderBy('name')->get()
+        ]);
     }
 
-    public function update(Request $r, User $user, SuperAdminAuditService $a)
+    public function update(Request $r, string $user, SuperAdminAuditService $a)
     {
+        $id = EncryptHelper::decrypt($user);
+
+        $user = User::findOrFail($id);
+
         $old = clone $user;
+
         $d = $this->valid($r, $user);
-        $user->fill(['name' => $d['name'], 'email' => $d['email']]);
+
+        $user->fill([
+            'name' => $d['name'],
+            'email' => $d['email']
+        ]);
+
         if ($d['password'] ?? false) {
             $user->password = Hash::make($d['password']);
-        }$user->save();
-        $user->syncRoles([$d['role']]);
-        $a->log($r, 'UPDATE', 'users', "Memperbarui pengguna $user->email", $old, $user);
+        }
 
-        return redirect()->route('super-admin.manage-users.show', $user)->with('success', 'Pengguna diperbarui.');
+        $user->save();
+
+        $user->syncRoles([$d['role']]);
+
+        $a->log(
+            $r,
+            'UPDATE',
+            'users',
+            "Memperbarui pengguna $user->email",
+            $old,
+            $user
+        );
+
+        return redirect()
+            ->route(
+                'super-admin.manage-users.show',
+                EncryptHelper::encrypt($user->id)
+            )
+            ->with('success', 'Pengguna diperbarui.');
     }
 
-    public function destroy(Request $r, User $user, SuperAdminAuditService $a)
+    public function destroy(Request $r, string $user, SuperAdminAuditService $a)
     {
-        abort_if($user->is($r->user()), 422, 'Akun sendiri tidak dapat dihapus.');
-        $old = clone $user;
-        $user->delete();
-        $a->log($r, 'DELETE', 'users', "Menghapus pengguna $old->email", $old);
+        $id = EncryptHelper::decrypt($user);
 
-        return redirect()->route('super-admin.manage-users.index')->with('success', 'Pengguna dihapus.');
+        $user = User::findOrFail($id);
+
+        abort_if(
+            $user->is($r->user()),
+            422,
+            'Akun sendiri tidak dapat dihapus.'
+        );
+
+        $old = clone $user;
+
+        $user->delete();
+
+        $a->log(
+            $r,
+            'DELETE',
+            'users',
+            "Menghapus pengguna $old->email",
+            $old
+        );
+
+        return redirect()
+            ->route('super-admin.manage-users.index')
+            ->with('success', 'Pengguna dihapus.');
     }
 
     private function valid(Request $r, ?User $u = null): array
     {
-        return $r->validate(['name' => ['required', 'string', 'max:255'], 'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($u)], 'role' => ['required', Rule::exists('roles','name')->where('guard_name','web')], 'password' => [$u ? 'nullable' : 'required', 'confirmed', 'min:8']]);
+        return $r->validate(['name' => ['required', 'string', 'max:255'], 'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($u)], 'role' => ['required', Rule::exists('roles', 'name')->where('guard_name', 'web')], 'password' => [$u ? 'nullable' : 'required', 'confirmed', 'min:8']]);
     }
 }

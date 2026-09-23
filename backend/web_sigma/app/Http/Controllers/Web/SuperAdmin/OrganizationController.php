@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\SuperAdmin;
 
+use \App\Helpers\EncryptHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Models\Region;
@@ -31,33 +32,76 @@ class OrganizationController extends Controller
         return redirect()->route('super-admin.organizations.index')->with('success', 'Organisasi dibuat.');
     }
 
-    public function show(Organization $organization)
-    {
-        return view('super_admin.organizations.show', compact('organization'));
-    }
+   public function show(string $organization)
+{
+    $id = EncryptHelper::decrypt($organization);
 
-    public function edit(Organization $organization)
-    {
-        return view('super_admin.organizations.edit', ['organization' => $organization, 'regions' => Region::orderBy('name')->get()]);
-    }
+    $organization = Organization::findOrFail($id);
 
-    public function update(Request $r, Organization $organization, SuperAdminAuditService $a)
-    {
-        $old = clone $organization;
-        $organization->update($this->valid($r));
-        $a->log($r, 'UPDATE', 'organizations', "Memperbarui organisasi $organization->name", $old, $organization);
+    return view('super_admin.organizations.show', compact('organization'));
+}
 
-        return redirect()->route('super-admin.organizations.show', $organization)->with('success', 'Organisasi diperbarui.');
-    }
+    public function edit(string $organization)
+{
+    $id = EncryptHelper::decrypt($organization);
 
-    public function destroy(Request $r, Organization $organization, SuperAdminAuditService $a)
-    {
-        $old = clone $organization;
-        $organization->delete();
-        $a->log($r, 'DELETE', 'organizations', "Menghapus organisasi $old->name", $old);
+    $organization = Organization::findOrFail($id);
 
-        return redirect()->route('super-admin.organizations.index')->with('success', 'Organisasi dihapus.');
-    }
+    return view('super_admin.organizations.edit', [
+        'organization' => $organization,
+        'regions' => Region::orderBy('name')->get()
+    ]);
+}
+
+    public function update(Request $r, string $organization, SuperAdminAuditService $a)
+{
+    $id = EncryptHelper::decrypt($organization);
+
+    $organization = Organization::findOrFail($id);
+
+    $old = clone $organization;
+
+    $organization->update($this->valid($r));
+
+    $a->log(
+        $r,
+        'UPDATE',
+        'organizations',
+        "Memperbarui organisasi $organization->name",
+        $old,
+        $organization
+    );
+
+    return redirect()
+        ->route(
+            'super-admin.organizations.show',
+            EncryptHelper::encrypt($organization->id)
+        )
+        ->with('success', 'Organisasi diperbarui.');
+}
+
+    public function destroy(Request $r, string $organization, SuperAdminAuditService $a)
+{
+    $id = EncryptHelper::decrypt($organization);
+
+    $organization = Organization::findOrFail($id);
+
+    $old = clone $organization;
+
+    $organization->delete();
+
+    $a->log(
+        $r,
+        'DELETE',
+        'organizations',
+        "Menghapus organisasi $old->name",
+        $old
+    );
+
+    return redirect()
+        ->route('super-admin.organizations.index')
+        ->with('success', 'Organisasi dihapus.');
+}
 
     private function valid(Request $r): array
     {

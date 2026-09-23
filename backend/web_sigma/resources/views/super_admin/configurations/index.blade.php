@@ -1,2 +1,86 @@
 @extends('layouts.super_admin')
-@section('content')<section class="page-heading"><div><h1>Konfigurasi Sistem</h1></div><a class="button button-primary" href="{{ route('super-admin.configurations.create') }}">Tambah Konfigurasi</a></section><section class="panel"><x-sigma.data-table><thead><tr><th>Key</th><th>Nilai</th><th>Tipe</th><th>Aksi</th></tr></thead><tbody>@forelse($configurations as $configuration)<tr><td>{{ $configuration->key }}</td><td>{{ Str::limit($configuration->value,80) }}</td><td>{{ $configuration->type }}</td><td><a class="text-action" href="{{ route('super-admin.configurations.show',$configuration) }}">Detail</a> <a class="text-action" href="{{ route('super-admin.configurations.edit',$configuration) }}">Edit</a><form class="inline" method="POST" action="{{ route('super-admin.configurations.destroy',$configuration) }}">@csrf @method('DELETE')<button class="text-action">Hapus</button></form></td></tr>@empty<tr><td colspan="4">Belum ada konfigurasi.</td></tr>@endforelse</tbody></x-sigma.data-table>{{ $configurations->links() }}</section>@endsection
+
+@section('content')
+    <section class="page-heading">
+        <div>
+            <h1>Konfigurasi Sistem</h1>
+        </div>
+
+        <a class="button button-primary" href="{{ route('super-admin.configurations.create') }}">
+            Tambah Konfigurasi
+        </a>
+    </section>
+
+    <section class="panel">
+
+        <x-sigma.data-table>
+
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Nilai</th>
+                    <th>Tipe</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @forelse($configurations as $configuration)
+                    <tr>
+
+                        <td>
+                            {{ $configuration->key }}
+                        </td>
+
+                        <td>
+                            {{ Str::limit($configuration->value, 80) }}
+                        </td>
+
+                        <td>
+                            {{ $configuration->type }}
+                        </td>
+
+                        <td>
+
+                            <a class="text-action"
+                                href="{{ route('super-admin.configurations.show', \App\Helpers\EncryptHelper::encrypt($configuration->id)) }}">
+                                Detail
+                            </a>
+
+                            <a class="text-action"
+                                href="{{ route('super-admin.configurations.edit', \App\Helpers\EncryptHelper::encrypt($configuration->id)) }}">
+                                Edit
+                            </a>
+
+                            <form class="inline" method="POST"
+                                action="{{ route('super-admin.configurations.destroy', \App\Helpers\EncryptHelper::encrypt($configuration->id)) }}">
+                                @csrf
+                                @method('DELETE')
+
+                                <button class="text-action">
+                                    Hapus
+                                </button>
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                @empty
+
+                    <tr>
+                        <td colspan="4">
+                            Belum ada konfigurasi.
+                        </td>
+                    </tr>
+                @endforelse
+
+            </tbody>
+
+        </x-sigma.data-table>
+
+        {{ $configurations->links() }}
+
+    </section>
+@endsection

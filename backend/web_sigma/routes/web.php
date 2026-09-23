@@ -107,15 +107,17 @@ Route::middleware(['auth', 'role:super_admin'])
         Route::resource('configurations', SystemConfigurationController::class);
 
         Route::resource('audit-logs', AuditLogController::class)
+            ->parameters([
+                'audit-logs' => 'auditLog'
+            ])
             ->only([
                 'index',
                 'show'
             ]);
 
-        Route::get('aspirations', 
+        Route::get('aspirations',
             [SuperAdminAspirationController::class, 'index']
         )->name('aspirations.index');
-
 
         Route::get('aspirations/{hash}',
             [SuperAdminAspirationController::class, 'show']
