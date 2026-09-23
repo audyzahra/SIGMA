@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/theme/sigma_theme.dart';
-import '../../../../../models/citizen_models.dart';
-import '../../../../../services/citizen_api.dart';
+import '../../../../core/theme/sigma_theme.dart';
+import '../../data/models/citizen_models.dart';
+import '../../data/datasources/citizen_remote_data_source.dart';
 import '../../reports/pages/report_detail_page.dart';
 import '../citizen_notification_store.dart';
 

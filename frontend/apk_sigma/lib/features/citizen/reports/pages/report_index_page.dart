@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../models/citizen_models.dart';
-import '../../../../services/citizen_api.dart';
+import '../../data/models/citizen_models.dart';
+import '../../data/datasources/citizen_remote_data_source.dart';
 import '../../widgets/citizen_widgets.dart';
 import '../widgets/report_card.dart';
 import 'report_detail_page.dart';

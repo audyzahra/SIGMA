@@ -13,4 +13,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/petugas', [AuthController::class, 'createPetugas'])->middleware('role:super_admin');
 
     require __DIR__.'/api/citizen.php';
+    require __DIR__.'/api/officer.php';
 });

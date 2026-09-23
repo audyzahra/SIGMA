@@ -6,15 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class FieldTeam extends Model
 {
-
     protected $fillable = [
         'organization_id',
         'team_name',
         'leader_name',
         'phone',
-        'status'
+        'status',
     ];
-
 
     public function organization()
     {
@@ -23,6 +21,12 @@ class FieldTeam extends Model
         );
     }
 
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'field_team_user')
+            ->withPivot(['online_status', 'last_seen_at'])
+            ->withTimestamps();
+    }
 
     public function assignments()
     {
@@ -32,7 +36,6 @@ class FieldTeam extends Model
         );
     }
 
-
     public function responseAssignments()
     {
         return $this->hasMany(
@@ -41,7 +44,6 @@ class FieldTeam extends Model
         );
     }
 
-
     public function verifications()
     {
         return $this->hasMany(
@@ -49,5 +51,4 @@ class FieldTeam extends Model
             'team_id'
         );
     }
-
 }

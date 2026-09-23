@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/sigma_theme.dart';
-import '../../../../models/citizen_models.dart';
-import '../../../../pages/auth/role_selection_page.dart';
-import '../../../../services/auth_api.dart';
-import '../../../../services/auth_storage.dart';
-import '../../../../services/citizen_api.dart';
+import '../../data/models/citizen_models.dart';
+import '../../../auth/presentation/pages/role_selection_page.dart';
+import '../../../auth/data/datasources/auth_api.dart';
+import '../../../auth/data/datasources/auth_storage.dart';
+import '../../data/datasources/citizen_remote_data_source.dart';
 import '../../widgets/citizen_widgets.dart';
 import 'edit_profile_page.dart';
 

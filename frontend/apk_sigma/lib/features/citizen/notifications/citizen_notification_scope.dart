@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../services/citizen_api.dart';
+import '../data/datasources/citizen_remote_data_source.dart';
 import 'citizen_notification_store.dart';
 
 class CitizenNotificationScope extends InheritedNotifier<CitizenNotificationStore> {

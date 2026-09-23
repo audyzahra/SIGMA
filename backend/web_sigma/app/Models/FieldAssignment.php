@@ -6,23 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class FieldAssignment extends Model
 {
-
     protected $fillable = [
         'incident_id',
         'team_id',
         'assigned_by',
+        'accepted_by',
         'priority_level',
         'status',
         'assigned_at',
-        'completed_at'
+        'accepted_at',
+        'completed_at',
     ];
-
 
     protected $casts = [
-        'assigned_at'=>'datetime',
-        'completed_at'=>'datetime'
+        'assigned_at' => 'datetime',
+        'accepted_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
-
 
     public function incident()
     {
@@ -30,7 +30,6 @@ class FieldAssignment extends Model
             Incident::class
         );
     }
-
 
     public function team()
     {
@@ -40,7 +39,6 @@ class FieldAssignment extends Model
         );
     }
 
-
     public function assigner()
     {
         return $this->belongsTo(
@@ -49,6 +47,10 @@ class FieldAssignment extends Model
         );
     }
 
+    public function acceptor()
+    {
+        return $this->belongsTo(User::class, 'accepted_by');
+    }
 
     public function navigationLogs()
     {
@@ -57,5 +59,4 @@ class FieldAssignment extends Model
             'assignment_id'
         );
     }
-
 }

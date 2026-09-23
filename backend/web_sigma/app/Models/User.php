@@ -48,6 +48,12 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
+    public function fieldTeams()
+    {
+        return $this->belongsToMany(FieldTeam::class, 'field_team_user')
+            ->withPivot(['online_status', 'last_seen_at'])
+            ->withTimestamps();
+    }
 
     public function auditLogs()
     {
@@ -55,7 +61,6 @@ class User extends Authenticatable implements MustVerifyEmail
             AuditLog::class
         );
     }
-
 
     public function aiModels()
     {

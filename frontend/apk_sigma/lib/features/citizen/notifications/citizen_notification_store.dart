@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../models/citizen_models.dart';
-import '../../../services/citizen_api.dart';
+import '../data/models/citizen_models.dart';
+import '../data/datasources/citizen_remote_data_source.dart';
 
 /// Shared notification state. It always reads the Laravel database; no local
 /// notification list or hard-coded badge count is maintained.

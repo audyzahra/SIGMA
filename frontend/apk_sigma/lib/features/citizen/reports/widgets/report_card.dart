@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../models/citizen_models.dart';
+import '../../data/models/citizen_models.dart';
 import '../../widgets/citizen_widgets.dart';
 
 class ReportCard extends StatelessWidget {
