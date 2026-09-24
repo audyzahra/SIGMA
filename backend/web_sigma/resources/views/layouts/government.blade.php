@@ -14,14 +14,7 @@
 
 
 <body>
-    @php($navigation = [
-        ['government.dashboard', 'Dashboard', '▦'],
-        ['government.fire-risk', 'Risiko Karhutla', '♨'],
-        ['government.impact', 'Analisis Dampak', '◉'],
-        ['government.priority', 'Prioritas Penanganan', '⌁'],
-        ['government.recommendation', 'Rekomendasi', '▣'],
-        ['government.reports.index', 'Laporan Masyarakat', '▤'],
-    ])
+    @php($navigation = [['government.dashboard', 'Dashboard', '▦'], ['government.fire-risk', 'Risiko Karhutla', '♨'], ['government.impact', 'Analisis Dampak', '◉'], ['government.priority', 'Prioritas Penanganan', '⌁'], ['government.recommendation', 'Rekomendasi', '▣'], ['government.reports.index', 'Laporan Masyarakat', '▤']])
 
     <div class="app-shell">
         <aside class="sidebar" id="sidebar"><a class="brand" href="{{ route('government.dashboard') }}"><img
@@ -59,6 +52,32 @@
                 class="button button-primary">Keluar</button></form>
     </x-sigma.modal>
     <div id="toast" class="toast" role="status"></div>
+
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const t = document.getElementById('toast');
+
+                if (t) {
+
+                    t.textContent = "{{ session('success') }}";
+
+                    t.classList.add('show');
+
+
+                    setTimeout(() => {
+
+                        t.classList.remove('show');
+
+                    }, 2600);
+
+                }
+
+            });
+        </script>
+    @endif
+
     <script>
         document.querySelectorAll('[data-modal]').forEach(b => b.addEventListener('click', () => document.getElementById(b
             .dataset.modal)?.classList.add('is-open')));

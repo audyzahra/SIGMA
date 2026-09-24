@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Web\Government;
 
 use App\Http\Controllers\Controller;
 use App\Models\AiResponseRecommendation;
+use App\Models\FieldTeam;
+use App\Models\Region;
+use App\Models\ResponseAction;
 
 class RecommendationController extends Controller
 {
     public function index()
     {
         $recommendations = AiResponseRecommendation::with([
-                'incident.priority',
-            ])
+            'incident.priority',
+        ])
             ->latest('generated_at')
             ->get()
             ->unique(function ($recommendation) {
@@ -24,8 +27,31 @@ class RecommendationController extends Controller
             })
             ->values();
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ambil tim pemadam aktif
+    |--------------------------------------------------------------------------
+    */
+
+        $teams = FieldTeam::where('status', 'active')
+            ->get();
+
+
+        $regions = Region::all();
+
+        $actions = ResponseAction::where(
+            'is_active',
+            true
+        )->get();
+
+
+
         return view('government.recommendation', compact(
-            'recommendations'
+            'recommendations',
+            'teams',
+            'regions',
+            'actions'
         ));
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\Government\ImpactController;
 use App\Http\Controllers\Web\Government\PriorityController;
 use App\Http\Controllers\Web\Government\RecommendationController;
 use App\Http\Controllers\Web\Government\CitizenReportController;
+use App\Http\Controllers\Web\Government\ResponseAssignmentController;
 
 use App\Http\Controllers\Web\public_sigma\AspirationController;
 use App\Http\Controllers\Web\SuperAdmin\AIModelController;
@@ -181,7 +182,16 @@ Route::middleware(['auth', 'role:government'])
             'index'
         ])->name('recommendation');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Response Assignment
+        |--------------------------------------------------------------------------
+        */
 
+        Route::post('/recommendation/assign', [
+            ResponseAssignmentController::class,
+            'store'
+        ])->name('recommendation.assign');
 
         /*
         |--------------------------------------------------------------------------
