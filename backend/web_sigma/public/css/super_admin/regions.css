@@ -1,0 +1,146 @@
+/* ===========================
+   REGION TABLE
+=========================== */
+
+.region-table {
+    width: 100%;
+}
+
+/* Header */
+
+.region-table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Body */
+
+.region-table tbody td {
+    vertical-align: middle;
+}
+
+/* Nama wilayah */
+
+.region-table tbody td:first-child {
+    text-align: left;
+}
+
+.region-name {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Kolom lain */
+
+.region-table tbody td:nth-child(2),
+.region-table tbody td:nth-child(3),
+.region-table tbody td:nth-child(4),
+.region-table tbody td:nth-child(5) {
+    text-align: center;
+}
+
+/* Action */
+
+.region-table .table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.region-table .inline-action {
+    display: inline-flex;
+}
+
+/* ===========================
+   REGION FORM
+=========================== */
+
+.region-form {
+    padding: 28px;
+}
+
+.region-form .form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 30px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.region-form .button {
+    min-width: 120px;
+
+    transition: 0.2s ease;
+}
+
+.region-form .button:hover {
+    transform: translateY(-2px);
+}
+
+/* ===========================
+   REGION FORM FIELD
+=========================== */
+
+.region-fields {
+    width: 100%;
+}
+
+.region-fields .two-column {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px 24px;
+}
+
+.region-fields label {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.region-fields input,
+.region-fields select {
+    width: 100%;
+
+    height: 44px;
+
+    padding: 0 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: white;
+}
+
+.region-fields input:focus,
+.region-fields select:focus {
+    outline: none;
+
+    border-color: var(--red);
+
+    box-shadow: 0 0 0 3px rgba(200, 40, 40, 0.12);
+}
+
+.error-text {
+    color: #dc2626;
+
+    font-size: 12px;
+}

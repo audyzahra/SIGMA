@@ -1,0 +1,146 @@
+.data-source-table {
+    width: 100%;
+}
+
+.data-source-table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.data-source-table tbody td {
+    vertical-align: middle;
+}
+
+.data-source-name {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.data-source-name small {
+    color: #64748b;
+}
+
+.data-source-table tbody td:not(:first-child) {
+    text-align: center;
+}
+
+.table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.inline-action {
+    display: inline-flex;
+}
+
+.badge {
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+}
+
+/* ===========================
+   DATA SOURCE DETAIL
+=========================== */
+
+.info-card {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px 30px;
+}
+
+.info-item {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.info-item b {
+    font-size: 13px;
+
+    color: #64748b;
+}
+
+.info-item strong {
+    font-weight: 600;
+}
+
+/* ==========================
+   DATA SOURCE FORM
+========================== */
+
+.data-source-form {
+    padding: 28px;
+}
+
+.data-source-fields .two-column {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px 24px;
+}
+
+.data-source-fields label {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.data-source-fields input,
+.data-source-fields select {
+    width: 100%;
+
+    height: 44px;
+
+    padding: 0 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+}
+
+.data-source-fields small {
+    font-size: 12px;
+
+    color: #64748b;
+}
+
+.data-source-form .form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 30px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.data-source-form .button {
+    min-width: 130px;
+
+    transition: 0.2s ease;
+}
+
+.data-source-form .button:hover {
+    transform: translateY(-2px);
+}

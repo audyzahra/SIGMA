@@ -1,1 +1,161 @@
-<div class="two-column"><label>Nama<input name="name" required value="{{ old('name',$aiModel->name ?? '') }}"></label><label>Kode<input name="code" required value="{{ old('code',$aiModel->code ?? '') }}"></label><label>Tipe<select name="type">@foreach(['classification','prediction','detection','recommendation'] as $v)<option value="{{ $v }}" @selected(old('type',$aiModel->type ?? '') === $v)>{{ $v }}</option>@endforeach</select></label><label>Input<select name="input_type">@foreach(['image','satellite','weather','text','geo'] as $v)<option value="{{ $v }}" @selected(old('input_type',$aiModel->input_type ?? '') === $v)>{{ $v }}</option>@endforeach</select></label><label>Versi<input name="version" value="{{ old('version',$aiModel->version ?? '') }}"></label><label>Status<select name="status">@foreach(['active','inactive','testing','deprecated'] as $v)<option value="{{ $v }}" @selected(old('status',$aiModel->status ?? 'testing') === $v)>{{ $v }}</option>@endforeach</select></label><label>Framework<input name="framework" value="{{ old('framework',$aiModel->framework ?? '') }}"></label><label>Algoritma<input name="algorithm" value="{{ old('algorithm',$aiModel->algorithm ?? '') }}"></label><label>Akurasi<input type="number" step="0.01" name="accuracy" value="{{ old('accuracy',$aiModel->accuracy ?? '') }}"></label><label>Endpoint<input type="url" name="endpoint_url" value="{{ old('endpoint_url',$aiModel->endpoint_url ?? '') }}"></label></div><label>Deskripsi<textarea name="description">{{ old('description',$aiModel->description ?? '') }}</textarea></label>
+<div class="ai-model-fields">
+
+
+    <div class="two-column">
+
+
+        <label>
+
+            Nama Model
+
+            <input name="name" required value="{{ old('name', $aiModel->name ?? '') }}">
+
+        </label>
+
+
+
+        <label>
+
+            Kode
+
+            <input name="code" required value="{{ old('code', $aiModel->code ?? '') }}">
+
+        </label>
+
+
+
+        <label>
+
+            Tipe
+
+            <select name="type">
+
+                @foreach (['classification', 'prediction', 'detection', 'recommendation'] as $v)
+                    <option value="{{ $v }}" @selected(old('type', $aiModel->type ?? '') === $v)>
+
+                        {{ ucfirst($v) }}
+
+                    </option>
+                @endforeach
+
+            </select>
+
+        </label>
+
+
+
+
+        <label>
+
+            Input Type
+
+            <select name="input_type">
+
+                @foreach (['image', 'satellite', 'weather', 'text', 'geo'] as $v)
+                    <option value="{{ $v }}" @selected(old('input_type', $aiModel->input_type ?? '') === $v)>
+
+                        {{ ucfirst($v) }}
+
+                    </option>
+                @endforeach
+
+            </select>
+
+        </label>
+
+
+
+
+        <label>
+
+            Versi
+
+            <input name="version" value="{{ old('version', $aiModel->version ?? '') }}">
+
+        </label>
+
+
+
+
+        <label>
+
+            Status
+
+            <select name="status">
+
+                @foreach (['active', 'inactive', 'testing', 'deprecated'] as $v)
+                    <option value="{{ $v }}" @selected(old('status', $aiModel->status ?? 'testing') === $v)>
+
+                        {{ ucfirst($v) }}
+
+                    </option>
+                @endforeach
+
+            </select>
+
+        </label>
+
+
+
+
+        <label>
+
+            Framework
+
+            <input name="framework" value="{{ old('framework', $aiModel->framework ?? '') }}">
+
+        </label>
+
+
+
+
+        <label>
+
+            Algoritma
+
+            <input name="algorithm" value="{{ old('algorithm', $aiModel->algorithm ?? '') }}">
+
+        </label>
+
+
+
+
+        <label>
+
+            Akurasi
+
+            <input type="number" step="0.01" name="accuracy"
+                value="{{ old('accuracy', $aiModel->accuracy ?? '') }}">
+
+        </label>
+
+
+
+
+        <label>
+
+            Endpoint
+
+            <input type="url" name="endpoint_url" value="{{ old('endpoint_url', $aiModel->endpoint_url ?? '') }}">
+
+        </label>
+
+
+
+    </div>
+
+
+
+    <label>
+
+        Deskripsi
+
+
+        <textarea name="description">{{ old('description', $aiModel->description ?? '') }}</textarea>
+
+
+    </label>
+
+
+
+</div>

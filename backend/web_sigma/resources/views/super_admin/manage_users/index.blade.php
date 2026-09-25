@@ -5,6 +5,7 @@
         <div>
             <p class="breadcrumb">Dashboard / Manajemen Pengguna</p>
             <h1>Manajemen Pengguna</h1>
+            <p>Manajemen pengguna SIGMA.</p>
         </div><a class="button button-primary" href="{{ route('super-admin.manage-users.create') }}">Tambah Pengguna</a>
     </section>
 

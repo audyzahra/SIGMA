@@ -14,9 +14,37 @@ class OrganizationController extends Controller
 {
     public function index(Request $r)
     {
-        $organizations = Organization::with('region')->when($r->search, fn ($q, $v) => $q->where('name', 'like', "%$v%"))->when($r->type, fn ($q, $v) => $q->where('type', $v))->when($r->status, fn ($q, $v) => $q->where('status', $v))->latest()->paginate(15)->withQueryString();
+        $organizations = Organization::with('region')
 
-        return view('super_admin.organizations.index', compact('organizations'));
+            ->when($r->search, function ($q, $value) {
+
+                $q->where(function ($query) use ($value) {
+
+                    $query
+                        ->where('name', 'like', "%{$value}%")
+                        ->orWhere('email', 'like', "%{$value}%");
+                });
+            })
+
+            ->when($r->type, function ($q, $value) {
+
+                $q->where('type', $value);
+            })
+
+            ->when($r->status, function ($q, $value) {
+
+                $q->where('status', $value);
+            })
+
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+
+        return view(
+            'super_admin.organizations.index',
+            compact('organizations')
+        );
     }
 
     public function create()
@@ -32,76 +60,76 @@ class OrganizationController extends Controller
         return redirect()->route('super-admin.organizations.index')->with('success', 'Organisasi dibuat.');
     }
 
-   public function show(string $organization)
-{
-    $id = EncryptHelper::decrypt($organization);
+    public function show(string $organization)
+    {
+        $id = EncryptHelper::decrypt($organization);
 
-    $organization = Organization::findOrFail($id);
+        $organization = Organization::findOrFail($id);
 
-    return view('super_admin.organizations.show', compact('organization'));
-}
+        return view('super_admin.organizations.show', compact('organization'));
+    }
 
     public function edit(string $organization)
-{
-    $id = EncryptHelper::decrypt($organization);
+    {
+        $id = EncryptHelper::decrypt($organization);
 
-    $organization = Organization::findOrFail($id);
+        $organization = Organization::findOrFail($id);
 
-    return view('super_admin.organizations.edit', [
-        'organization' => $organization,
-        'regions' => Region::orderBy('name')->get()
-    ]);
-}
+        return view('super_admin.organizations.edit', [
+            'organization' => $organization,
+            'regions' => Region::orderBy('name')->get()
+        ]);
+    }
 
     public function update(Request $r, string $organization, SuperAdminAuditService $a)
-{
-    $id = EncryptHelper::decrypt($organization);
+    {
+        $id = EncryptHelper::decrypt($organization);
 
-    $organization = Organization::findOrFail($id);
+        $organization = Organization::findOrFail($id);
 
-    $old = clone $organization;
+        $old = clone $organization;
 
-    $organization->update($this->valid($r));
+        $organization->update($this->valid($r));
 
-    $a->log(
-        $r,
-        'UPDATE',
-        'organizations',
-        "Memperbarui organisasi $organization->name",
-        $old,
-        $organization
-    );
+        $a->log(
+            $r,
+            'UPDATE',
+            'organizations',
+            "Memperbarui organisasi $organization->name",
+            $old,
+            $organization
+        );
 
-    return redirect()
-        ->route(
-            'super-admin.organizations.show',
-            EncryptHelper::encrypt($organization->id)
-        )
-        ->with('success', 'Organisasi diperbarui.');
-}
+        return redirect()
+            ->route(
+                'super-admin.organizations.show',
+                EncryptHelper::encrypt($organization->id)
+            )
+            ->with('success', 'Organisasi diperbarui.');
+    }
 
     public function destroy(Request $r, string $organization, SuperAdminAuditService $a)
-{
-    $id = EncryptHelper::decrypt($organization);
+    {
+        $id = EncryptHelper::decrypt($organization);
 
-    $organization = Organization::findOrFail($id);
+        $organization = Organization::findOrFail($id);
 
-    $old = clone $organization;
+        $old = clone $organization;
 
-    $organization->delete();
+        $organization->delete();
 
-    $a->log(
-        $r,
-        'DELETE',
-        'organizations',
-        "Menghapus organisasi $old->name",
-        $old
-    );
+        $a->log(
+            $r,
+            'DELETE',
+            'organizations',
+            "Menghapus organisasi $old->name",
+            $old
+        );
 
-    return redirect()
-        ->route('super-admin.organizations.index')
-        ->with('success', 'Organisasi dihapus.');
-}
+        return redirect()
+            ->route('super-admin.organizations.index')
+            ->with('success', 'Organisasi dihapus.');
+    }
 
     private function valid(Request $r): array
     {

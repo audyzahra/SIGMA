@@ -1,0 +1,356 @@
+/* ===========================
+   Organization Filter
+=========================== */
+
+
+.organization-filter {
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+}
+
+
+
+.organization-filter input,
+.organization-filter select {
+
+    height:42px;
+
+}
+
+
+
+.organization-filter input {
+
+    flex:1;
+
+}
+
+
+
+/* Button Filter */
+
+.organization-filter .button-light {
+
+    transition:.2s ease;
+
+}
+
+
+
+.organization-filter .button-light:hover {
+
+    background:var(--red);
+    color:white;
+    transform:translateY(-2px);
+
+}
+
+/* =================================
+   Organization Table Alignment
+================================= */
+
+
+.organization-table {
+    width: 100%;
+}
+
+
+/* Header */
+
+.organization-table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* Body */
+
+.organization-table tbody td {
+    vertical-align: middle;
+}
+
+
+/* Kolom nama tetap kiri */
+
+.organization-table tbody td:first-child {
+    text-align: left;
+}
+
+
+/* Kolom lainnya rata tengah */
+
+.organization-table tbody td:nth-child(2),
+.organization-table tbody td:nth-child(3),
+.organization-table tbody td:nth-child(4),
+.organization-table tbody td:nth-child(5) {
+    text-align: center;
+}
+
+
+/* Lebar kolom */
+
+.organization-table th:nth-child(1),
+.organization-table td:nth-child(1) {
+    width: 35%;
+}
+
+
+.organization-table th:nth-child(2),
+.organization-table td:nth-child(2) {
+    width: 15%;
+}
+
+
+.organization-table th:nth-child(3),
+.organization-table td:nth-child(3) {
+    width: 25%;
+}
+
+
+.organization-table th:nth-child(4),
+.organization-table td:nth-child(4) {
+    width: 15%;
+}
+
+
+.organization-table th:nth-child(5),
+.organization-table td:nth-child(5) {
+    width: 10%;
+}
+
+
+/* Action icon */
+
+.organization-table .table-actions {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+}
+
+
+.organization-table .inline-action {
+    display: inline-flex;
+}
+
+/* Pagination */
+
+.pagination {
+
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-top:25px;
+
+}
+
+
+.pagination a,
+.pagination span {
+
+    min-width:38px;
+    height:38px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    border-radius:10px;
+
+    font-size:14px;
+
+    transition:.2s ease;
+
+}
+
+
+
+/* Hover */
+
+.pagination a:hover {
+
+    background:#2563eb;
+    color:white;
+
+    transform:translateY(-2px);
+
+}
+
+
+
+/* Active */
+
+.pagination .active span {
+
+    background:#2563eb;
+    color:white;
+
+}
+
+
+.pagination .disabled span {
+
+    opacity:.5;
+
+}
+
+/* ===========================
+   ORGANIZATION CREATE
+=========================== */
+
+
+.organization-form {
+
+    padding: 28px;
+
+}
+
+
+
+.organization-form .form-actions {
+
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:12px;
+
+    margin-top:30px;
+    padding-top:20px;
+
+    border-top:1px solid #e2e8f0;
+
+}
+
+
+
+.organization-form .button {
+
+    min-width:120px;
+
+}
+
+
+
+/* hover */
+
+.organization-form .button {
+
+    transition:.2s ease;
+
+}
+
+
+.organization-form .button:hover {
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================
+   ORGANIZATION FORM
+========================== */
+
+
+.organization-fields {
+
+    width:100%;
+
+}
+
+
+
+.organization-fields .two-column {
+
+    display:grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap:20px 24px;
+
+}
+
+
+
+.organization-fields label {
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    font-weight:600;
+
+    color:#334155;
+
+}
+
+
+
+.organization-fields input,
+.organization-fields select,
+.organization-fields textarea {
+
+
+    width:100%;
+
+    padding:12px 14px;
+
+    border:1px solid #cbd5e1;
+
+    border-radius:10px;
+
+    background:white;
+
+    font-size:14px;
+
+    transition:.2s ease;
+
+}
+
+
+
+.organization-fields input:focus,
+.organization-fields select:focus,
+.organization-fields textarea:focus {
+
+    outline:none;
+
+    border-color:var(--red);
+
+    box-shadow:0 0 0 3px rgba(200,40,40,.12);
+
+}
+
+
+
+.organization-fields textarea {
+
+    resize:vertical;
+
+    margin-top:8px;
+
+}
+
+
+
+.organization-fields .full-width {
+
+    margin-top:22px;
+
+}
+
+
+
+.error-text {
+
+    color:#dc2626;
+
+    font-size:12px;
+
+}

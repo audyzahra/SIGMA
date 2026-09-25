@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SIGMA Command Center')</title>
     @vite(['resources/css/app.css', 'resources/css/super-admin.css', 'resources/js/app.js'])
+    @stack('styles')
 
     {{-- CSS khusus Dashboard Super Admin --}}
     <link rel="stylesheet" href="{{ asset('css/super_admin/dashboard.css') }}">

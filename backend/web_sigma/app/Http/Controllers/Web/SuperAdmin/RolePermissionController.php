@@ -14,7 +14,11 @@ class RolePermissionController extends Controller
 {
     public function index()
     {
-        return view('super_admin.role_permissions.index', ['roles' => Role::withCount('permissions')->paginate(15)]);
+        $roles = Role::withCount('permissions')
+            ->orderBy('name')
+            ->get();
+
+        return view('super_admin.role_permissions.index', compact('roles'));
     }
 
     public function create()

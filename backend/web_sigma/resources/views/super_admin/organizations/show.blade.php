@@ -3,12 +3,14 @@
 @section('content')
     <section class="page-heading">
         <div>
+            <p class="breadcrumb">
+                Dashboard / Manajemen Organisasi / Detail
+            </p>
             <h1>{{ $organization->name }}</h1>
-            <p>Detail organisasi</p>
         </div>
         <a class="button button-primary"
             href="{{ route('super-admin.organizations.edit', \App\Helpers\EncryptHelper::encrypt($organization->id)) }}">
-            Edit
+            Edit Organisasi
         </a>
     </section>
     <section class="panel info-card">
