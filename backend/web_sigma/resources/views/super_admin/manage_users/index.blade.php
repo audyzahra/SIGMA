@@ -1,4 +1,10 @@
 @extends('layouts.super_admin')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/super_admin/manage_users.css') }}">
+@endpush
+@push('scripts')
+    <script src="{{ asset('js/super_admin/manage_users.js') }}"></script>
+@endpush
 @section('title', 'Manajemen Pengguna | SIGMA')
 @section('content')
     <section class="page-heading">
@@ -36,13 +42,15 @@
         </select>
 
 
-        <button type="submit" class="button button-search">
-    <i data-lucide="search"></i>
-    <span>Cari</span>
-</button>
+        @if (request()->hasAny(['search', 'role', 'per_page']))
+            <a href="{{ route('super-admin.manage-users.index') }}" class="button button-light">
+                Reset
+            </a>
+        @endif
 
     </form>
-    <section class="panel"><x-sigma.data-table>
+    <section class="panel">
+        <x-sigma.data-table class="user-table">
             <thead>
                 <tr>
                     <th class="text-center">ID</th>
@@ -100,7 +108,8 @@
                     </tr>
                 @endforelse
             </tbody>
-        </x-sigma.data-table>{{ $users->links() }}</section>
+        </x-sigma.data-table>{{ $users->links() }}
+    </section>
 
     <script>
         let timer;

@@ -1,46 +1,55 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById('organization-filter');
+    const form = document.querySelector("#organization-filter");
+
+    const search = document.querySelector("#search-organization");
+
+    const type = document.querySelector("#type-filter");
+
+    const status = document.querySelector("#status-filter");
+
 
     if (!form) return;
-
-
-    const search = document.getElementById('search-organization');
-    const type = document.getElementById('type-filter');
-    const status = document.getElementById('status-filter');
 
 
     let timer;
 
 
-    function autoSubmit() {
+    function submitFilter(){
 
-        clearTimeout(timer);
-
-        timer = setTimeout(() => {
-
-            form.submit();
-
-        }, 500);
+        form.submit();
 
     }
 
 
+
     search.addEventListener(
-        'input',
-        autoSubmit
+        "input",
+        function(){
+
+            clearTimeout(timer);
+
+
+            timer = setTimeout(
+                submitFilter,
+                500
+            );
+
+        }
     );
+
 
 
     type.addEventListener(
-        'change',
-        autoSubmit
+        "change",
+        submitFilter
     );
 
 
+
     status.addEventListener(
-        'change',
-        autoSubmit
+        "change",
+        submitFilter
     );
 
 

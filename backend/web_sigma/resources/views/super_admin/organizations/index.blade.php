@@ -1,10 +1,8 @@
 @extends('layouts.super_admin')
 
-
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/super_admin/organizations.css') }}">
 @endpush
-
 
 @push('scripts')
     <script src="{{ asset('js/super_admin/organizations.js') }}"></script>
@@ -33,12 +31,13 @@
         </a>
 
     </section>
-    <form class="panel filters organization-filter" method="GET" action="{{ route('super-admin.organizations.index') }}">
+    <form class="panel filters organization-filter" id="organization-filter" method="GET" action="{{ route('super-admin.organizations.index') }}">
 
-        <input name="search" value="{{ request('search') }}" placeholder="Cari organisasi">
+        <input name="search" type="text" id="search-organization" value="{{ request('search') }}"
+            placeholder="Cari organisasi">
 
 
-        <select name="type">
+        <select name="type" id="type-filter">
 
             <option value="">
                 Semua tipe
@@ -54,7 +53,7 @@
 
 
 
-        <select name="status">
+        <select name="status" id="status-filter">
 
             <option value="">
                 Semua status
@@ -70,114 +69,17 @@
 
         </select>
 
-        <button class="button button-light">
-            Filter
-        </button>
-
         @if (request()->hasAny(['search', 'type', 'status']))
-            <a class="button button-light" href="{{ route('super-admin.organizations.index') }}">
+            <a href="{{ route('super-admin.organizations.index') }}" class="button button-light">
                 Reset
             </a>
         @endif
 
     </form>
 
-    <section class="panel"><x-sigma.data-table class="organization-table">
-            <thead>
-                <tr>
+    <section class="panel" id="organization-result">
 
-                    <th>
-                        Organisasi
-                    </th>
+        @include('super_admin.organizations.table')
 
-                    <th>
-                        Tipe
-                    </th>
-
-                    <th>
-                        Wilayah
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                    <th class="action-column">
-                        Aksi
-                    </th>
-
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($organizations as $organization)
-                    <tr>
-                        <td class="organization-name">
-
-                            <strong>
-                                {{ $organization->name }}
-                            </strong>
-
-                            <small>
-                                {{ $organization->email ?? 'Tidak ada email' }}
-                            </small>
-
-                        </td>
-                        <td><span class="badge type-{{ $organization->type }}">
-                                {{ ucfirst($organization->type) }}
-                            </span></td>
-                        <td>{{ $organization->region?->name ?? '—' }}</td>
-                        <td>
-                            <span
-                                class="badge status-{{ $organization->status }}">{{ ucfirst($organization->status) }}</span>
-                        </td>
-                        <td>
-
-                            <div class="table-actions">
-
-
-                                <a href="{{ route('super-admin.organizations.show', \App\Helpers\EncryptHelper::encrypt($organization->id)) }}"
-                                    class="action-btn detail" title="Detail">
-
-                                    <i data-lucide="eye"></i>
-
-                                </a>
-
-
-
-                                <a href="{{ route('super-admin.organizations.edit', \App\Helpers\EncryptHelper::encrypt($organization->id)) }}"
-                                    class="action-btn edit" title="Edit">
-
-                                    <i data-lucide="square-pen"></i>
-
-                                </a>
-
-
-
-                                <form class="inline-action" method="POST"
-                                    action="{{ route('super-admin.organizations.destroy', \App\Helpers\EncryptHelper::encrypt($organization->id)) }}">
-
-                                    @csrf
-                                    @method('DELETE')
-
-
-                                    <button class="action-btn delete" title="Hapus"
-                                        onclick="return confirm('Hapus organisasi ini?')">
-
-                                        <i data-lucide="trash-2"></i>
-
-                                    </button>
-
-
-                                </form>
-
-
-                            </div>
-
-                        </td>
-                </tr>@empty<tr>
-                        <td colspan="5">Belum ada organisasi.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </x-sigma.data-table>{{ $organizations->links() }}</section>
+    </section>
 @endsection

@@ -19,21 +19,40 @@ class RegionController extends Controller
             ->withCount(['children', 'organizations'])
             ->when(
                 $request->search,
-                fn ($query, $value) => $query->where(
-                    fn ($query) => $query
-                        ->where('name', 'like', "%{$value}%")
-                        ->orWhere('code', 'like', "%{$value}%")
-                )
+                function ($query, $value) {
+
+                    $query->where(function ($query) use ($value) {
+
+                        $query
+                            ->where('name', 'like', "%{$value}%")
+                            ->orWhere('code', 'like', "%{$value}%")
+                            ->orWhereHas('parent', function ($parent) use ($value) {
+
+                                $parent->where(
+                                    'name',
+                                    'like',
+                                    "%{$value}%"
+                                );
+                            });
+                    });
+                }
             )
             ->when(
                 $request->level,
-                fn ($query, $value) => $query->where('level', $value)
+                fn($query, $value) => $query->where('level', $value)
             )
             ->orderBy('level')
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
+        if ($request->ajax()) {
+
+            return view(
+                'super_admin.regions.table',
+                compact('regions')
+            );
+        }
         return view('super_admin.regions.index', compact('regions'));
     }
 

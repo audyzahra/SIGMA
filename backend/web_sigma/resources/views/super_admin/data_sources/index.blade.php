@@ -3,6 +3,10 @@
     <link rel="stylesheet" href="{{ asset('css/super_admin/data_sources.css') }}">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('js/super_admin/data_sources.js') }}"></script>
+@endpush
+
 @section('title', 'Sumber Data | SIGMA')
 @section('content')
     <section class="page-heading">
@@ -21,9 +25,10 @@
             Tambah Data Source
         </a>
     </section>
-    <form class="panel filters data-source-filter" method="GET" action="{{ route('super-admin.data-sources.index') }}"><input
-            name="search" value="{{ request('search') }}" placeholder="Cari sumber data">
-        <select name="type">
+    <form class="panel filters data-source-filter" id="data-source-filter" method="GET"
+        action="{{ route('super-admin.data-sources.index') }}">
+        <input id="search-data-source" name="search" value="{{ request('search') }}" placeholder="Cari sumber data">
+        <select name="type" id="type-filter">
 
             <option value="">
                 Semua tipe
@@ -36,7 +41,7 @@
             @endforeach
 
         </select>
-        <select name="status">
+        <select name="status" id="status-filter">
 
             <option value="">
                 Semua status
@@ -50,7 +55,11 @@
             @endforeach
 
         </select>
-        <button class="button button-light">Filter</button>
+        @if (request()->hasAny(['search', 'type', 'status']))
+            <a href="{{ route('super-admin.data-sources.index') }}" class="button button-light">
+                Reset
+            </a>
+        @endif
     </form>
     <section class="panel">
         <x-sigma.data-table class="data-source-table">
@@ -109,7 +118,7 @@
 
                         <td>
 
-                            <span class="badge">
+                            <span class="badge type-{{ $dataSource->type }}">
                                 {{ ucfirst($dataSource->type) }}
                             </span>
 

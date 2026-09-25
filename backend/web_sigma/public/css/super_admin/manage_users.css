@@ -1,0 +1,69 @@
+/* =====================
+   USER TABLE
+===================== */
+
+.user-table {
+    width: 100%;
+}
+
+.user-table thead th {
+    text-align: center;
+
+    vertical-align: middle;
+}
+
+.user-table tbody td {
+    vertical-align: middle;
+}
+
+.user-table tbody td:not(:nth-child(2)) {
+    text-align: center;
+}
+
+.user-name {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.user-name small {
+    color: #64748b;
+}
+
+/* ACTION */
+
+.user-table .table-actions {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.inline-action {
+    display: inline-flex;
+}
+
+/* FILTER */
+
+.user-filter {
+    display: flex;
+
+    gap: 12px;
+
+    align-items: center;
+}
+
+/* BUTTON SEARCH */
+
+.button-search {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}

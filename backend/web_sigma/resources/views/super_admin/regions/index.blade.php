@@ -2,6 +2,9 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/super_admin/regions.css') }}">
 @endpush
+@push('scripts')
+    <script src="{{ asset('js/super_admin/regions.js') }}"></script>
+@endpush
 @section('title', 'Wilayah | SIGMA')
 @section('content')
     <section class="page-heading">
@@ -15,96 +18,30 @@
         <a class="button button-primary" href="{{ route('super-admin.regions.create') }}">Tambah Wilayah</a>
     </section>
 
-    <form class="panel filters region-filter" method="GET" action="{{ route('super-admin.regions.index') }}">
-        <input name="search" value="{{ request('search') }}" placeholder="Cari nama atau kode"><select name="level">
+    <form class="panel filters region-filter" method="GET" id="region-filter"
+        action="{{ route('super-admin.regions.index') }}">
+        <input name="search" id="search-region" value="{{ request('search') }}" placeholder="Cari nama atau kode">
+        <select
+            name="level" id="level-filter">
             <option value="">Semua level</option>
             @foreach (['province', 'regency', 'district'] as $level)
                 <option value="{{ $level }}" @selected(request('level') === $level)>{{ ucfirst($level) }}</option>
             @endforeach
         </select>
-        <button class="button button-light">Filter</button>
+
+        @if (request()->hasAny(['search', 'level']))
+            <a href="{{ route('super-admin.regions.index') }}" class="button button-light">
+                Reset
+            </a>
+        @endif
+
     </form>
 
-    <section class="panel"><x-sigma.data-table class="region-table">
-            <thead>
-                <tr>
+    <section class="panel">
+        <div id="region-result">
 
-                    <th>
-                        Wilayah
-                    </th>
+            @include('super_admin.regions.table')
 
-                    <th>
-                        Level
-                    </th>
-
-                    <th>
-                        Wilayah Induk
-                    </th>
-
-                    <th>
-                        Luas Area
-                    </th>
-
-                    <th class="action-column">
-                        Aksi
-                    </th>
-
-                </tr>
-            </thead>
-
-            <tbody>
-                @forelse($regions as $region)
-                    <tr>
-                        <td class="region-name">
-
-                            <strong>
-                                {{ $region->name }}
-                            </strong>
-
-                            <small>
-                                {{ $region->code ?? '-' }}
-                            </small>
-
-                        </td>
-                        <td>{{ ucfirst($region->level) }}</td>
-                        <td>{{ $region->parent?->name ?? '—' }}</td>
-                        <td>{{ $region->area_size ?? '—' }}</td>
-                        <td>
-                            <div class="table-actions">
-
-                                <a href="{{ route('super-admin.regions.show', \App\Helpers\EncryptHelper::encrypt($region->id)) }}"
-                                    class="action-btn detail" title="Detail">
-                                    <i data-lucide="eye"></i>
-                                </a>
-
-                                <a href="{{ route('super-admin.regions.edit', \App\Helpers\EncryptHelper::encrypt($region->id)) }}"
-                                    class="action-btn edit" title="Edit">
-                                    <i data-lucide="square-pen"></i>
-                                </a>
-
-                                <form class="inline-action" method="POST"
-                                    action="{{ route('super-admin.regions.destroy', \App\Helpers\EncryptHelper::encrypt($region->id)) }}">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button class="action-btn delete" title="Hapus"
-                                        onclick="return confirm('Hapus wilayah ini?')">
-                                        <i data-lucide="trash-2"></i>
-                                    </button>
-                                </form>
-
-                            </div>
-                        </td>
-
-                </tr>@empty<tr>
-
-                        <td colspan="5">Belum ada wilayah.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-
-        </x-sigma.data-table>{{ $regions->links() }}
-        
+        </div>
     </section>
 @endsection

@@ -144,3 +144,23 @@
 .data-source-form .button:hover {
     transform: translateY(-2px);
 }
+
+/* tambahan css tabel */
+.data-source-table tbody td {
+    vertical-align: middle;
+}
+
+.data-source-table tbody td:not(:first-child) {
+    text-align: center;
+}
+
+.data-source-table thead th {
+    text-align: center;
+}
+
+.data-source-table .table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}

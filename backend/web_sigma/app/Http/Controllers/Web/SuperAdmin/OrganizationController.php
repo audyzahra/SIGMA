@@ -41,6 +41,15 @@ class OrganizationController extends Controller
             ->withQueryString();
 
 
+        if ($r->ajax()) {
+
+            return view(
+                'super_admin.organizations.table',
+                compact('organizations')
+            );
+        }
+
+
         return view(
             'super_admin.organizations.index',
             compact('organizations')
