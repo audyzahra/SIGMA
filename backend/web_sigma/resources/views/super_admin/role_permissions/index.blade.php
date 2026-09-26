@@ -1,6 +1,6 @@
 @extends('layouts.super_admin')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/super_admin/role_permissions.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/super_admin/role_permissions.css') }}">
 @endpush
 @section('title', 'Role & Permission | SIGMA')
 
@@ -133,19 +133,16 @@
                                 @if ($role->name !== 'super_admin')
                                     <form method="POST"
                                         action="{{ route('super-admin.role-permissions.destroy', \App\Helpers\EncryptHelper::encrypt($role->id)) }}"
-                                        class="inline-action">
+                                        class="inline-action delete-form">
 
 
                                         @csrf
                                         @method('DELETE')
 
 
-                                        <button class="action-btn delete" title="Hapus"
-                                            onclick="return confirm('Hapus role ini?')">
-
+                                        <button type="submit" class="action-btn delete delete-confirm" title="Hapus">
 
                                             <i data-lucide="trash-2"></i>
-
 
                                         </button>
 

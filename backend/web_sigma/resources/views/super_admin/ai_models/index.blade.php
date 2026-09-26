@@ -137,7 +137,7 @@
 
 
 
-                                <form class="inline-action" method="POST"
+                                <form class="inline-action delete-form" method="POST"
                                     action="{{ route('super-admin.ai-models.destroy', \App\Helpers\EncryptHelper::encrypt($aiModel->id)) }}">
 
 
@@ -146,8 +146,7 @@
                                     @method('DELETE')
 
 
-                                    <button class="action-btn delete" title="Hapus"
-                                        onclick="return confirm('Hapus model ini?')">
+                                    <button type="submit" class="action-btn delete delete-confirm" title="Hapus">
 
                                         <i data-lucide="trash-2"></i>
 

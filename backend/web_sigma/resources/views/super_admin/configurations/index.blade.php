@@ -113,15 +113,14 @@
 
 
 
-                                <form class="inline-action" method="POST"
+                                <form class="inline-action delete-form" method="POST"
                                     action="{{ route('super-admin.configurations.destroy', \App\Helpers\EncryptHelper::encrypt($configuration->id)) }}">
 
                                     @csrf
                                     @method('DELETE')
 
 
-                                    <button class="action-btn delete" title="Hapus"
-                                        onclick="return confirm('Hapus konfigurasi ini?')">
+                                    <button type="submit" class="action-btn delete delete-confirm" title="Hapus">
 
                                         <i data-lucide="trash-2"></i>
 

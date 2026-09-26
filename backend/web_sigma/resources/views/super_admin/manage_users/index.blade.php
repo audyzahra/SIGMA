@@ -88,14 +88,13 @@
 
 
                                 {{-- Hapus --}}
-                                <form class="inline-action" method="POST"
+                                <form class="inline-action delete-form" method="POST"
                                     action="{{ route('super-admin.manage-users.destroy', \App\Helpers\EncryptHelper::encrypt($user->id)) }}">
 
                                     @csrf
                                     @method('DELETE')
 
-                                    <button type="submit" class="action-btn delete" title="Hapus Pengguna"
-                                        onclick="return confirm('Hapus pengguna ini?')">
+                                    <button type="submit" class="action-btn delete delete-confirm" title="Hapus Pengguna">
 
                                         <i data-lucide="trash-2"></i>
 

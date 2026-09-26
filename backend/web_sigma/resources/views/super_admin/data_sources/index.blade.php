@@ -155,15 +155,14 @@
 
 
 
-                                <form class="inline-action" method="POST"
+                                <form class="inline-action delete-form" method="POST"
                                     action="{{ route('super-admin.data-sources.destroy', \App\Helpers\EncryptHelper::encrypt($dataSource->id)) }}">
 
                                     @csrf
                                     @method('DELETE')
 
 
-                                    <button class="action-btn delete" title="Hapus"
-                                        onclick="return confirm('Hapus sumber data ini?')">
+                                    <button type="submit" class="action-btn delete delete-confirm" title="Hapus">
 
                                         <i data-lucide="trash-2"></i>
 

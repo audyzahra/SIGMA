@@ -1,0 +1,10 @@
+.sigma-toast {
+
+    border-radius: 14px !important;
+
+    font-family: inherit;
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.12);
+
+}
