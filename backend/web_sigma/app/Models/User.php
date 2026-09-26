@@ -16,6 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
     'name',
     'email',
     'password',
+    'organization_id',                                                                                                                                                  
 ])]
 
 #[Hidden([
@@ -41,7 +42,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function organizations()
+    public function organization()
     {
         return $this->belongsTo(
             Organization::class

@@ -14,8 +14,15 @@
 
 
 <body>
-    @php($navigation = [['government.dashboard', 'Dashboard', '▦'], ['government.fire-risk', 'Risiko Karhutla', '♨'], ['government.impact', 'Analisis Dampak', '◉'], ['government.priority', 'Prioritas Penanganan', '⌁'], ['government.recommendation', 'Rekomendasi', '▣'], ['government.reports.index', 'Laporan Masyarakat', '▤']])
-
+    @php($navigation = [
+    ['government.dashboard', 'Dashboard', '▦'],
+    ['government.fire-risk', 'Risiko Karhutla', '♨'],
+    ['government.impact', 'Analisis Dampak', '◉'],
+    ['government.priority', 'Prioritas Penanganan', '⌁'],
+    ['government.recommendation', 'Rekomendasi', '▣'],
+    ['government.field-teams.index', 'Tim Pemadam', '♟'],
+    ['government.reports.index', 'Laporan Masyarakat', '▤']
+])
     <div class="app-shell">
         <aside class="sidebar" id="sidebar"><a class="brand" href="{{ route('government.dashboard') }}"><img
                     src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla
