@@ -1,0 +1,153 @@
+.configuration-table {
+    width: 100%;
+}
+
+.configuration-table thead th {
+    text-align: center;
+}
+
+.configuration-table tbody td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.configuration-key {
+    text-align: left !important;
+}
+
+.configuration-value {
+    max-width: 300px;
+}
+
+.table-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.inline-action {
+    display: inline-flex;
+}
+
+.configuration-form {
+    padding: 28px;
+}
+
+.configuration-fields {
+    display: grid;
+    gap: 20px;
+}
+
+.configuration-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.configuration-fields input,
+.configuration-fields select,
+.configuration-fields textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.configuration-fields textarea {
+    min-height: 120px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.info-card {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-item.full {
+    grid-column: 1/-1;
+}
+
+/* ==========================
+   CONFIGURATION FORM
+========================== */
+
+.configuration-fields {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 22px;
+}
+
+.configuration-fields .two-column {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px 24px;
+}
+
+.configuration-fields label {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.configuration-fields input,
+.configuration-fields select,
+.configuration-fields textarea {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    background: #fff;
+}
+
+.configuration-fields textarea {
+    resize: vertical;
+
+    min-height: 120px;
+}
+
+.configuration-fields input:focus,
+.configuration-fields select:focus,
+.configuration-fields textarea:focus {
+    outline: none;
+
+    border-color: var(--red);
+
+    box-shadow: 0 0 0 3px rgba(200, 40, 40, 0.12);
+}
+
+.error-text {
+    color: #dc2626;
+
+    font-size: 12px;
+}

@@ -1,136 +1,242 @@
 @extends('layouts.super_admin')
 
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/super_admin/aspirations.css') }}">
+@endpush
+
+
 @php
     use App\Helpers\EncryptHelper;
 @endphp
 
-@section('title','Aspirasi Masyarakat')
+
+@section('title', 'Aspirasi Masyarakat | SIGMA')
+
 
 @section('content')
 
-<section class="page-heading">
-    <div>
-        <h1>Aspirasi Masyarakat</h1>
-        <p>Daftar masukan dan laporan yang dikirim oleh masyarakat.</p>
-    </div>
-</section>
 
+    <section class="page-heading">
 
-<div class="panel">
-
-    <div class="panel-title">
         <div>
-            <h3>Data Aspirasi</h3>
-            <p>Total aspirasi masyarakat</p>
+
+            <p class="breadcrumb">
+                Dashboard / Aspirasi Masyarakat
+            </p>
+
+
+            <h1>
+                Aspirasi Masyarakat
+            </h1>
+
+
+            <p>
+                Daftar masukan dan laporan yang dikirim oleh masyarakat.
+            </p>
+
+
         </div>
 
-        <span class="pill">
-            {{ $aspirations->total() }} Data
-        </span>
-    </div>
+
+    </section>
 
 
-    <div class="table-wrap">
 
-        <table class="data-table">
+
+    <section class="panel">
+
+
+        <div class="panel-title">
+
+            <div>
+
+                <h3>
+                    Data Aspirasi
+                </h3>
+
+
+                <p>
+                    Total aspirasi masyarakat
+                </p>
+
+
+            </div>
+
+
+            <span class="pill">
+                {{ $aspirations->total() }} Data
+            </span>
+
+
+        </div>
+
+
+
+
+        <x-sigma.data-table class="aspiration-table">
+
 
             <thead>
+
                 <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>No HP</th>
-                    <th>Wilayah</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
+
+                    <th>
+                        No
+                    </th>
+
+                    <th>
+                        Nama
+                    </th>
+
+                    <th>
+                        Kontak
+                    </th>
+
+                    <th>
+                        Wilayah
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th class="action-column">
+                        Aksi
+                    </th>
+
+
                 </tr>
+
+
             </thead>
+
+
 
 
             <tbody>
 
-            @foreach($aspirations as $item)
 
-                <tr>
-
-                    <td>
-                        {{ $loop->iteration }}
-                    </td>
+                @forelse($aspirations as $item)
+                    <tr>
 
 
-                    <td>
-                        <b>{{ $item->name }}</b>
-                    </td>
+                        <td>
+                            {{ $loop->iteration }}
+                        </td>
 
 
-                    <td>
-                        {{ $item->email }}
-                    </td>
+
+                        <td class="aspiration-name">
+
+                            <strong>
+                                {{ $item->name }}
+                            </strong>
+
+                            <small>
+                                {{ $item->organization ?? '-' }}
+                            </small>
+
+                        </td>
 
 
-                    <td>
-                        {{ $item->phone }}
-                    </td>
+
+                        <td>
+
+                            {{ $item->email }}
+
+                            <br>
+
+                            <small>
+                                {{ $item->phone }}
+                            </small>
 
 
-                    <td>
-                        {{ $item->region ?? '-' }}
-                    </td>
+                        </td>
 
 
-                    <td>
 
-                        @if($item->status=='pending')
+                        <td>
 
-                            <span class="status pending">
-                                Pending
-                            </span>
+                            {{ $item->region ?? '-' }}
 
-                        @else
-
-                            <span class="status">
-                                Selesai
-                            </span>
-
-                        @endif
-
-                    </td>
+                        </td>
 
 
-                    <td>
-
-                        <a href="{{ route(
-                            'super-admin.aspirations.show',
-                            EncryptHelper::encrypt($item->id)
-                            ) }}"
-                            class="button button-primary">
-
-                            Detail
-
-                        </a>
-
-                    </td>
 
 
-                </tr>
+                        <td>
 
 
-            @endforeach
+                            @if ($item->status === 'pending')
+                                <span class="status pending">
+                                    Pending
+                                </span>
+                            @elseif($item->status === 'process')
+                                <span class="status">
+                                    Diproses
+                                </span>
+                            @else
+                                <span class="status">
+                                    Selesai
+                                </span>
+                            @endif
+
+
+
+                        </td>
+
+
+
+                        <td>
+
+
+                            <div class="table-actions">
+
+
+                                <a href="{{ route('super-admin.aspirations.show', EncryptHelper::encrypt($item->id)) }}"
+                                    class="action-btn detail" title="Detail">
+
+                                    <i data-lucide="eye"></i>
+
+                                </a>
+
+
+                            </div>
+
+
+                        </td>
+
+
+                    </tr>
+
+
+                @empty
+
+
+                    <tr>
+
+                        <td colspan="6">
+                            Belum ada aspirasi.
+                        </td>
+
+                    </tr>
+                @endforelse
+
 
             </tbody>
 
 
-        </table>
-
-    </div>
+        </x-sigma.data-table>
 
 
-    <div class="pagination">
+
+
         {{ $aspirations->links() }}
-    </div>
 
 
-</div>
+
+    </section>
 
 
 @endsection

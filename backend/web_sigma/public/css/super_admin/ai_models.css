@@ -1,0 +1,106 @@
+.ai-model-table {
+    width: 100%;
+}
+
+.ai-model-table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.ai-model-table tbody td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.ai-model-name {
+    text-align: left !important;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.ai-model-name small {
+    color: #64748b;
+}
+
+.table-actions {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.inline-action {
+    display: inline-flex;
+}
+
+.badge {
+    padding: 6px 12px;
+
+    border-radius: 999px;
+}
+
+.status {
+    padding: 6px 12px;
+
+    border-radius: 999px;
+}
+
+/* show/detail dari ai models */
+.info-card {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 30px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-item b {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.info-item.full {
+    grid-column: 1/-1;
+}
+
+/* bagian form */
+.ai-model-fields .two-column {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 24px;
+}
+
+.ai-model-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-model-fields input,
+.ai-model-fields select,
+.ai-model-fields textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.ai-model-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}

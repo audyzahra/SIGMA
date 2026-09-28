@@ -7,6 +7,8 @@ use App\Http\Controllers\Web\Government\ImpactController;
 use App\Http\Controllers\Web\Government\PriorityController;
 use App\Http\Controllers\Web\Government\RecommendationController;
 use App\Http\Controllers\Web\Government\CitizenReportController;
+use App\Http\Controllers\Web\Government\ResponseAssignmentController;
+use App\Http\Controllers\Web\Government\FieldTeamController;
 
 use App\Http\Controllers\Web\public_sigma\AspirationController;
 use App\Http\Controllers\Web\SuperAdmin\AIModelController;
@@ -117,17 +119,19 @@ Route::middleware(['auth', 'role:super_admin'])
                 'show'
             ]);
 
-        Route::get('aspirations',
+        Route::get(
+            'aspirations',
             [SuperAdminAspirationController::class, 'index']
         )->name('aspirations.index');
 
-        Route::get('aspirations/{hash}',
+        Route::get(
+            'aspirations/{hash}',
             [SuperAdminAspirationController::class, 'show']
         )->name('aspirations.show');
 
         Route::patch(
             'aspirations/{aspiration}/status',
-            [SuperAdminAspirationController::class,'updateStatus']
+            [SuperAdminAspirationController::class, 'updateStatus']
         )->name('aspirations.status');
     });
 
@@ -181,7 +185,16 @@ Route::middleware(['auth', 'role:government'])
             'index'
         ])->name('recommendation');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Response Assignment
+        |--------------------------------------------------------------------------
+        */
 
+        Route::post('/recommendation/assign', [
+            ResponseAssignmentController::class,
+            'store'
+        ])->name('recommendation.assign');
 
         /*
         |--------------------------------------------------------------------------
@@ -193,6 +206,11 @@ Route::middleware(['auth', 'role:government'])
             'reports',
             [CitizenReportController::class, 'index']
         )->name('reports.index');
+
+        Route::get(
+            'reports/{report}/history',
+            [CitizenReportController::class, 'history']
+        )->name('reports.history');
 
         Route::get(
             'reports/{report}',
@@ -208,6 +226,53 @@ Route::middleware(['auth', 'role:government'])
             'reports/{report}/reject',
             [CitizenReportController::class, 'reject']
         )->name('reports.reject');
+
+        Route::post(
+            'reports/assign',
+            [CitizenReportController::class, 'assign']
+        )->name('reports.assign');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Field Team Management
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/field-teams', [
+            FieldTeamController::class,
+            'index'
+        ])->name('field-teams.index');
+
+
+        Route::get('/field-teams/create', [
+            FieldTeamController::class,
+            'create'
+        ])->name('field-teams.create');
+
+
+        Route::post('/field-teams', [
+            FieldTeamController::class,
+            'store'
+        ])->name('field-teams.store');
+
+
+        Route::get('/field-teams/{team}/edit', [
+            FieldTeamController::class,
+            'edit'
+        ])->name('field-teams.edit');
+
+
+        Route::put('/field-teams/{team}', [
+            FieldTeamController::class,
+            'update'
+        ])->name('field-teams.update');
+
+
+        Route::delete('/field-teams/{team}', [
+            FieldTeamController::class,
+            'destroy'
+        ])->name('field-teams.destroy');
     });
 
 /*
@@ -238,7 +303,6 @@ Route::name('public_sigma.')
                 'totalHotspot',
                 'totalIncident'
             ));
-
         })->name('index');
 
 

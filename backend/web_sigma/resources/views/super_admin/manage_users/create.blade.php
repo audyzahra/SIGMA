@@ -4,7 +4,20 @@
 
 @section('content')
     <section class="page-heading">
-        <h1>Tambah Pengguna</h1>
+        <div>
+            <p class="breadcrumb">
+                Dashboard / Manajemen Pengguna / Tambah
+            </p>
+
+            <h1>
+                Tambah Pengguna
+            </h1>
+        </div>
+
+        <a class="button button-light"
+            href="{{ route('super-admin.manage-users.index') }}">
+            Kembali
+        </a>
     </section>
 
     <section class="panel">

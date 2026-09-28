@@ -87,6 +87,80 @@
             </svg>
         ',
 
+        'fire' => '
+        <svg xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.8"
+            stroke="currentColor">
+
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 21a9 9 0 0 0 9-9
+                c0-3.75-2.25-6.75-5.25-9
+                .75 2.25-.75 4.5-3 5.25
+                .75-3-1.5-5.25-3.75-6.75
+                C9 5.25 6 8.25 6 12a6 6 0 0 0 6 6
+                0 0 0 0 0 0 0Z"/>
+        </svg>
+        ',
+
+
+        'alert' => '
+        <svg xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.8"
+            stroke="currentColor">
+
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m0 3h.008
+                M10.34 3.94 2.69 17.19
+                A1.875 1.875 0 0 0 4.31 20h15.38
+                a1.875 1.875 0 0 0 1.62-2.81L13.66 3.94
+                a1.875 1.875 0 0 0-3.32 0Z"/>
+        </svg>
+        ',
+
+
+        'check' => '
+        <svg xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.8"
+            stroke="currentColor">
+
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75 11.25 15 15 9.75
+                M21 12a9 9 0 1 1-18 0
+                9 9 0 0 1 18 0Z"/>
+        </svg>
+        ',
+
+
+        'location' => '
+        <svg xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.8"
+            stroke="currentColor">
+
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 10.5a3 3 0 1 1-6 0
+                3 3 0 0 1 6 0Z
+
+                M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25
+                S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+        </svg>
+        ',
+
         'default' => '
             <svg xmlns="http://www.w3.org/2000/svg"
                 fill="none"

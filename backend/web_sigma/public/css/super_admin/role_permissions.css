@@ -1,0 +1,46 @@
+/* =====================================
+   Role & Permission Table
+===================================== */
+
+.role-permission-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.role-permission-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* Action button alignment */
+
+.table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.inline-action {
+    display: inline-flex;
+}
+.role-permission-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.role-permission-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.role-permission-table .table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}

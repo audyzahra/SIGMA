@@ -1,10 +1,17 @@
 @extends('layouts.super_admin')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/super_admin/manage_users.css') }}">
+@endpush
+@push('scripts')
+    <script src="{{ asset('js/super_admin/manage_users.js') }}"></script>
+@endpush
 @section('title', 'Manajemen Pengguna | SIGMA')
 @section('content')
     <section class="page-heading">
         <div>
             <p class="breadcrumb">Dashboard / Manajemen Pengguna</p>
             <h1>Manajemen Pengguna</h1>
+            <p>Manajemen pengguna SIGMA.</p>
         </div><a class="button button-primary" href="{{ route('super-admin.manage-users.create') }}">Tambah Pengguna</a>
     </section>
 
@@ -35,13 +42,15 @@
         </select>
 
 
-        <button type="submit" class="button button-search">
-    <i data-lucide="search"></i>
-    <span>Cari</span>
-</button>
+        @if (request()->hasAny(['search', 'role', 'per_page']))
+            <a href="{{ route('super-admin.manage-users.index') }}" class="button button-light">
+                Reset
+            </a>
+        @endif
 
     </form>
-    <section class="panel"><x-sigma.data-table>
+    <section class="panel">
+        <x-sigma.data-table class="user-table">
             <thead>
                 <tr>
                     <th class="text-center">ID</th>
@@ -79,14 +88,13 @@
 
 
                                 {{-- Hapus --}}
-                                <form class="inline-action" method="POST"
+                                <form class="inline-action delete-form" method="POST"
                                     action="{{ route('super-admin.manage-users.destroy', \App\Helpers\EncryptHelper::encrypt($user->id)) }}">
 
                                     @csrf
                                     @method('DELETE')
 
-                                    <button type="submit" class="action-btn delete" title="Hapus Pengguna"
-                                        onclick="return confirm('Hapus pengguna ini?')">
+                                    <button type="submit" class="action-btn delete delete-confirm" title="Hapus Pengguna">
 
                                         <i data-lucide="trash-2"></i>
 
@@ -99,7 +107,8 @@
                     </tr>
                 @endforelse
             </tbody>
-        </x-sigma.data-table>{{ $users->links() }}</section>
+        </x-sigma.data-table>{{ $users->links() }}
+    </section>
 
     <script>
         let timer;

@@ -25,31 +25,31 @@ class DashboardController extends Controller
                 [
                     'label' => 'Total Hotspot',
                     'value' => number_format($statistics->total_hotspots),
-                    'icon' => '◉',
+                    'icon' => 'fire',
                     'accent' => 'danger',
                 ],
                 [
                     'label' => 'Insiden Aktif',
                     'value' => number_format($statistics->active_incidents),
-                    'icon' => '🔥',
+                    'icon' => 'alert',
                     'accent' => 'orange',
                 ],
                 [
                     'label' => 'Insiden Selesai',
                     'value' => number_format($statistics->resolved_incident),
-                    'icon' => '✓',
+                    'icon' => 'check',
                     'accent' => 'success',
                 ],
                 [
                     'label' => 'Luas Terdampak',
                     'value' => number_format($statistics->affected_area) . ' Ha',
-                    'icon' => '▣',
+                    'icon' => 'map',
                     'accent' => 'warning',
                 ],
                 [
                     'label' => 'Wilayah Terdampak',
                     'value' => number_format($statistics->affected_region),
-                    'icon' => '⌖',
+                    'icon' => 'location',
                     'accent' => 'info',
                 ],
             ];

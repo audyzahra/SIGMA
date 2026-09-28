@@ -1,15 +1,18 @@
 @extends('layouts.super_admin')
-
+@section('title', 'Detail Wilayah | SIGMA')
 @section('content')
     <section class="page-heading">
         <div>
+            <p class="breadcrumb">
+                Dashboard / Manajemen Wilayah / Detail
+            </p>
+
             <h1>{{ $region->name }}</h1>
-            <p>Detail wilayah</p>
         </div>
 
         <a class="button button-primary"
             href="{{ route('super-admin.regions.edit', \App\Helpers\EncryptHelper::encrypt($region->id)) }}">
-            Edit
+            Edit Wilayah
         </a>
     </section>
 

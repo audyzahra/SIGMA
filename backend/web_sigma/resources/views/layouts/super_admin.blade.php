@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SIGMA Command Center')</title>
     @vite(['resources/css/app.css', 'resources/css/super-admin.css', 'resources/js/app.js'])
+    @stack('styles')
 
     {{-- CSS khusus Dashboard Super Admin --}}
     <link rel="stylesheet" href="{{ asset('css/super_admin/dashboard.css') }}">
+
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -44,15 +46,17 @@
             <main class="super-admin-content">
 
                 @if (session('success'))
-                    <div class="alert success">
-                        {{ session('success') }}
-                    </div>
+                    <script>
+                        window.successMessage = "{{ session('success') }}";
+                    </script>
                 @endif
 
+
+
                 @if ($errors->any())
-                    <div class="alert danger">
-                        {{ $errors->first() }}
-                    </div>
+                    <script>
+                        window.errorMessage = "{{ $errors->first() }}";
+                    </script>
                 @endif
 
                 @yield('content')
@@ -76,6 +80,17 @@
 
         lucide.createIcons();
     </script>
+
+    {{-- sweet alert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- sweet alert untuk konfirmasi --}}
+    <script src="{{ asset('js/super_admin/sweetalert.js') }}"></script>
+
+    @stack('scripts')
+
+    {{-- notifikasi --}}
+    <link rel="stylesheet" href="{{ asset('css/super_admin/notification.css') }}">
+    <script src="{{ asset('js/super_admin/notification.js') }}"></script>
 </body>
 
 </html>
