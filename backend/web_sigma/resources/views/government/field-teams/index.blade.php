@@ -1,137 +1,153 @@
 @extends('layouts.government')
 
-@section('title', 'Tim Pemadam | SIGMA')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/government/field_team.css') }}">
+@endpush
 
+@section('title', 'Tim Pemadam | SIGMA')
 
 @section('content')
 
-<div class="page-heading">
+    <section class="page-heading">
 
-    <div>
-        <p class="breadcrumb">
-            Beranda › Tim Pemadam
-        </p>
+        <div>
+            <p class="breadcrumb">
+                Beranda › Tim Pemadam
+            </p>
 
-        <h1>
-            Tim Pemadam
-        </h1>
+            <h1>
+                Tim Pemadam
+            </h1>
 
-        <p>
-            Kelola tim petugas lapangan SIGMA.
-        </p>
-    </div>
+            <p>
+                Kelola tim petugas lapangan SIGMA.
+            </p>
+        </div>
 
+        <a href="{{ route('government.field-teams.create') }}"
+           class="button button-primary">
+            + Tambah Tim
+        </a>
 
-    <a href="{{ route('government.field-teams.create') }}"
-       class="button button-primary">
-        + Tambah Tim
-    </a>
-
-</div>
-
+    </section>
 
 
-<div class="panel">
+    <section class="panel">
 
-<table width="100%">
+        <x-sigma.data-table class="field-team-table">
 
-<thead>
-<tr>
-    <th>Nama Tim</th>
-    <th>Ketua</th>
-    <th>Anggota</th>
-    <th>Status</th>
-    <th>Aksi</th>
-</tr>
-</thead>
+            <thead>
+                <tr>
+                    <th>Nama Tim</th>
+                    <th>Ketua</th>
+                    <th>Anggota</th>
+                    <th>Status</th>
+                    <th class="action-column">Aksi</th>
+                </tr>
+            </thead>
 
+            <tbody>
 
-<tbody>
+                @forelse($teams as $team)
 
-@forelse($teams as $team)
+                    <tr>
 
-<tr>
+                        <td>
+                            <div class="field-team-name">
+                                <strong>
+                                    {{ $team->team_name }}
+                                </strong>
 
-<td>
-    {{ $team->team_name }}
-</td>
+                                <small>
+                                    {{ $team->phone ?? '-' }}
+                                </small>
+                            </div>
+                        </td>
 
+                        <td>
+                            {{ $team->leader_name ?? '-' }}
+                        </td>
 
-<td>
-    {{ $team->leader_name ?? '-' }}
-</td>
+                        <td>
+                            @forelse($team->members as $member)
 
+                                <span class="member-pill">
+                                    {{ $member->name }}
+                                </span>
 
-<td>
-    @forelse($team->members as $member)
+                            @empty
 
-        <span>
-            {{ $member->name }}
-        </span>
+                                -
 
-        @if(!$loop->last)
-        ,
-        @endif
+                            @endforelse
+                        </td>
 
-    @empty
+                        <td>
+                            <span class="status {{ $team->status }}">
+                                {{ ucfirst($team->status) }}
+                            </span>
+                        </td>
 
-        Belum ada anggota
+                        <td>
+                            <div class="table-actions">
 
-    @endforelse
-</td>
+                                <a href="{{ route(
+                                        'government.field-teams.show',
+                                        \App\Helpers\EncryptHelper::encrypt($team->id)
+                                    ) }}"
+                                   class="action-btn detail"
+                                   title="Detail">
+                                    <i data-lucide="eye"></i>
+                                </a>
 
+                                <a href="{{ route(
+                                        'government.field-teams.edit',
+                                        \App\Helpers\EncryptHelper::encrypt($team->id)
+                                    ) }}"
+                                   class="action-btn edit"
+                                   title="Edit">
+                                    <i data-lucide="square-pen"></i>
+                                </a>
 
-<td>
-    {{ $team->status }}
-</td>
+                                <form class="inline-action delete-form"
+                                      method="POST"
+                                      action="{{ route(
+                                          'government.field-teams.destroy',
+                                          \App\Helpers\EncryptHelper::encrypt($team->id)
+                                      ) }}">
 
+                                    @csrf
+                                    @method('DELETE')
 
-<td>
+                                    <button type="submit"
+                                            class="action-btn delete delete-confirm"
+                                            title="Hapus">
+                                        <i data-lucide="trash-2"></i>
+                                    </button>
 
-    <a href="{{ route('government.field-teams.edit', $team->id) }}"
-       class="button button-light">
-        ✏ Edit
-    </a>
+                                </form>
 
+                            </div>
+                        </td>
 
-    <form action="{{ route('government.field-teams.destroy', $team->id) }}"
-          method="POST"
-          style="display:inline">
+                    </tr>
 
-        @csrf
-        @method('DELETE')
+                @empty
 
-        <button type="submit"
-                class="button button-danger"
-                onclick="return confirm('Yakin hapus tim ini?')">
-            🗑 Hapus
-        </button>
+                    <tr>
+                        <td colspan="5">
+                            Belum ada tim pemadam.
+                        </td>
+                    </tr>
 
-    </form>
+                @endforelse
 
-</td>
+            </tbody>
 
+        </x-sigma.data-table>
 
-</tr>
+        {{ $teams->links() }}
 
-
-@empty
-
-<tr>
-<td colspan="5">
-    Belum ada tim pemadam.
-</td>
-</tr>
-
-@endforelse
-
-
-</tbody>
-
-
-</table>
-
-</div>
-
+    </section>
 
 @endsection

@@ -1,53 +1,66 @@
-<form method="POST"
-action="{{ route('government.field-teams.store') }}">
+@extends('layouts.government')
 
-@csrf
+@section('title', 'Tambah Tim Pemadam | SIGMA')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/government/field_team.css') }}">
+@endpush
 
-<label>
-Nama Tim
-</label>
+@section('content')
 
-<input
-name="team_name"
-class="form-control">
+    <section class="page-heading">
 
+        <div>
+            <p class="breadcrumb">
+                Beranda › Tim Pemadam › Tambah
+            </p>
 
-<label>
-Ketua Tim
-</label>
+            <h1>
+                Tambah Tim Pemadam
+            </h1>
 
-<input
-name="leader_name"
-class="form-control">
+            <p>
+                Tambahkan tim petugas lapangan baru ke dalam sistem.
+            </p>
+        </div>
 
+        <a href="{{ route('government.field-teams.index') }}"
+           class="button button-light">
+            Kembali
+        </a>
 
-<label>
-Anggota Petugas
-</label>
-
-
-@foreach($officers as $officer)
-
-<div>
-
-<input
-type="checkbox"
-name="members[]"
-value="{{ $officer->id }}"
->
-
-{{ $officer->name }}
-
-</div>
+    </section>
 
 
-@endforeach
+    <section class="panel">
 
+        <form method="POST"
+              action="{{ route('government.field-teams.store') }}">
 
-<button>
-Simpan Tim
-</button>
+            @csrf
 
+            <div class="field-team-form">
 
-</form>
+                @include('government.field-teams.form')
+
+                <div class="form-actions">
+
+                    <a href="{{ route('government.field-teams.index') }}"
+                       class="button button-light">
+                        Batal
+                    </a>
+
+                    <button type="submit"
+                            class="button button-primary">
+                        Simpan Tim
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+@endsection

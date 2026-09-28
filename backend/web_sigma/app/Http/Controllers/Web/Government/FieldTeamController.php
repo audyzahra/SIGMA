@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Government;
 
+use App\Helpers\EncryptHelper;
 use App\Http\Controllers\Controller;
 use App\Models\FieldTeam;
 use App\Models\User;
@@ -15,7 +16,7 @@ class FieldTeamController extends Controller
     {
         $teams = FieldTeam::with('members')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view(
             'government.field-teams.index',
@@ -43,8 +44,11 @@ class FieldTeamController extends Controller
 
         $request->validate([
 
-            'team_name' => 'required',
-            'members' => 'required|array'
+            'team_name' => 'required|string|max:255',
+            'leader_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'members' => 'required|array',
+            'members.*' => 'exists:users,id',
 
         ]);
 
@@ -81,11 +85,16 @@ class FieldTeamController extends Controller
     }
 
 
-    public function edit(FieldTeam $team)
+    public function edit(string $team)
     {
+        $id = EncryptHelper::decrypt($team);
+
+        $team = FieldTeam::with('members')
+            ->findOrFail($id);
+
+
         $officers = User::role('officer')->get();
 
-        $team->load('members');
 
         return view(
             'government.field-teams.edit',
@@ -97,8 +106,12 @@ class FieldTeamController extends Controller
     }
 
 
-    public function update(Request $request, FieldTeam $team)
+    public function update(Request $request, string $team)
     {
+
+        $id = EncryptHelper::decrypt($team);
+
+        $team = FieldTeam::findOrFail($id);
 
         $request->validate([
 
@@ -132,9 +145,31 @@ class FieldTeamController extends Controller
             );
     }
 
-
-    public function destroy(FieldTeam $team)
+    public function show(string $team)
     {
+
+        $id = EncryptHelper::decrypt($team);
+
+
+        $team = FieldTeam::with('members')
+            ->findOrFail($id);
+
+
+
+        return view(
+            'government.field-teams.show',
+            compact('team')
+        );
+    }
+
+
+    public function destroy(string $team)
+    {
+
+        $id = EncryptHelper::decrypt($team);
+
+        $team = FieldTeam::findOrFail($id);
+
 
         $team->members()->detach();
 
