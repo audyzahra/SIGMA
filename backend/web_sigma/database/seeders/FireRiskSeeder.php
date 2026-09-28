@@ -17,7 +17,7 @@ class FireRiskSeeder extends Seeder
         $riskData = [
             [
                 'risk_score' => 35,
-                'risk_level' => 'low',
+                'risk_level' => 'LOW',
                 'temperature' => 30.50,
                 'humidity' => 70.00,
                 'rainfall' => 5.00,
@@ -26,7 +26,7 @@ class FireRiskSeeder extends Seeder
             ],
             [
                 'risk_score' => 55,
-                'risk_level' => 'medium',
+                'risk_level' => 'MEDIUM',
                 'temperature' => 32.00,
                 'humidity' => 60.00,
                 'rainfall' => 3.00,
@@ -35,7 +35,7 @@ class FireRiskSeeder extends Seeder
             ],
             [
                 'risk_score' => 72,
-                'risk_level' => 'high',
+                'risk_level' => 'HIGH',
                 'temperature' => 33.50,
                 'humidity' => 50.00,
                 'rainfall' => 2.00,
@@ -44,7 +44,7 @@ class FireRiskSeeder extends Seeder
             ],
             [
                 'risk_score' => 88,
-                'risk_level' => 'extreme',
+                'risk_level' => 'HIGH',
                 'temperature' => 35.00,
                 'humidity' => 42.00,
                 'rainfall' => 1.00,
@@ -53,7 +53,7 @@ class FireRiskSeeder extends Seeder
             ],
             [
                 'risk_score' => 64,
-                'risk_level' => 'high',
+                'risk_level' => 'HIGH',
                 'temperature' => 34.00,
                 'humidity' => 55.00,
                 'rainfall' => 4.00,
@@ -63,7 +63,7 @@ class FireRiskSeeder extends Seeder
         ];
 
         foreach ($regions as $index => $region) {
-            $data = $riskData[$index] ?? $riskData[0];
+            $data = $riskData[$index % count($riskData)];
 
             FireRisk::updateOrCreate(
                 [
