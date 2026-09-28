@@ -16,7 +16,8 @@ class FireRisk extends Model
         'rainfall',
         'wind_speed',
         'vegetation_index',
-        'calculated_at'
+        'calculated_at',
+        'ai_confidence',
     ];
 
 

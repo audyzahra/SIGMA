@@ -9,96 +9,229 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- Leaflet GIS --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
     @stack('styles')
 </head>
 
-
 <body>
-    @php($navigation = [
-    ['government.dashboard', 'Dashboard', '▦'],
-    ['government.fire-risk', 'Risiko Karhutla', '♨'],
-    ['government.impact', 'Analisis Dampak', '◉'],
-    ['government.priority', 'Prioritas Penanganan', '⌁'],
-    ['government.recommendation', 'Rekomendasi', '▣'],
-    ['government.field-teams.index', 'Tim Pemadam', '♟'],
-    ['government.reports.index', 'Laporan Masyarakat', '▤']
-])
+
+    @php
+        $navigation = [
+            ['government.dashboard', 'Dashboard', '▦'],
+            ['government.fire-risk', 'Risiko Karhutla', '♨'],
+            ['government.impact', 'Analisis Dampak', '◉'],
+            ['government.priority', 'Prioritas Penanganan', '⌁'],
+            ['government.recommendation', 'Rekomendasi', '▣'],
+            ['government.field-teams.index', 'Tim Pemadam', '♟'],
+            ['government.reports.index', 'Laporan Masyarakat', '▤'],
+        ];
+    @endphp
+
     <div class="app-shell">
-        <aside class="sidebar" id="sidebar"><a class="brand" href="{{ route('government.dashboard') }}"><img
-                    src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span><strong>SIGMA</strong><small>Karhutla
-                        Command</small></span></a>
-            <div class="institution"><i></i> PEMERINTAH</div>
-            <p class="menu-label">MENU MONITORING</p>
+
+        <aside class="sidebar" id="sidebar">
+
+            <a class="brand" href="{{ route('government.dashboard') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA">
+
+                <span>
+                    <strong>SIGMA</strong>
+                    <small>Karhutla Command</small>
+                </span>
+            </a>
+
+            <div class="institution">
+                <i></i>
+                PEMERINTAH
+            </div>
+
+            <p class="menu-label">
+                MENU MONITORING
+            </p>
+
             <nav>
                 @foreach ($navigation as [$route, $label, $icon])
                     <a href="{{ route($route) }}"
-                        class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}"><span>{{ $icon }}</span>{{ $label }}</a>
+                        class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}">
+                        <span>{{ $icon }}</span>
+                        {{ $label }}
+                    </a>
                 @endforeach
             </nav>
-            <div class="profile-card"><span class="avatar">PS</span><span><b>Pemerintah
-                        SIGMA</b><small>Pemerintah</small></span>
-                <div><a href="#" data-toast="Profil Pemerintah SIGMA">⚙ Pengaturan</a><button type="button"
-                        data-modal="logout-modal">⇥ Keluar</button></div>
+
+            <div class="profile-card">
+
+                <span class="avatar">
+                    PS
+                </span>
+
+                <span>
+                    <b>Pemerintah SIGMA</b>
+                    <small>Pemerintah</small>
+                </span>
+
+                <div>
+                    <a href="#" data-toast="Profil Pemerintah SIGMA">
+                        ⚙ Pengaturan
+                    </a>
+
+                    <button type="button" data-modal="logout-modal">
+                        ⇥ Keluar
+                    </button>
+                </div>
+
             </div>
+
         </aside>
+
         <div class="main-wrap">
-            <header class="topbar"><button class="mobile-menu" type="button" data-sidebar-toggle>☰</button>
-                <div class="header-brand"><img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA"><span>Command
-                        Center Karhutla Nasional</span></div>
-                <div class="topbar-meta"><span class="system-status">● Sistem Normal</span><span>◷ Selasa, 24 Okt 2024 •
-                        10:45 WIB</span><button type="button" class="icon-button"
-                        data-toast="Tidak ada notifikasi baru">♧</button><span class="avatar small">PS</span></div>
+
+            <header class="topbar">
+
+                <button class="mobile-menu" type="button" data-sidebar-toggle>
+                    ☰
+                </button>
+
+                <div class="header-brand">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo SIGMA">
+
+                    <span>
+                        Command Center Karhutla Nasional
+                    </span>
+                </div>
+
+                <div class="topbar-meta">
+
+                    <span class="system-status">
+                        ● Sistem Normal
+                    </span>
+
+                    <span>
+                        ◷ Selasa, 24 Okt 2024 • 10:45 WIB
+                    </span>
+
+                    <button type="button"
+                        class="icon-button"
+                        data-toast="Tidak ada notifikasi baru">
+                        ♧
+                    </button>
+
+                    <span class="avatar small">
+                        PS
+                    </span>
+
+                </div>
+
             </header>
-            <main class="page-content">@yield('content')</main>
+
+            <main class="page-content">
+                @yield('content')
+            </main>
+
         </div>
+
     </div>
+
     <x-sigma.modal id="logout-modal" title="Keluar dari SIGMA">
-        <p>Apakah Anda yakin ingin mengakhiri sesi Pemerintah?</p>
-        <form method="POST" action="{{ route('logout') }}" class="modal-actions">@csrf <button type="button"
-                class="button button-light" data-modal-close>Batal</button><button
-                class="button button-primary">Keluar</button></form>
+
+        <p>
+            Apakah Anda yakin ingin mengakhiri sesi Pemerintah?
+        </p>
+
+        <form method="POST"
+            action="{{ route('logout') }}"
+            class="modal-actions">
+
+            @csrf
+
+            <button type="button"
+                class="button button-light"
+                data-modal-close>
+                Batal
+            </button>
+
+            <button class="button button-primary">
+                Keluar
+            </button>
+
+        </form>
+
     </x-sigma.modal>
+
     <div id="toast" class="toast" role="status"></div>
 
+    {{-- Success Toast dari Session --}}
     @if (session('success'))
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                const toast = document.getElementById('toast');
 
-                const t = document.getElementById('toast');
-
-                if (t) {
-
-                    t.textContent = "{{ session('success') }}";
-
-                    t.classList.add('show');
-
+                if (toast) {
+                    toast.textContent = @json(session('success'));
+                    toast.classList.add('show');
 
                     setTimeout(() => {
-
-                        t.classList.remove('show');
-
+                        toast.classList.remove('show');
                     }, 2600);
-
                 }
-
             });
         </script>
     @endif
 
+    {{-- Leaflet GIS JS --}}
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     <script>
-        document.querySelectorAll('[data-modal]').forEach(b => b.addEventListener('click', () => document.getElementById(b
-            .dataset.modal)?.classList.add('is-open')));
-        document.querySelectorAll('[data-modal-close]').forEach(b => b.addEventListener('click', () => b.closest(
-            '.modal-backdrop').classList.remove('is-open')));
-        document.querySelectorAll('[data-toast]').forEach(b => b.addEventListener('click', () => {
-            const t = document.getElementById('toast');
-            t.textContent = b.dataset.toast;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2600)
-        }));
-        document.querySelectorAll('[data-sidebar-toggle]').forEach(b => b.addEventListener('click', () => document
-            .getElementById('sidebar').classList.toggle('open')))
+        // Modal
+        document.querySelectorAll('[data-modal]').forEach(button => {
+            button.addEventListener('click', () => {
+                document
+                    .getElementById(button.dataset.modal)
+                    ?.classList.add('is-open');
+            });
+        });
+
+        // Close Modal
+        document.querySelectorAll('[data-modal-close]').forEach(button => {
+            button.addEventListener('click', () => {
+                button
+                    .closest('.modal-backdrop')
+                    ?.classList.remove('is-open');
+            });
+        });
+
+        // Toast
+        document.querySelectorAll('[data-toast]').forEach(button => {
+            button.addEventListener('click', () => {
+                const toast = document.getElementById('toast');
+
+                if (!toast) {
+                    return;
+                }
+
+                toast.textContent = button.dataset.toast;
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2600);
+            });
+        });
+
+        // Mobile Sidebar
+        document.querySelectorAll('[data-sidebar-toggle]').forEach(button => {
+            button.addEventListener('click', () => {
+                document
+                    .getElementById('sidebar')
+                    ?.classList.toggle('open');
+            });
+        });
     </script>
+
+    @stack('scripts')
+
 </body>
 
 </html>

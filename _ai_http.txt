@@ -1,0 +1,4 @@
+﻿root_code=200
+ openapi_code=200
+ predict_region_code=404
+ predict_risk_code=404

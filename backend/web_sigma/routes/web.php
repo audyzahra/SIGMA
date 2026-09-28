@@ -21,6 +21,10 @@ use App\Http\Controllers\Web\SuperAdmin\SystemConfigurationController;
 use App\Http\Controllers\Web\SuperAdmin\UserManagementController;
 use App\Http\Controllers\Web\SuperAdminDashboardController;
 use App\Http\Controllers\Web\SuperAdmin\AspirationController as SuperAdminAspirationController;
+
+use App\Http\Controllers\Api\RegionController as ApiRegionController;
+use App\Http\Controllers\Api\HotspotController;
+
 use App\Models\SystemProfile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -170,6 +174,29 @@ Route::middleware(['auth', 'role:government'])
             'index'
         ])->name('fire-risk');
 
+        /*
+        |--------------------------------------------------------------------------
+        | GIS Region Children
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/fire-risk/{id}/children', [
+            FireRiskController::class,
+            'children'
+        ])->name('fire-risk.children');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Perbarui Analisis Risiko (AI Service)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/fire-risk/ai-refresh', [
+            FireRiskController::class,
+            'aiRefresh'
+        ])->name('fire-risk.ai-refresh');
+
         Route::get('/impact', [
             ImpactController::class,
             'index'
@@ -208,12 +235,12 @@ Route::middleware(['auth', 'role:government'])
         )->name('reports.index');
 
         Route::get(
-            'reports/{report}/history',
+            'reports/{hash}/history',
             [CitizenReportController::class, 'history']
         )->name('reports.history');
 
         Route::get(
-            'reports/{report}',
+            'reports/{hash}',
             [CitizenReportController::class, 'show']
         )->name('reports.show');
 
@@ -244,6 +271,10 @@ Route::middleware(['auth', 'role:government'])
             'index'
         ])->name('field-teams.index');
 
+        Route::get('/field-teams/{team}', [
+            FieldTeamController::class,
+            'show'
+        ])->name('field-teams.show');
 
         Route::get('/field-teams/create', [
             FieldTeamController::class,
@@ -316,4 +347,54 @@ Route::name('public_sigma.')
             AspirationController::class,
             'store'
         ])->name('aspirations.store');
+   });
+
+    use App\Http\Controllers\AITestController;
+
+
+    Route::get(
+        '/ai-test',
+        [AITestController::class,'test']
+    );
+
+    Route::prefix('regions')->group(function(){
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Semua Provinsi
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/provinces',
+            [
+                ApiRegionController::class,
+                'provinces'
+            ]
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Child Wilayah
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/{id}/children',
+            [
+                ApiRegionController::class,
+                'children'
+            ]
+        );
+
+        Route::get(
+            '/hotspots',
+            [
+                HotspotController::class,
+                'index'
+            ]
+        );
+
+
     });

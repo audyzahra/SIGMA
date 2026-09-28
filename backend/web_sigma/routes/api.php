@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\RegionController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
@@ -14,4 +15,39 @@ Route::middleware('auth:sanctum')->group(function () {
 
     require __DIR__.'/api/citizen.php';
     require __DIR__.'/api/officer.php';
+});
+Route::prefix('regions')->group(function(){
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Semua Provinsi
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/provinces',
+        [
+            RegionController::class,
+            'provinces'
+        ]
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Child Wilayah
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/{id}/children',
+        [
+            RegionController::class,
+            'children'
+        ]
+    );
+
+
 });

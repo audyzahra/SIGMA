@@ -2,225 +2,163 @@
 
 @section('title', 'Risiko Karhutla | SIGMA')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/government/fire-risk.css') }}?v={{ time() }}">
+@endpush
+
 @section('content')
 
 @php
     $riskByRegion = $fireRisks->keyBy('region_id');
 
-    $selectedRegion = $regions->first();
+    $provinces = $regions
+        ->where('level', 'province')
+        ->sortBy('name')
+        ->values();
 
+    $selectedRegion = $provinces->first();
     $selectedRisk = $selectedRegion
         ? $riskByRegion->get($selectedRegion->id)
         : null;
 
-    $sigmaRegions = $regions->map(function ($region) use ($riskByRegion) {
-        $risk = $riskByRegion->get($region->id);
-
-        return [
-            'id' => $region->id,
-            'name' => $region->name,
-            'risk_score' => $risk?->risk_score,
-            'risk_level' => $risk?->risk_level,
-            'temperature' => $risk?->temperature,
-            'humidity' => $risk?->humidity,
-            'wind_speed' => $risk?->wind_speed,
-            'rainfall' => $risk?->rainfall,
-        ];
-    })->values();
+    /*
+    |--------------------------------------------------------------------------
+    | $sigmaRegions sudah dikirim oleh controller
+    |--------------------------------------------------------------------------
+    |
+    | Jangan membangun ulang dari $region->geometry. Accessor tersebut
+    | menjalankan 1 query + json_decode untuk setiap wilayah, sehingga
+    | halaman kehabisan memory (7231 wilayah) dan berhenti dengan HTTP 500.
+    |
+    */
 @endphp
 
 <section class="page-heading">
     <div>
         <p class="breadcrumb">Beranda › Risiko Karhutla</p>
-
         <h1>Analisis Risiko Karhutla</h1>
-
-        <p>
-            Analisis tingkat risiko kebakaran di setiap wilayah.
-        </p>
+        <p>Analisis tingkat risiko kebakaran di setiap wilayah.</p>
     </div>
 
-    <button
-        class="button button-light"
-        data-toast="Analisis risiko diperbarui"
-    >
+    <button class="button button-light" data-ai-refresh>
         Perbarui Analisis
     </button>
 </section>
 
-
 <div class="government-grid risk-grid">
 
-    {{-- PETA RISIKO --}}
-    <section class="panel">
+    <section class="panel map-panel">
+        <div id="sigma-map"></div>
 
-        <div class="map-placeholder monitoring-map">
+        <div class="map-legend">
+            <span class="success">● Rendah</span>
+            <span class="warning">● Sedang</span>
+            <span class="orange-text">● Tinggi</span>
+            <span class="danger">● Ekstrem</span>
+        </div>
+    </section>
 
-            <div class="map-controls">
-                +
-                <hr>
-                −
-            </div>
+    <aside class="panel detail-panel">
+        <h3>Detail Wilayah</h3>
 
-            <div class="island island-one"></div>
+        <div class="region-selector">
 
-            <div class="island island-two">
-                <i></i>
-                <i></i>
-            </div>
+            <label for="province-select">
+                Provinsi
+            </label>
 
-            <div class="island island-three"></div>
+            <select id="province-select">
+                <option value="">Pilih Provinsi</option>
 
-            <div class="island island-four"></div>
+                @foreach ($provinces as $province)
+                    <option value="{{ $province->id }}">
+                        {{ $province->name }}
+                    </option>
+                @endforeach
+            </select>
 
-            <div class="map-legend">
-                <span class="success">● Rendah</span>
-                <span class="warning">● Sedang</span>
-                <span class="orange-text">● Tinggi</span>
-                <span class="danger">● Ekstrem</span>
-            </div>
+            <label for="regency-select">
+                Kabupaten / Kota
+            </label>
+
+            <select id="regency-select" disabled>
+                <option value="">
+                    Pilih Kabupaten / Kota
+                </option>
+            </select>
+
+            <label for="district-select">
+                Kecamatan
+            </label>
+
+            <select id="district-select" data-region-select disabled>
+                <option value="">
+                    Pilih Kecamatan
+                </option>
+            </select>
 
         </div>
 
-    </section>
-
-
-    {{-- DETAIL WILAYAH --}}
-    <aside class="panel detail-panel">
-
-        <h3>Detail Wilayah</h3>
-
-        <label>
-            Pilih Wilayah
-
-            <select data-region-select>
-
-                @foreach($regions as $region)
-
-                    <option
-                        value="{{ $region->id }}"
-                        {{ $selectedRegion?->id === $region->id ? 'selected' : '' }}
-                    >
-                        {{ $region->name }}
-                    </option>
-
-                @endforeach
-
-            </select>
-        </label>
-
-
-        {{-- SCORE --}}
         <div class="score-ring">
-
-            <b data-risk-score>
+            <b id="risk-score">
                 {{ $selectedRisk?->risk_score ?? 0 }}
             </b>
 
             <span>/100</span>
-
         </div>
 
-
-        {{-- LEVEL --}}
         <p class="score-label">
             Risiko
 
-            <b
-                class="
-                    {{
-                        match ($selectedRisk?->risk_level) {
-                            'low' => 'success',
-                            'medium' => 'warning',
-                            'high' => 'orange-text',
-                            'extreme' => 'danger',
-                            default => 'danger',
-                        }
-                    }}
-                "
-                data-risk-level
-            >
-                {{
-                    $selectedRisk?->risk_level
-                        ? ucfirst($selectedRisk->risk_level)
-                        : 'Belum tersedia'
-                }}
+            <b id="risk-level">
+                {{ $selectedRisk?->risk_level ?? 'LOW' }}
             </b>
         </p>
 
-
-        {{-- SUHU --}}
         <div class="parameter">
-
             <span>Suhu</span>
 
-            <b data-risk-temperature>
-                {{
-                    $selectedRisk?->temperature !== null
-                        ? $selectedRisk->temperature . '°C'
-                        : '-'
-                }}
+            <b id="risk-temperature">
+                {{ $selectedRisk?->temperature !== null ? $selectedRisk->temperature . '°C' : '-' }}
             </b>
-
         </div>
 
-
-        {{-- KELEMBAPAN --}}
         <div class="parameter">
-
             <span>Kelembapan</span>
 
-            <b data-risk-humidity>
-                {{
-                    $selectedRisk?->humidity !== null
-                        ? $selectedRisk->humidity . '%'
-                        : '-'
-                }}
+            <b id="risk-humidity">
+                {{ $selectedRisk?->humidity !== null ? $selectedRisk->humidity . '%' : '-' }}
             </b>
-
         </div>
 
-
-        {{-- KECEPATAN ANGIN --}}
         <div class="parameter">
-
             <span>Kecepatan Angin</span>
 
-            <b data-risk-wind>
-                {{
-                    $selectedRisk?->wind_speed !== null
-                        ? $selectedRisk->wind_speed . ' km/jam'
-                        : '-'
-                }}
+            <b id="risk-wind">
+                {{ $selectedRisk?->wind_speed !== null ? $selectedRisk->wind_speed . ' km/jam' : '-' }}
             </b>
-
         </div>
 
-
-        {{-- CURAH HUJAN --}}
         <div class="parameter">
-
             <span>Curah Hujan</span>
 
-            <b data-risk-rainfall>
-                {{
-                    $selectedRisk?->rainfall !== null
-                        ? $selectedRisk->rainfall . ' mm'
-                        : '-'
-                }}
+            <b id="risk-rainfall">
+                {{ $selectedRisk?->rainfall !== null ? $selectedRisk->rainfall . ' mm' : '-' }}
             </b>
-
         </div>
-
     </aside>
 
 </div>
 
-
 <script>
+    window.regionChildrenUrl = "{{ url('/regions') }}";
+    window.fireRiskRefreshUrl = "{{ route('government.fire-risk.ai-refresh') }}";
     window.sigmaRegions = @json($sigmaRegions);
 </script>
 
-@endsection
-
+@push('scripts')
+<script src="{{ asset('js/government/gis-map.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/government/fire-risk.js') }}?v={{ time() }}"></script>
+@endpush
+
+@endsection
