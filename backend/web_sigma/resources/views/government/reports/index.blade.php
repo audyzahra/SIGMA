@@ -245,8 +245,13 @@
 
                         <td>
 
-                            <a href="{{ route('government.reports.show', $report) }}" class="text-action">
-                                Lihat Detail
+                            <a href="{{ route('government.reports.show', [
+                                    'hash' => \App\Helpers\EncryptHelper::encrypt($report->id)
+                                ]) }}" 
+                                class="text-action">
+
+                                    Lihat Detail
+
                             </a>
 
                         </td>

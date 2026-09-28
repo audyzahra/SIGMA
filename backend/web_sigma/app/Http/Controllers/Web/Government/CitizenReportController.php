@@ -10,6 +10,7 @@ use App\Models\Region;
 use App\Models\Incident;
 use App\Models\FieldAssignment;
 use App\Models\ResponseAction;
+use App\Helpers\EncryptHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -93,13 +94,24 @@ class CitizenReportController extends Controller
     /**
      * Menampilkan detail laporan.
      */
-    public function show(CitizenReport $report)
+    public function show($hash)
     {
-        $report->load([
+        try {
+
+            $id = EncryptHelper::decrypt($hash);
+
+        } catch (\Exception $e) {
+
+            abort(404);
+
+        }
+
+
+        $report = CitizenReport::with([
             'user',
             'incident',
             'statusHistories.updater',
-        ]);
+        ])->findOrFail($id);
 
 
         $teams = FieldTeam::where(
@@ -214,7 +226,9 @@ class CitizenReportController extends Controller
         return redirect()
             ->route(
                 'government.reports.show',
-                $report
+                [
+                    'hash' => EncryptHelper::encrypt($report->id)
+                ]
             )
             ->with(
                 'success',
@@ -276,7 +290,8 @@ class CitizenReportController extends Controller
 
 
         return redirect()
-            ->route('government.reports.show', $report)
+            ->route('government.reports.show', [
+            'hash' => EncryptHelper::encrypt($report->id)])
             ->with(
                 'success',
                 'Laporan berhasil ditolak.'
@@ -379,7 +394,9 @@ class CitizenReportController extends Controller
         return redirect()
             ->route(
                 'government.reports.show',
-                $report
+                [
+                    'hash' => EncryptHelper::encrypt($report->id)
+                ]
             )
             ->with(
                 'success',
@@ -388,13 +405,28 @@ class CitizenReportController extends Controller
     }
 
 
-    public function history(CitizenReport $report)
+    public function history($hash)
 {
+    try {
+
+        $id = EncryptHelper::decrypt($hash);
+
+    } catch (\Exception $e) {
+
+        abort(404);
+
+    }
+
+
+    $report = CitizenReport::findOrFail($id);
+
+
     $histories = $report->statusHistories()
         ->with('updater')
         ->latest('created_at')
         ->get()
         ->map(function ($history) {
+
             return [
                 'id' => $history->id,
                 'status' => $history->status,
@@ -402,7 +434,9 @@ class CitizenReportController extends Controller
                 'updated_by' => $history->updater?->name,
                 'created_at' => $history->created_at?->format('d M Y, H:i'),
             ];
+
         });
+
 
     return response()->json([
         'histories' => $histories,
