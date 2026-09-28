@@ -35,4 +35,19 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | SIGMA AI Service (FastAPI)
+    |--------------------------------------------------------------------------
+    |
+    | URL dan timeout untuk AI Service Python/FastAPI (folder ai_service).
+    | Dipakai App\Services\AI\AIService.
+    |
+    */
+
+    'ai' => [
+        'url' => env('AI_SERVICE_URL', 'http://127.0.0.1:8000'),
+        'timeout' => env('AI_SERVICE_TIMEOUT', 20),
+    ],
+
 ];

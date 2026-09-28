@@ -1,0 +1,9 @@
+﻿
+
+ProcessId   : 9200
+Name        : python.exe
+CommandLine : "C:\Users\Asus\AppData\Local\Programs\Python\Python310\python.exe" 
+              "D:\laragon\www\SIGMA\ai_service\ai_service_sigma\venv\Scripts\uvicorn.exe" app.main:app --reload
+
+
+
