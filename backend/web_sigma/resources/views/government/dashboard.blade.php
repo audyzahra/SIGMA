@@ -1,8 +1,14 @@
 @extends('layouts.government')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/government/dashboard.css') }}">
+@endpush
+
 @section('title', 'Dashboard Monitoring Karhutla | SIGMA')
 
 @section('content')
+
+<div class="dashboard-page">
 
 <section class="page-heading">
     <div>
@@ -26,7 +32,7 @@
      STATISTIK UTAMA
 ============================================================ --}}
 
-<div class="stats-grid">
+<div class="stats-grid government-stats">
 
     @foreach($data['government_metrics'] as $metric)
 
@@ -35,7 +41,7 @@
             :value="$metric['value']"
             :icon="$metric['icon']"
             :accent="$metric['accent']"
-            caption="<b class='success'>↑ Data realtime</b>"
+            caption="<b class='success'>Data realtime</b>"
         />
 
     @endforeach
@@ -175,22 +181,70 @@
     title="Aktivitas Terkini"
 >
 
-    <p>
-        Sinkronisasi data satelit berhasil dan seluruh indikator
-        risiko telah diperbarui.
-    </p>
 
-    <div class="modal-actions">
+<div class="table-wrap">
 
-        <button
-            class="button button-primary"
-            data-modal-close
-        >
-            Tutup
-        </button>
+    <table class="data-table">
 
-    </div>
+        <thead>
+
+            <tr>
+
+                <th>
+                    Waktu
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Aktivitas
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        @foreach($data['recent_activities'] ?? [] as $activity)
+
+            <tr>
+
+                <td>
+                    {{ $activity['time'] }}
+                </td>
+
+
+                <td>
+
+                    <span class="status {{ $activity['type'] }}">
+                        {{ ucfirst($activity['type']) }}
+                    </span>
+
+                </td>
+
+
+                <td>
+                    {{ $activity['label'] }}
+                </td>
+
+
+            </tr>
+
+        @endforeach
+
+
+        </tbody>
+
+
+    </table>
+
+</div>
 
 </x-sigma.modal>
 
+</div>
 @endsection
