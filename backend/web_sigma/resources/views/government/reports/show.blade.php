@@ -131,13 +131,13 @@
 
                     {{ match ($report->report_type) {
                         'fire' => 'Kebakaran',
-
+                    
                         'smoke' => 'Asap',
-
+                    
                         'burning_activity' => 'Aktivitas Pembakaran',
-
+                    
                         'other' => 'Lainnya',
-
+                    
                         default => ucfirst(str_replace('_', ' ', $report->report_type ?? '-')),
                     } }}
 
@@ -292,26 +292,33 @@
         </div>
 
 
-        @forelse($report->statusHistories as $history)
+        @forelse($report->statusHistories->sortBy('created_at') as $history)
             <div class="report-history-item">
 
                 <div>
 
                     <strong>
 
-                        {{ match ($history->status) {
-                            'submitted' => 'Laporan Dikirim',
-
-                            'pending' => 'Menunggu Verifikasi',
-
-                            'verified' => 'Laporan Diterima',
-
-                            'rejected' => 'Laporan Ditolak',
-
-                            'process' => 'Laporan Diproses',
+                        {{ match (true) {
+                            $history->status === 'submitted' => 'Laporan Dikirim',
                         
-                            'completed' => 'Penanganan Selesai',
-
+                            $history->status === 'pending' => 'Menunggu Verifikasi',
+                        
+                            $history->status === 'verified' => 'Laporan Diterima',
+                        
+                            $history->status === 'rejected' => 'Laporan Ditolak',
+                        
+                            $history->status === 'process' && str_contains(strtolower($history->description ?? ''), 'menerima tugas')
+                                => 'Tugas Diterima Petugas',
+                        
+                            $history->status === 'process' &&
+                                str_contains(strtolower($history->description ?? ''), 'mulai melakukan penanganan')
+                                => 'Penanganan Dimulai',
+                        
+                            $history->status === 'process' => 'Laporan Diproses',
+                        
+                            $history->status === 'completed' => 'Penanganan Selesai',
+                        
                             default => ucfirst($history->status),
                         } }}
                     </strong>
@@ -359,7 +366,7 @@
         AKSI PEMERINTAH
     =========================================================== --}}
 
-    @if ($report->verification_status === 'pending')
+    @if ($report->verification_status === 'pending' || $report->verification_status === 'verified')
         <section class="panel">
 
             <div class="section-title">
@@ -369,7 +376,7 @@
                 </h2>
 
                 <p>
-                    Periksa informasi laporan sebelum menentukan statusnya.
+                    Kelola proses verifikasi dan penanganan laporan.
                 </p>
 
             </div>
@@ -377,23 +384,46 @@
 
             <div class="modal-actions">
 
-                <button type="button" class="button button-light" data-modal="reject-report-modal">
-                    Tolak Laporan
-                </button>
 
+                {{-- BELUM DIVERIFIKASI --}}
+                @if ($report->verification_status === 'pending')
+                    <button type="button" class="button button-light" data-modal="reject-report-modal">
 
-                <form method="POST" action="{{ route('government.reports.verify', $report) }}">
+                        Tolak Laporan
 
-                    @csrf
-                    @method('PATCH')
-
-                    <button type="submit" class="button button-primary">
-                        Terima Laporan
                     </button>
 
-                </form>
+
+
+                    <form method="POST" action="{{ route('government.reports.verify', $report) }}">
+
+                        @csrf
+                        @method('PATCH')
+
+
+                        <button type="submit" class="button button-primary">
+
+                            Terima Laporan
+
+                        </button>
+
+
+                    </form>
+
+
+
+                    {{-- SUDAH DITERIMA --}}
+                @elseif($report->verification_status === 'verified')
+                    <button type="button" class="button button-primary" data-modal="send-officer-modal">
+
+                        Kirim Petugas →
+
+                    </button>
+                @endif
+
 
             </div>
+
 
         </section>
     @endif
@@ -444,4 +474,206 @@
 
     </x-sigma.modal>
 
+    {{-- ==========================================================
+        MODAL KIRIM PETUGAS
+    =========================================================== --}}
+
+    <x-sigma.modal id="send-officer-modal" title="Kirim Petugas Penanganan">
+
+
+        <form method="POST" action="{{ route('government.reports.assign') }}">
+            @csrf
+
+            <input type="hidden" name="report_id" value="{{ $report->id }}">
+
+
+            <div class="form-group">
+
+                <label>
+                    Wilayah Penanganan
+                </label>
+
+
+                <select name="region" class="form-control">
+
+
+                    <option value="">
+                        Pilih Wilayah
+                    </option>
+
+
+                    @foreach ($regions as $region)
+                        <option value="{{ $region->name }}">
+
+                            {{ $region->name }}
+
+                        </option>
+                    @endforeach
+
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Pilih Petugas
+                </label>
+
+
+                <select name="team_id" class="form-control">
+
+
+                    <option value="">
+                        Pilih Tim Pemadam
+                    </option>
+
+
+                    @foreach ($teams as $team)
+                        <option value="{{ $team->id }}">
+
+                            {{ $team->team_name }}
+
+                        </option>
+                    @endforeach
+
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Jenis Penanganan
+                </label>
+
+
+                <select name="action_type" class="form-control">
+
+
+                    <option value="">
+                        Pilih Jenis Penanganan
+                    </option>
+
+
+                    @foreach ($actions as $action)
+                        <option value="{{ $action->name }}">
+
+                            {{ $action->name }}
+
+                        </option>
+                    @endforeach
+
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+                    Instruksi Tambahan
+                </label>
+
+
+                <textarea name="instruction" class="form-control" rows="3" placeholder="Masukkan arahan untuk petugas">
+</textarea>
+
+
+            </div>
+
+
+
+
+            <div class="modal-actions">
+
+
+                <button type="button" class="button button-light" data-modal-close>
+                    Batal
+                </button>
+
+
+
+                <button type="submit" class="button button-primary">
+
+                    Kirim Petugas
+
+                </button>
+
+
+
+            </div>
+
+
+        </form>
+
+
+    </x-sigma.modal>
+
+
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const reportId = @json($report->id);
+
+            let lastHistoryId = @json($report->statusHistories->max('id'));
+
+            async function checkReportHistory() {
+
+                try {
+
+                    const response = await fetch(
+                        `{{ url('/government/reports') }}/${reportId}/history`, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }
+                    );
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (!data.histories || !data.histories.length) {
+                        return;
+                    }
+
+                    const latest = data.histories[0];
+
+                    if (latest.id > lastHistoryId) {
+
+                        lastHistoryId = latest.id;
+
+                        window.location.reload();
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        'Gagal mengecek update laporan:',
+                        error
+                    );
+
+                }
+
+            }
+
+            setInterval(checkReportHistory, 3000);
+
+        });
+    </script>
+@endpush

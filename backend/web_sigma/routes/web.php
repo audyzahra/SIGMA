@@ -208,6 +208,11 @@ Route::middleware(['auth', 'role:government'])
         )->name('reports.index');
 
         Route::get(
+            'reports/{report}/history',
+            [CitizenReportController::class, 'history']
+        )->name('reports.history');
+
+        Route::get(
             'reports/{report}',
             [CitizenReportController::class, 'show']
         )->name('reports.show');
@@ -221,6 +226,11 @@ Route::middleware(['auth', 'role:government'])
             'reports/{report}/reject',
             [CitizenReportController::class, 'reject']
         )->name('reports.reject');
+
+        Route::post(
+            'reports/assign',
+            [CitizenReportController::class, 'assign']
+        )->name('reports.assign');
 
 
         /*
