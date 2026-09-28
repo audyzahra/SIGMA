@@ -310,90 +310,347 @@ class TaskTile extends StatelessWidget {
   }
 }
 
-class TaskDetailPage extends StatelessWidget {
+class TaskDetailPage extends StatefulWidget {
   const TaskDetailPage({super.key, required this.store, required this.task});
 
   final OfficerStore store;
   final OfficerTask task;
 
   @override
+  State<TaskDetailPage> createState() => _TaskDetailPageState();
+}
+
+class _TaskDetailPageState extends State<TaskDetailPage> {
+  bool _updating = false;
+
+  OfficerTask get currentTask {
+    return widget.store.tasks.firstWhere(
+      (item) => item.id == widget.task.id,
+      orElse: () => widget.task,
+    );
+  }
+
+  Future<void> _updateStatus(TaskStatus status) async {
+    if (_updating) return;
+
+    setState(() {
+      _updating = true;
+    });
+
+    await widget.store.setTaskStatus(widget.task.id, status);
+
+    if (!mounted) return;
+
+    setState(() {
+      _updating = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final incident = task.incident;
-    final status = task.status;
+    // final task = currentTask;
+    // final incident = task.incident;
+    // final status = task.status;
 
-    return Scaffold(
-      body: SafeArea(
-        child: OfficerPage(
-          title: 'Detail Tugas',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SigmaCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      incident.location,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18,
-                      ),
+    return AnimatedBuilder(
+      animation: widget.store,
+      builder: (context, _) {
+        final updatedTask = currentTask;
+        final updatedStatus = updatedTask.status;
+
+        return Scaffold(
+          body: SafeArea(
+            child: OfficerPage(
+              title: 'Detail Tugas',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /*
+                  |--------------------------------------------------------------------------
+                  | INFORMASI TUGAS
+                  |--------------------------------------------------------------------------
+                  */
+
+                  SigmaCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          updatedTask.incident.location,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                          ),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        Text(
+                          '${updatedTask.incident.latitude}, '
+                          '${updatedTask.incident.longitude}',
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        SigmaChip(
+                          text: statusLabel(updatedStatus),
+                          color: statusColor(updatedStatus),
+                        ),
+                      ],
                     ),
-                    Text('${incident.latitude}, ${incident.longitude}'),
-                    const SizedBox(height: 8),
-                    SigmaChip(
-                      text: statusLabel(status),
-                      color: statusColor(status),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  /*
+                  |--------------------------------------------------------------------------
+                  | PROGRESS TINDAKAN
+                  |--------------------------------------------------------------------------
+                  */
+                  const Text(
+                    'Proses Penanganan',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: sigmaNavy,
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  _TaskProgressActions(
+                    status: updatedStatus,
+                    loading: _updating,
+                    onStatusSelected: _updateStatus,
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              if (status == TaskStatus.assigned)
-                SigmaButton(
-                  label: 'Terima Tugas',
-                  onPressed: () async {
-                    await store.setTaskStatus(task.id, TaskStatus.accepted);
-
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                    }
-                  },
-                )
-              else
-                _NextTaskAction(store: store, task: task, status: status),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-class _NextTaskAction extends StatelessWidget {
-  const _NextTaskAction({
-    required this.store,
-    required this.task,
+class _TaskProgressActions extends StatelessWidget {
+  const _TaskProgressActions({
     required this.status,
+    required this.loading,
+    required this.onStatusSelected,
   });
 
-  final OfficerStore store;
-  final OfficerTask task;
   final TaskStatus status;
+  final bool loading;
+  final Future<void> Function(TaskStatus status) onStatusSelected;
 
   @override
   Widget build(BuildContext context) {
-    final next = nextStatus(status);
+    final steps = <TaskStatus>[
+      TaskStatus.accepted,
+      TaskStatus.enRoute,
+      TaskStatus.arrived,
+      TaskStatus.handling,
+      TaskStatus.completed,
+    ];
 
-    if (next == null) {
-      return const SizedBox.shrink();
+    final currentIndex = _currentIndex(status);
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: steps.asMap().entries.map((entry) {
+        final index = entry.key;
+        final step = entry.value;
+
+        /*
+        |--------------------------------------------------------------------------
+        | BELUM SAMPAI
+        |--------------------------------------------------------------------------
+        */
+
+        if (index > currentIndex + 1) {
+          return _TaskStepButton(
+            label: actionLabel(step),
+            icon: Icons.lock_outline,
+            enabled: false,
+            completed: false,
+            loading: false,
+            onPressed: null,
+          );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUDAH SELESAI
+        |--------------------------------------------------------------------------
+        */
+
+        if (index <= currentIndex) {
+          return _TaskStepButton(
+            label: actionLabel(step),
+            icon: Icons.check,
+            enabled: false,
+            completed: true,
+            loading: false,
+            onPressed: null,
+          );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | AKSI BERIKUTNYA
+        |--------------------------------------------------------------------------
+        */
+
+        return _TaskStepButton(
+          label: actionLabel(step),
+          icon: _actionIcon(step),
+          enabled: !loading,
+          completed: false,
+          loading: loading,
+          onPressed: () {
+            onStatusSelected(step);
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  int _currentIndex(TaskStatus status) {
+    return switch (status) {
+      TaskStatus.assigned => -1,
+      TaskStatus.accepted => 0,
+      TaskStatus.enRoute => 1,
+      TaskStatus.arrived => 2,
+      TaskStatus.handling => 3,
+      TaskStatus.completed => 4,
+      _ => -1,
+    };
+  }
+
+  IconData _actionIcon(TaskStatus status) {
+    return switch (status) {
+      TaskStatus.accepted => Icons.check_circle_outline,
+      TaskStatus.enRoute => Icons.directions_car_outlined,
+      TaskStatus.arrived => Icons.location_on_outlined,
+      TaskStatus.handling => Icons.local_fire_department_outlined,
+      TaskStatus.completed => Icons.done_all,
+      _ => Icons.arrow_forward,
+    };
+  }
+}
+
+class _TaskStepButton extends StatelessWidget {
+  const _TaskStepButton({
+    required this.label,
+    required this.icon,
+    required this.enabled,
+    required this.completed,
+    required this.loading,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool enabled;
+  final bool completed;
+  final bool loading;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    /*
+    |--------------------------------------------------------------------------
+    | SUDAH SELESAI
+    |--------------------------------------------------------------------------
+    */
+
+    if (completed) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE8F5E9),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFA5D6A7)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, size: 17, color: sigmaGreen),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: sigmaGreen,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
-    return SigmaButton(
-      label: actionLabel(next),
-      onPressed: () {
-        store.setTaskStatus(task.id, next);
-      },
+    /*
+    |--------------------------------------------------------------------------
+    | BELUM AKTIF
+    |--------------------------------------------------------------------------
+    */
+
+    if (!enabled) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F3F5),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 17, color: Colors.grey.shade500),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | AKSI BERIKUTNYA
+    |--------------------------------------------------------------------------
+    */
+
+    return ElevatedButton.icon(
+      onPressed: loading ? null : onPressed,
+      icon: loading
+          ? const SizedBox(
+              width: 15,
+              height: 15,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Icon(icon, size: 17),
+      label: Text(loading ? 'Memproses...' : label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: sigmaRed,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: sigmaRed.withValues(alpha: 0.6),
+        disabledForegroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 0,
+      ),
     );
   }
 }
@@ -706,7 +963,14 @@ String actionLabel(TaskStatus status) {
 }
 
 Color statusColor(TaskStatus status) {
-  return status == TaskStatus.completed ? sigmaGreen : sigmaOrange;
+  return switch (status) {
+    TaskStatus.completed => sigmaGreen,
+    TaskStatus.handling => sigmaRed,
+    TaskStatus.arrived => sigmaBlue,
+    TaskStatus.enRoute => sigmaOrange,
+    TaskStatus.accepted => sigmaBlue,
+    _ => sigmaOrange,
+  };
 }
 
 class _LoadError extends StatelessWidget {
