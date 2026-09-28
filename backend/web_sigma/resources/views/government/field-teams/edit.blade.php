@@ -1,13 +1,17 @@
 @extends('layouts.government')
 
-@section('title', 'Edit Tim Pemadam | SIGMA')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/government/field_team.css') }}">
+@endpush
 
+@section('title', 'Edit Tim Pemadam | SIGMA')
 
 @section('content')
 
-    <div class="page-heading">
+    <section class="page-heading">
 
         <div>
+
             <p class="breadcrumb">
                 Beranda › Tim Pemadam › Edit
             </p>
@@ -17,101 +21,53 @@
             </h1>
 
             <p>
-                Perbarui informasi tim dan anggota petugas lapangan.
+                Perbarui informasi dan anggota tim petugas lapangan.
             </p>
+
         </div>
 
 
-        <a href="{{ route('government.field-teams.index') }}" class="button button-light">
-            ← Kembali
+        <a href="{{ route('government.field-teams.index') }}"
+           class="button button-light">
+            Kembali
         </a>
 
-    </div>
+    </section>
 
 
+    <section class="panel">
 
-    <div class="panel">
-
-        <form action="{{ route('government.field-teams.update', $team->id) }}" method="POST">
+        <form method="POST"
+              action="{{ route(
+                  'government.field-teams.update',
+                  \App\Helpers\EncryptHelper::encrypt($team->id)
+              ) }}">
 
             @csrf
             @method('PUT')
 
+            <div class="field-team-form">
 
-            <div class="form-group">
+                @include('government.field-teams.form')
 
-                <label>
-                    Nama Tim
-                </label>
+                <div class="form-actions">
 
-                <input type="text" name="team_name" value="{{ old('team_name', $team->team_name) }}" required>
+                    <a href="{{ route('government.field-teams.index') }}"
+                       class="button button-light">
+                        Batal
+                    </a>
 
-            </div>
-
-
-
-            <div class="form-group">
-
-                <label>
-                    Ketua Tim
-                </label>
-
-                <input type="text" name="leader_name" value="{{ old('leader_name', $team->leader_name) }}">
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-                    Pilih Anggota Petugas
-                </label>
-
-
-                <div class="member-list">
-
-                    @foreach ($officers as $officer)
-                        <label class="checkbox-item">
-
-
-                            <input type="checkbox" name="members[]" value="{{ $officer->id }}"
-                                {{ $team->members->contains('id', $officer->id) ? 'checked' : '' }}>
-
-
-                            <span>
-                                {{ $officer->name }}
-                            </span>
-
-
-                        </label>
-                    @endforeach
+                    <button type="submit"
+                            class="button button-primary">
+                        Simpan Perubahan
+                    </button>
 
                 </div>
 
-
             </div>
-
-
-
-            <div class="form-actions">
-
-
-                <a href="{{ route('government.field-teams.index') }}" class="button button-light">
-                    Batal
-                </a>
-
-
-                <button type="submit" class="button button-primary">
-                    Simpan Perubahan
-                </button>
-
-
-            </div>
-
-
 
         </form>
 
-    </div>
-
+    </section>
 
 @endsection

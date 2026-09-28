@@ -8,6 +8,7 @@
     <title>@yield('title', 'SIGMA Pemerintah')</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     {{-- Leaflet GIS --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
@@ -228,6 +229,10 @@
                     ?.classList.toggle('open');
             });
         });
+    </script>
+
+    <script>
+        lucide.createIcons();
     </script>
 
     @stack('scripts')

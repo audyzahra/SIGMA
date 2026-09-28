@@ -1,0 +1,430 @@
+/* ==========================================================
+   SIGMA GOVERNMENT - FIELD TEAM
+   File : field_team.css
+
+   Fungsi :
+   - Styling tabel Tim Pemadam
+   - Styling form Tambah/Edit Tim
+   - Styling daftar anggota petugas
+   - Styling halaman Detail
+   - Styling tombol aksi
+   ========================================================== */
+
+
+/* ==========================================================
+   1. FIELD TEAM TABLE
+   ========================================================== */
+
+.field-team-table {
+    width: 100%;
+}
+
+/* Header tabel */
+.field-team-table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Isi tabel */
+.field-team-table tbody td {
+    vertical-align: middle;
+}
+
+/* Nama tim dan informasi tambahan */
+.field-team-name {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Nomor telepon di bawah nama tim */
+.field-team-name small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+/* Kolom tabel selain nama tim */
+.field-team-table tbody td:not(:first-child) {
+    text-align: center;
+}
+
+
+/* ==========================================================
+   2. MEMBER BADGE
+   Digunakan pada tabel dan halaman detail.
+   ========================================================== */
+
+.member-pill {
+    display: inline-block;
+
+    padding: 5px 10px;
+    margin: 3px;
+
+    border-radius: 999px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* ==========================================================
+   3. TABLE ACTION
+   Tombol Detail, Edit, dan Hapus pada tabel.
+   ========================================================== */
+
+.field-team-table .table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Form DELETE tetap sejajar dengan action lainnya */
+.inline-action {
+    display: inline-flex;
+}
+
+
+/* ==========================================================
+   4. FIELD TEAM FORM
+   Container utama form Tambah/Edit.
+   ========================================================== */
+
+.field-team-form {
+    padding: 28px;
+}
+
+/* Grid informasi utama tim */
+.field-team-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 22px 24px;
+}
+
+
+/* ==========================================================
+   5. INPUT FORM
+   ========================================================== */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Label */
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Input */
+.form-group input {
+    width: 100%;
+    height: 44px;
+
+    padding: 0 14px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #1e293b;
+
+    font-size: 14px;
+
+    outline: none;
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Placeholder */
+.form-group input::placeholder {
+    color: #94a3b8;
+}
+
+/* Focus */
+.form-group input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+
+/* ==========================================================
+   6. SECTION ANGGOTA PETUGAS
+   ========================================================== */
+
+.field-team-members {
+    margin-top: 28px;
+    padding-top: 24px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Judul section */
+.section-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    margin-bottom: 14px;
+}
+
+/* Label section */
+.section-label label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Keterangan section */
+.section-label span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+
+/* ==========================================================
+   7. MEMBER LIST
+   Daftar petugas pada form.
+   ========================================================== */
+
+.member-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+}
+
+
+/* ==========================================================
+   8. MEMBER CHECKBOX
+   Digunakan hanya pada form Tambah/Edit.
+   ========================================================== */
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 48px;
+    padding: 0 14px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+/* Hover */
+.checkbox-item:hover {
+    border-color: #bfdbfe;
+    background: #f8fafc;
+}
+
+/* Checkbox */
+.checkbox-item input {
+    width: 16px;
+    height: 16px;
+
+    margin: 0;
+
+    accent-color: #2563eb;
+
+    cursor: pointer;
+}
+
+/* Nama petugas */
+.checkbox-item span {
+    font-size: 14px;
+    color: #334155;
+}
+
+
+/* ==========================================================
+   9. EMPTY MEMBER
+   ========================================================== */
+
+.empty-members {
+    grid-column: 1 / -1;
+
+    padding: 18px;
+
+    text-align: center;
+
+    color: #64748b;
+    font-size: 14px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+
+    background: #f8fafc;
+}
+
+
+/* ==========================================================
+   10. FORM ACTIONS
+   Tombol Batal dan Simpan.
+   Posisi berada di kanan bawah.
+   ========================================================== */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 30px;
+    padding-top: 20px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Ukuran tombol */
+.form-actions .button {
+    min-width: 110px;
+    justify-content: center;
+}
+
+
+/* ==========================================================
+   11. DETAIL PAGE
+   ========================================================== */
+
+/* Tombol Edit dan Kembali pada header detail */
+.field-team-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Garis pemisah informasi dan anggota */
+.field-team-detail-divider {
+    height: 1px;
+
+    margin: 28px 0;
+
+    background: #e2e8f0;
+}
+
+/* Section anggota pada detail */
+.field-team-member-section {
+    width: 100%;
+}
+
+/* Daftar anggota pada detail */
+.detail-member-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 6px;
+
+    min-height: 40px;
+}
+
+/* Kondisi ketika tidak ada anggota */
+.empty-detail-member {
+    margin: 0;
+
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+/* ==========================================================
+   12. ACTION BUTTON
+   ========================================================== */
+
+.action-btn {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    transition: transform 0.2s ease;
+}
+
+/* Ukuran icon Lucide */
+.action-btn svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* Detail */
+.action-btn.detail {
+    color: #2563eb;
+}
+
+/* Edit */
+.action-btn.edit {
+    color: #16a34a;
+}
+
+/* Delete */
+.action-btn.delete {
+    color: #dc2626;
+}
+
+/* Hover */
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+
+/* ==========================================================
+   13. RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 768px) {
+
+    /* Form menjadi satu kolom */
+    .field-team-fields {
+        grid-template-columns: 1fr;
+    }
+
+    /* Anggota menjadi satu kolom */
+    .member-list {
+        grid-template-columns: 1fr;
+    }
+
+    /* Tombol form memenuhi lebar */
+    .form-actions {
+        justify-content: stretch;
+    }
+
+    .form-actions .button {
+        flex: 1;
+    }
+
+    /* Tombol header detail */
+    .field-team-header-actions {
+        width: 100%;
+    }
+
+    .field-team-header-actions .button {
+        flex: 1;
+    }
+}
