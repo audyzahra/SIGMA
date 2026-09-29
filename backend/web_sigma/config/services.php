@@ -47,7 +47,12 @@ return [
 
     'ai' => [
         'url' => env('AI_SERVICE_URL', 'http://127.0.0.1:8000'),
-        'timeout' => env('AI_SERVICE_TIMEOUT', 20),
+
+        /*
+        | AI_SERVICE_TIMEOUT dipakai lebih dulu; jika tidak diset,
+        | AI_REQUEST_TIMEOUT (konfigurasi AI Service) juga dibaca.
+        */
+        'timeout' => env('AI_SERVICE_TIMEOUT', env('AI_REQUEST_TIMEOUT', 20)),
     ],
 
 ];

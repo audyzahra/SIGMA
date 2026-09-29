@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 
+from config import setup_logging
+
 from routers.fire_risk import router as fire_risk_router
+
+
+setup_logging()
 
 
 app = FastAPI(

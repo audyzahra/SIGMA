@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Web\Government;
 use App\Http\Controllers\Controller;
 use App\Models\Region;
 use App\Models\FireRisk;
-use App\Models\FireRiskHistory;
 use App\Services\AI\AIService;
+use App\Services\AI\FireRiskPredictionService;
+use App\Services\GIS\RegionGeometry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -184,9 +185,9 @@ class FireRiskController extends Controller
      *
      * Province
      *    |
-     *    └── Regency
+     *    â””â”€â”€ Regency
      *          |
-     *          └── District
+     *          â””â”€â”€ District
      */
     public function children($id)
     {
@@ -209,31 +210,22 @@ class FireRiskController extends Controller
     }
 
     /**
-     * Skor risiko per level.
-     *
-     * Mengikuti konvensi data fire_risks yang sudah ada
-     * (LOW = 30, MEDIUM = 60, HIGH = 72).
-     */
-    protected const RISK_SCORES = [
-        'LOW' => 30,
-        'MEDIUM' => 60,
-        'HIGH' => 72,
-    ];
-
-    /**
      * Perbarui analisis risiko memakai AI Service (FastAPI).
      *
      * Alur:
-     *   regions (geometry) -> titik tengah dari GeoJSON
-     *   -> AI POST /predict-region
-     *   -> simpan ke fire_risks + fire_risk_histories
+     *   regions (geometry) -> titik tengah GeoJSON (RegionGeometry)
+     *   -> AI POST /predict-region (NASA POWER + NASA FIRMS + model)
+     *   -> normalisasi + simpan lewat FireRiskPredictionService
      *   -> respon JSON untuk frontend.
      *
      * Ketika AI Service offline, respon tetap JSON (success = false)
      * sehingga halaman tidak pernah HTTP 500.
      */
-    public function aiRefresh(Request $request, AIService $ai)
-    {
+    public function aiRefresh(
+        Request $request,
+        AIService $ai,
+        FireRiskPredictionService $predictionService
+    ) {
         $validated = $request->validate([
             'region_id' => ['nullable', 'integer', 'exists:regions,id'],
         ]);
@@ -266,12 +258,9 @@ class FireRiskController extends Controller
 
         }
 
-        $geometries = DB::table('regions')
-            ->whereIn('id', $regions->pluck('id'))
-            ->select(['id'])
-            ->selectRaw('ST_AsGeoJSON(geometry) AS geometry_json')
-            ->get()
-            ->keyBy('id');
+        $geometries = RegionGeometry::geojsonByRegionIds(
+            $regions->pluck('id')->all()
+        );
 
         $updated = [];
 
@@ -279,7 +268,7 @@ class FireRiskController extends Controller
 
         foreach ($regions as $region) {
 
-            $center = $this->geometryCenter(
+            $center = RegionGeometry::centerFromGeoJson(
                 optional($geometries->get($region->id))->geometry_json
             );
 
@@ -300,87 +289,33 @@ class FireRiskController extends Controller
                 $center['longitude']
             );
 
-            $level = strtoupper((string) ($prediction['risk_level'] ?? ''));
+            /*
+            |--------------------------------------------------------------------------
+            | Normalisasi + simpan
+            |--------------------------------------------------------------------------
+            |
+            | FireRiskPredictionService menangani normalisasi risk_level
+            | (LOW / MEDIUM / HIGH) serta penulisan fire_risks dan riwayatnya,
+            | termasuk metadata sumber data AI (NASA POWER / NASA FIRMS).
+            |
+            */
 
-            if (! ($prediction['success'] ?? false) || ! isset(self::RISK_SCORES[$level])) {
+            $row = $predictionService->store($region, $prediction, $center);
+
+            if (! $row) {
 
                 $failed[] = [
                     'region_id' => $region->id,
                     'name' => $region->name,
                     'message' => $prediction['message']
-                        ?? ('Hasil AI tidak dikenali: ' . $level),
+                        ?? 'Hasil AI tidak dikenali atau AI Service tidak dapat dihubungi.',
                 ];
 
                 continue;
 
             }
 
-            $attributes = [
-                'risk_score' => self::RISK_SCORES[$level],
-                'risk_level' => $level,
-                'calculated_at' => now(),
-            ];
-
-            if (isset($prediction['confidence']) && is_numeric($prediction['confidence'])) {
-
-                $attributes['ai_confidence'] = round(
-                    (float) $prediction['confidence'],
-                    2
-                );
-
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Parameter cuaca
-            |--------------------------------------------------------------------------
-            |
-            | AI dapat mengembalikan nilai 0 ketika baris dataset terdekat tidak
-            | memiliki data cuaca. Nilai 0 tidak ditulis agar halaman tidak
-            | menampilkan suhu/kelembapan yang menyesatkan.
-            |
-            */
-
-            foreach (['temperature', 'humidity', 'rainfall', 'wind_speed'] as $parameter) {
-
-                $value = $prediction[$parameter] ?? null;
-
-                if ($value !== null && is_numeric($value) && (float) $value > 0) {
-
-                    $attributes[$parameter] = (float) $value;
-
-                }
-
-            }
-
-            $fireRisk = FireRisk::updateOrCreate(
-                ['region_id' => $region->id],
-                $attributes
-            );
-
-            FireRiskHistory::create([
-                'region_id' => $region->id,
-                'risk_score' => $attributes['risk_score'],
-                'risk_level' => $attributes['risk_level'],
-                'calculated_at' => $attributes['calculated_at'],
-            ]);
-
-            $updated[] = [
-                'region_id' => $region->id,
-                'name' => $region->name,
-                'level' => $region->level,
-                'risk_score' => $fireRisk->risk_score,
-                'risk_level' => $fireRisk->risk_level,
-                'temperature' => $fireRisk->temperature,
-                'humidity' => $fireRisk->humidity,
-                'wind_speed' => $fireRisk->wind_speed,
-                'rainfall' => $fireRisk->rainfall,
-                'confidence' => $attributes['ai_confidence'] ?? null,
-                'calculated_at' => optional($fireRisk->calculated_at)
-                    ->format('Y-m-d H:i:s'),
-                'latitude' => round($center['latitude'], 4),
-                'longitude' => round($center['longitude'], 4),
-            ];
+            $updated[] = $row;
 
         }
 
@@ -395,89 +330,5 @@ class FireRiskController extends Controller
                 ? 'Analisis AI diperbarui untuk ' . count($updated) . ' wilayah.'
                 : 'AI Service tidak dapat dihubungi atau tidak ada wilayah yang dapat dianalisis.',
         ]);
-    }
-
-    /**
-     * Titik tengah wilayah dari GeoJSON.
-     *
-     * MySQL tidak mendukung ST_Centroid / ST_Envelope untuk geometry
-     * SRID 4326 (error 3618), sehingga titik tengah dihitung dari
-     * bounding box koordinat GeoJSON.
-     */
-    protected function geometryCenter(?string $geojson): ?array
-    {
-        if (! $geojson) {
-            return null;
-        }
-
-        $geometry = json_decode($geojson, true);
-
-        if (! is_array($geometry) || empty($geometry['coordinates'])) {
-            return null;
-        }
-
-        $bounds = [
-            'min_latitude' => null,
-            'max_latitude' => null,
-            'min_longitude' => null,
-            'max_longitude' => null,
-        ];
-
-        $this->collectCoordinates($geometry['coordinates'], $bounds);
-
-        if ($bounds['min_latitude'] === null || $bounds['min_longitude'] === null) {
-            return null;
-        }
-
-        return [
-            'latitude' => ($bounds['min_latitude'] + $bounds['max_latitude']) / 2,
-            'longitude' => ($bounds['min_longitude'] + $bounds['max_longitude']) / 2,
-        ];
-    }
-
-    /**
-     * Kumpulkan batas koordinat (rekursif: Polygon / MultiPolygon).
-     */
-    protected function collectCoordinates(array $coordinates, array &$bounds): void
-    {
-        foreach ($coordinates as $coordinate) {
-
-            if (! is_array($coordinate)) {
-                continue;
-            }
-
-            if (
-                isset($coordinate[0], $coordinate[1])
-                && is_numeric($coordinate[0])
-                && is_numeric($coordinate[1])
-            ) {
-
-                $longitude = (float) $coordinate[0];
-
-                $latitude = (float) $coordinate[1];
-
-                $bounds['min_latitude'] = $bounds['min_latitude'] === null
-                    ? $latitude
-                    : min($bounds['min_latitude'], $latitude);
-
-                $bounds['max_latitude'] = $bounds['max_latitude'] === null
-                    ? $latitude
-                    : max($bounds['max_latitude'], $latitude);
-
-                $bounds['min_longitude'] = $bounds['min_longitude'] === null
-                    ? $longitude
-                    : min($bounds['min_longitude'], $longitude);
-
-                $bounds['max_longitude'] = $bounds['max_longitude'] === null
-                    ? $longitude
-                    : max($bounds['max_longitude'], $longitude);
-
-                continue;
-
-            }
-
-            $this->collectCoordinates($coordinate, $bounds);
-
-        }
     }
 }
