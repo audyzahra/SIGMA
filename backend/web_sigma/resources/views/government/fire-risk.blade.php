@@ -54,7 +54,6 @@
             <span class="success">● Rendah</span>
             <span class="warning">● Sedang</span>
             <span class="orange-text">● Tinggi</span>
-            <span class="danger">● Ekstrem</span>
         </div>
     </section>
 

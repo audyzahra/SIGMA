@@ -351,7 +351,7 @@ small,
     justify-content:space-between;
     position:sticky;
     top:0;
-    z-index:8
+    z-index:9999;
 }
 .header-brand,
 .topbar-meta {

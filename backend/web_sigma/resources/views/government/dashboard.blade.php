@@ -81,50 +81,28 @@
 
 
         {{-- Map --}}
-        <div class="map-placeholder monitoring-map">
+        <div class="monitoring-map">
 
-            <div class="map-controls">
-                ＋
-                <hr>
-                −
-            </div>
+    <div id="sigma-map"></div>
 
 
-            {{-- Placeholder wilayah --}}
-            <div class="island island-one"></div>
+    <div class="map-legend">
 
-            <div class="island island-two">
-                <i></i>
-                <i></i>
-            </div>
+        <span class="success">
+            ● Rendah
+        </span>
 
-            <div class="island island-three"></div>
+        <span class="warning">
+            ● Sedang
+        </span>
 
-            <div class="island island-four"></div>
+        <span class="orange-text">
+            ● Tinggi
+        </span>
 
+    </div>
 
-            {{-- Legend --}}
-            <div class="map-legend">
-
-                <span class="danger">
-                    ● Hotspot
-                </span>
-
-                <span class="orange-text">
-                    ● Zona Risiko
-                </span>
-
-                <span class="warning">
-                    ● Area Kejadian
-                </span>
-
-                <span>
-                    □ Batas Wilayah
-                </span>
-
-            </div>
-
-        </div>
+</div>
 
     </section>
 
@@ -247,4 +225,17 @@
 </x-sigma.modal>
 
 </div>
+
+<script>
+
+window.sigmaRegions = @json($sigmaRegions);
+
+</script>
+
+
+@push('scripts')
+
+<script src="{{ asset('js/government/gis-map.js') }}?v={{ time() }}"></script>
+
+@endpush
 @endsection

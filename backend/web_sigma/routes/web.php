@@ -271,10 +271,6 @@ Route::middleware(['auth', 'role:government'])
             'index'
         ])->name('field-teams.index');
 
-        Route::get('/field-teams/{team}', [
-            FieldTeamController::class,
-            'show'
-        ])->name('field-teams.show');
 
         Route::get('/field-teams/create', [
             FieldTeamController::class,
@@ -286,6 +282,12 @@ Route::middleware(['auth', 'role:government'])
             FieldTeamController::class,
             'store'
         ])->name('field-teams.store');
+
+
+        Route::get('/field-teams/{team}', [
+            FieldTeamController::class,
+            'show'
+        ])->name('field-teams.show');
 
 
         Route::get('/field-teams/{team}/edit', [

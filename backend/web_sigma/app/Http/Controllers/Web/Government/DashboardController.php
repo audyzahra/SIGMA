@@ -8,6 +8,8 @@ use App\Models\IncidentStatusHistory;
 use App\Models\Hotspot;
 use App\Models\Incident;
 use App\Models\FireRisk;
+use App\Models\Region;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -99,12 +101,85 @@ class DashboardController extends Controller
             ->latest('calculated_at')
             ->get();
 
+
+            $regions = Region::query()
+    ->whereIn('level', [
+        'province',
+        'regency',
+        'district'
+    ])
+    ->select([
+        'id',
+        'parent_id',
+        'name',
+        'code',
+        'level'
+    ])
+    ->orderBy('level')
+    ->orderBy('name')
+    ->get();
+
+
+$geometryData = DB::table('regions')
+    ->whereIn('level', [
+        'province',
+        'regency',
+        'district'
+    ])
+    ->select([
+        'id'
+    ])
+    ->selectRaw('ST_AsGeoJSON(geometry) AS geometry_json')
+    ->get()
+    ->keyBy('id');
+
+
+$regions->each(function ($region) use ($geometryData) {
+
+    $data = $geometryData->get($region->id);
+
+    $region->setAttribute(
+        'gis_geometry',
+        $data?->geometry_json
+    );
+
+});
+
+
+$riskByRegion = $fireRisks->keyBy('region_id');
+
+
+$sigmaRegions = $regions->map(function ($region) use ($riskByRegion) {
+
+    $risk = $riskByRegion->get($region->id);
+
+    return [
+        'id' => $region->id,
+        'name' => $region->name,
+        'code' => $region->code,
+        'level' => $region->level,
+        'parent_id' => $region->parent_id,
+
+        'geometry' => $region->gis_geometry,
+
+        'risk_score' => $risk?->risk_score ?? 0,
+        'risk_level' => $risk?->risk_level ?? 'LOW',
+
+        'temperature' => $risk?->temperature,
+        'humidity' => $risk?->humidity,
+        'wind_speed' => $risk?->wind_speed,
+        'rainfall' => $risk?->rainfall,
+    ];
+
+})->values();
+
         return view('government.dashboard', compact(
             'data',
             'statistics',
             'hotspots',
             'incidents',
-            'fireRisks'
+            'fireRisks',
+            'sigmaRegions'
         ));
     }
 }

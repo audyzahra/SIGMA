@@ -138,3 +138,25 @@
     }
 
 }
+
+.monitoring-map {
+    height:600px;
+    border-radius:18px;
+    overflow:hidden;
+}
+
+
+#sigma-map {
+
+    width:100%;
+    height:100%;
+
+}
+
+
+.leaflet-container {
+
+    width:100%;
+    height:100%;
+
+}

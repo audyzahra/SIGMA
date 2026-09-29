@@ -109,19 +109,15 @@
                         ● Sistem Normal
                     </span>
 
-                    <span>
-                        ◷ Selasa, 24 Okt 2024 • 10:45 WIB
+                    <span id="realtime-clock">
+                        ◷ Memuat waktu...
                     </span>
 
                     <button type="button"
                         class="icon-button"
                         data-toast="Tidak ada notifikasi baru">
-                        ♧
+                        <i data-lucide="bell"></i>
                     </button>
-
-                    <span class="avatar small">
-                        PS
-                    </span>
 
                 </div>
 
@@ -234,6 +230,60 @@
     <script>
         lucide.createIcons();
     </script>
+
+    <script>
+    function updateClock() {
+        const now = new Date();
+
+        const days = [
+            'Minggu',
+            'Senin',
+            'Selasa',
+            'Rabu',
+            'Kamis',
+            'Jumat',
+            'Sabtu'
+        ];
+
+        const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'Mei',
+            'Jun',
+            'Jul',
+            'Agu',
+            'Sep',
+            'Okt',
+            'Nov',
+            'Des'
+        ];
+
+        // WIB (UTC+7)
+        const wib = new Date(
+            now.toLocaleString('en-US', {
+                timeZone: 'Asia/Jakarta'
+            })
+        );
+
+        const day = days[wib.getDay()];
+        const date = wib.getDate();
+        const month = months[wib.getMonth()];
+        const year = wib.getFullYear();
+
+        const hours = String(wib.getHours()).padStart(2, '0');
+        const minutes = String(wib.getMinutes()).padStart(2, '0');
+        const seconds = String(wib.getSeconds()).padStart(2, '0');
+
+        document.getElementById('realtime-clock').innerHTML =
+            `◷ ${day}, ${date} ${month} ${year} • ${hours}:${minutes}:${seconds} WIB`;
+    }
+
+    updateClock();
+
+    setInterval(updateClock, 1000);
+</script>
 
     @stack('scripts')
 
