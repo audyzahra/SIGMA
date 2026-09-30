@@ -33,7 +33,7 @@ class AIModelController extends Controller
                 fn ($query, $value) => $query->where('status', $value)
             )
             ->latest()
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view(

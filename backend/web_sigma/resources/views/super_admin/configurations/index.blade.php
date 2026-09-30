@@ -148,8 +148,7 @@
             </tbody>
 
         </x-sigma.data-table>
-
-        {{ $configurations->links() }}
+        <x-pagination :paginator="$configurations" />
 
     </section>
 @endsection

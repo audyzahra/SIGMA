@@ -232,7 +232,7 @@
 
 
 
-        {{ $aspirations->links() }}
+        <x-pagination :paginator="$aspirations" />
 
 
 

@@ -107,7 +107,8 @@
                     </tr>
                 @endforelse
             </tbody>
-        </x-sigma.data-table>{{ $users->links() }}
+        </x-sigma.data-table>
+        <x-pagination :paginator="$users" />
     </section>
 
     <script>

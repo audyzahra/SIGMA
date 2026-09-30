@@ -279,11 +279,7 @@
             PAGINATION
         ======================================================= --}}
 
-        @if ($reports->hasPages())
-            <div style="margin-top: 20px;">
-                {{ $reports->links() }}
-            </div>
-        @endif
+        <x-pagination :paginator="$reports" />
 
     </section>
 

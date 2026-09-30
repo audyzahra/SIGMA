@@ -43,7 +43,7 @@ class RegionController extends Controller
             )
             ->orderBy('level')
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         if ($request->ajax()) {

@@ -180,6 +180,8 @@
                     </tr>
                 @endforelse
             </tbody>
-        </x-sigma.data-table>{{ $dataSources->links() }}
+        </x-sigma.data-table>
+        <x-pagination :paginator="$dataSources" />
+   
     </section>
 @endsection
