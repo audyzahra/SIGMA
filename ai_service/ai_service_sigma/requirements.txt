@@ -1,6 +1,9 @@
 fastapi
 uvicorn
 
+# HTTP client untuk NASA POWER / NASA FIRMS (dan data pipeline)
+requests
+
 pydantic
 python-dotenv
 
