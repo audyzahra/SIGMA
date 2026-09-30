@@ -6,6 +6,8 @@ use App\Models\Region;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+use function count;
+
 /**
  * Utility geometry wilayah (MySQL Spatial).
  *
@@ -14,6 +16,10 @@ use Illuminate\Support\Facades\DB;
  * bounding box GeoJSON.
  *
  * Format GeoJSON: [longitude, latitude] -> latitude = Y, longitude = X.
+ *
+ * Catatan urutan sumbu (terbukti pada MySQL 8.4):
+ *   ST_SRID(POINT(longitude, latitude), 4326)  -> benar
+ *   ST_SRID(POINT(latitude, longitude), 4326)  -> error 3732
  */
 class RegionGeometry
 {
@@ -22,6 +28,9 @@ class RegionGeometry
         'regency',
         'district',
     ];
+
+    /** Radius rata-rata bumi (km) untuk perhitungan lingkaran geodesik. */
+    public const EARTH_RADIUS_KM = 6371.0088;
 
     /**
      * Ambil GeoJSON wilayah (bulk, satu query).
@@ -100,6 +109,67 @@ class RegionGeometry
             'latitude' => ($bounds['min_latitude'] + $bounds['max_latitude']) / 2,
             'longitude' => ($bounds['min_longitude'] + $bounds['max_longitude']) / 2,
         ];
+    }
+
+    /**
+     * Lingkaran geodesik (zona analisis radius) sebagai GeoJSON Polygon.
+     *
+     * GeoJSON memakai urutan [longitude, latitude] sehingga hasilnya
+     * langsung kompatibel dengan ST_GeomFromGeoJSON.
+     *
+     * @return string GeoJSON Polygon
+     */
+    public static function radiusPolygon(
+        float $latitude,
+        float $longitude,
+        float $radiusKm,
+        int $steps = 96
+    ): string {
+        $steps = max($steps, 16);
+
+        $angularDistance = $radiusKm / self::EARTH_RADIUS_KM;
+
+        $latRad = deg2rad($latitude);
+        $lngRad = deg2rad($longitude);
+
+        $points = [];
+
+        for ($i = 0; $i <= $steps; $i++) {
+
+            $bearing = 2 * M_PI * $i / $steps;
+
+            $pointLat = asin(
+                sin($latRad) * cos($angularDistance)
+                + cos($latRad) * sin($angularDistance) * cos($bearing)
+            );
+
+            $pointLng = $lngRad + atan2(
+                sin($bearing) * sin($angularDistance) * cos($latRad),
+                cos($angularDistance) - sin($latRad) * sin($pointLat)
+            );
+
+            $points[] = [
+                round(rad2deg($pointLng), 6),
+                round(rad2deg($pointLat), 6),
+            ];
+
+        }
+
+        return json_encode([
+            'type' => 'Polygon',
+            'coordinates' => [$points],
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Ekspresi SQL untuk zona analisis radius (SRID 4326).
+     *
+     * Mengembalikan string SQL yang HARUS diikuti binding GeoJSON
+     * sebanyak jumlah placeholder ($placeholders).
+     */
+    public static function radiusSql(int $placeholders = 1): string
+    {
+        return str_repeat('ST_SRID(ST_GeomFromGeoJSON(?), 4326)', max($placeholders, 1));
     }
 
     /**

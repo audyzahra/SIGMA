@@ -2,34 +2,51 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\ImpactAssessment;
 use App\Models\Incident;
+use App\Services\Impact\ImpactAnalysisService;
+use Illuminate\Database\Seeder;
 
+/**
+ * Analisis dampak awal untuk insiden yang sudah ada.
+ *
+ * CATATAN PENTING
+ * Seeder ini TIDAK mengisi angka dampak secara manual. Nilai seperti jumlah
+ * penduduk terdampak, rumah tangga, luas hutan, atau impact score tidak boleh
+ * dikarang karena akan tampak sebagai hasil analisis nyata di dashboard.
+ *
+ * Yang dilakukan: menjalankan ImpactAnalysisService (perhitungan spatial
+ * MySQL + data nyata) untuk setiap insiden, lalu menyimpan hasilnya
+ * (impact_assessments) apa adanya — termasuk laporan bahwa dataset
+ * penduduk/permukiman belum tersedia.
+ */
 class ImpactAssessmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $incidents = Incident::all();
+        $service = app(ImpactAnalysisService::class);
+
+        $radius = $service->defaultRadius();
+
+        $incidents = Incident::query()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->orderBy('id')
+            ->take(5)
+            ->get();
 
         foreach ($incidents as $incident) {
-            ImpactAssessment::firstOrCreate(
-                [
-                    'incident_id' => $incident->id,
-                ],
-                [
-                    'affected_population' => 150,
-                    'affected_households' => 45,
-                    'affected_area' => 12.50,
-                    'forest_area' => 5.00,
-                    'peatland_area' => 2.50,
-                    'school_count' => 1,
-                    'hospital_count' => 0,
-                    'road_distance' => 2.50,
-                    'impact_score' => 40,
-                    'calculated_at' => now(),
-                ]
-            );
+
+            $analysis = $service->analyzeForIncident($incident, $radius);
+
+            if (! ($analysis['success'] ?? false)) {
+
+                continue;
+
+            }
+
+            $service->persist($analysis, $incident->id);
+
         }
     }
 }
+

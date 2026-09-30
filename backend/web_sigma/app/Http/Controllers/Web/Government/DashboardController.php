@@ -18,8 +18,17 @@ class DashboardController extends Controller
         // Statistik terbaru
         $statistics = FireStatistic::latest('statistic_date')->first();
 
-        // Data dasar dashboard
-        $data = config('sigma_data');
+        /*
+         * Dashboard TIDAK memakai config('sigma_data') sebagai sumber angka.
+         * Semua nilai di bawah berasal dari tabel nyata (fire_statistics,
+         * incident_status_histories). Bila statistik belum pernah dihitung,
+         * daftar metrik dibiarkan kosong supaya UI menampilkan keterangan
+         * "belum tersedia" alih-alih angka contoh.
+         */
+        $data = [
+            'government_metrics' => [],
+            'recent_activities' => [],
+        ];
 
         // Statistik dari database
         if ($statistics) {

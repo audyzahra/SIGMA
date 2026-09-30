@@ -34,7 +34,7 @@
 
 <div class="stats-grid government-stats">
 
-    @foreach($data['government_metrics'] as $metric)
+    @forelse($data['government_metrics'] as $metric)
 
         <x-sigma.stat-card
             :label="$metric['label']"
@@ -44,7 +44,18 @@
             caption="<b class='success'>Data realtime</b>"
         />
 
-    @endforeach
+    @empty
+
+        {{-- Tabel fire_statistics kosong: tampilkan keterangan, bukan angka contoh --}}
+        <x-sigma.stat-card
+            label="Statistik Hotspot"
+            value="Belum tersedia"
+            icon="alert"
+            accent="warning"
+            caption="Tabel <b>fire_statistics</b> masih kosong sehingga belum ada angka nyata untuk ditampilkan."
+        />
+
+    @endforelse
 
 </div>
 

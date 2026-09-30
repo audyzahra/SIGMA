@@ -1,0 +1,233 @@
+/*
+|--------------------------------------------------------------------------
+| Analisis Dampak — Government
+|--------------------------------------------------------------------------
+|
+| Melengkapi kelas dasar di app.css (.panel, .government-grid, .risk-grid,
+| .impact-metric, .impact-score, .filters, .data-table, .source-card).
+| Hanya menambah hal yang khusus halaman Analisis Dampak.
+|
+*/
+
+/* ------------------------------------------------------------------ PETA */
+
+#sigma-impact-map {
+    width: 100%;
+    height: 600px;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.map-panel {
+    padding: 20px;
+}
+
+.impact-point-select {
+    min-width: 260px;
+}
+
+.map-legend .legend-fire {
+    color: #d62828;
+}
+
+.map-legend .legend-zone {
+    color: #b45309;
+}
+
+.map-legend .legend-affected {
+    color: #ea580c;
+}
+
+.map-legend .legend-hotspot {
+    color: #b91c1c;
+}
+
+.map-legend .legend-incident {
+    color: #7c3aed;
+}
+
+.map-legend .legend-report {
+    color: #2563eb;
+}
+
+/* --------------------------------------------------------------- FILTER */
+
+.heading-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.impact-filter {
+    margin-bottom: 20px;
+}
+
+.impact-filter .filters {
+    margin-bottom: 0;
+}
+
+.impact-filter-note {
+    margin: 14px 0 0;
+    color: #6c5a58;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ------------------------------------------------------- PANEL DAMPAK */
+
+.impact-status {
+    margin: 0 0 14px;
+    color: #6c5a58;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.impact-detail .parameter:first-of-type {
+    border-top: 1px solid var(--line);
+}
+
+.impact-metric em {
+    display: block;
+    margin-top: 3px;
+    color: #7a6a68;
+    font-size: 11px;
+    font-style: normal;
+    line-height: 1.45;
+}
+
+.impact-metric.is-unavailable > span {
+    background: #eef1f6;
+    color: #7a838f;
+}
+
+.impact-metric.is-unavailable b {
+    color: #7a838f;
+    font-size: 15px;
+}
+
+/* --------------------------------------------------- KOMPONEN SKOR */
+
+.methodology-version {
+    color: #7a6a68;
+    font-size: 11px;
+    font-family: monospace;
+}
+
+.component-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.impact-component {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 15px;
+}
+
+.impact-component.is-unavailable {
+    background: #f8fafc;
+}
+
+.component-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.component-head span {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--red);
+}
+
+.impact-component.is-unavailable .component-head span {
+    color: #7a838f;
+    font-weight: 700;
+}
+
+.component-bar {
+    height: 6px;
+    margin: 9px 0 7px;
+    border-radius: 6px;
+    background: #eef1f6;
+    overflow: hidden;
+}
+
+.component-bar i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #d62828);
+}
+
+.impact-component small {
+    display: block;
+    color: #6c5a58;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.impact-component em {
+    display: block;
+    margin-top: 5px;
+    color: #8b7b78;
+    font-size: 11px;
+    font-style: normal;
+}
+
+/* ------------------------------------------------- OBJEK DALAM RADIUS */
+
+.impact-objects-grid {
+    grid-template-columns: 1.1fr 1.1fr;
+    align-items: start;
+    margin-top: 20px;
+}
+
+.sub-heading {
+    margin: 22px 0 10px;
+    font-size: 14px;
+}
+
+/* ------------------------------------------- SUMBER DATA & METODOLOGI */
+
+.impact-sources {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 6px;
+}
+
+.impact-sources .source-card h3 {
+    font-size: 13px;
+}
+
+.impact-sources .source-card p {
+    font-size: 11px;
+}
+
+.methodology-notes {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: #5d4d4b;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* ----------------------------------------------------------- RESPONSIF */
+
+@media (max-width: 1080px) {
+
+    #sigma-impact-map {
+        height: 420px;
+    }
+
+    .impact-objects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .impact-point-select {
+        min-width: 0;
+        flex-basis: 100%;
+    }
+}

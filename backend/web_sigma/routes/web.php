@@ -202,6 +202,22 @@ Route::middleware(['auth', 'role:government'])
             'index'
         ])->name('impact');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Analisis Dampak (Spatial)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/impact/analysis', [
+            ImpactController::class,
+            'analysis'
+        ])->name('impact.analysis');
+
+        Route::post('/impact/analysis', [
+            ImpactController::class,
+            'analyze'
+        ])->name('impact.analyze');
+
         Route::get('/priority', [
             PriorityController::class,
             'index'
