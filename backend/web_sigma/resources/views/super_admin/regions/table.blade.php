@@ -78,4 +78,6 @@
         @endforelse
     </tbody>
 
-</x-sigma.data-table>{{ $regions->links() }}
+</x-sigma.data-table>
+
+<x-pagination :paginator="$regions" />

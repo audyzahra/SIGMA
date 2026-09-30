@@ -28,7 +28,7 @@ class SystemConfigurationController extends Controller
                 fn ($query, $value) => $query->where('type', $value)
             )
             ->orderBy('key')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view(

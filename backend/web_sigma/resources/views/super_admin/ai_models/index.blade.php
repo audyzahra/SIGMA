@@ -165,6 +165,8 @@
                     </tr>
                 @endforelse
             </tbody>
-        </x-sigma.data-table>{{ $aiModels->links() }}
-    </section>
+        </x-sigma.data-table>
+        <x-pagination :paginator="$aiModels" />
+    
+</section>
 @endsection

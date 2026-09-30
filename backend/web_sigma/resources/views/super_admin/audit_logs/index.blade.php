@@ -184,7 +184,7 @@
         </x-sigma.data-table>
 
 
-        {{ $auditLogs->links() }}
+        <x-pagination :paginator="$auditLogs" />
 
 
     </section>

@@ -133,5 +133,4 @@
 
 </x-sigma.data-table>
 
-
-{{ $organizations->links() }}
+<x-pagination :paginator="$organizations" />

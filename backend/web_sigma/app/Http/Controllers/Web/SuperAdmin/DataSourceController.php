@@ -32,7 +32,7 @@ class DataSourceController extends Controller
                 fn ($query, $value) => $query->where('status', $value)
             )
             ->latest()
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('super_admin.data_sources.index', compact('dataSources'));
