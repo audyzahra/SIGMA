@@ -418,23 +418,170 @@ Route::name('public_sigma.')
 
         Route::get('/', function () {
 
+            /*
+            |--------------------------------------------------------------------------
+            | PROFILE
+            |--------------------------------------------------------------------------
+            */
+
             $profile = SystemProfile::first();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATISTIK
+            |--------------------------------------------------------------------------
+            */
 
             $totalHotspot = DB::table('hotspots')->count();
 
             $totalIncident = DB::table('incidents')->count();
 
-            return view('public_sigma.index', compact(
-                'profile',
-                'totalHotspot',
-                'totalIncident'
-            ));
+
+            /*
+            |--------------------------------------------------------------------------
+            | REGION
+            |--------------------------------------------------------------------------
+            */
+
+            $regions = \App\Models\Region::query()
+                ->whereIn('level', [
+                    'province',
+                    'regency',
+                    'district'
+                ])
+                ->select([
+                    'id',
+                    'parent_id',
+                    'name',
+                    'code',
+                    'level'
+                ])
+                ->orderBy('level')
+                ->orderBy('name')
+                ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | GEOMETRY
+            |--------------------------------------------------------------------------
+            */
+
+            $geometryData = DB::table('regions')
+                ->whereIn('level', [
+                    'province',
+                    'regency',
+                    'district'
+                ])
+                ->select([
+                    'id'
+                ])
+                ->selectRaw(
+                    'ST_AsGeoJSON(geometry) AS geometry_json'
+                )
+                ->get()
+                ->keyBy('id');
+
+
+            $regions->each(function ($region) use ($geometryData) {
+
+                $geometry = $geometryData->get($region->id);
+
+                $region->setAttribute(
+                    'gis_geometry',
+                    $geometry?->geometry_json
+                );
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | FIRE RISK
+            |--------------------------------------------------------------------------
+            */
+
+            $fireRisks = \App\Models\FireRisk::latest(
+                'calculated_at'
+            )->get();
+
+            $riskByRegion = $fireRisks->keyBy(
+                'region_id'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DATA PETA
+            |--------------------------------------------------------------------------
+            */
+
+            $sigmaRegions = $regions->map(
+                function ($region) use ($riskByRegion) {
+
+                    $risk = $riskByRegion->get(
+                        $region->id
+                    );
+
+                    return [
+                        'id' => $region->id,
+
+                        'name' => $region->name,
+
+                        'code' => $region->code,
+
+                        'level' => $region->level,
+
+                        'parent_id' => $region->parent_id,
+
+                        'geometry' => $region->gis_geometry,
+
+                        'risk_score' =>
+                            $risk?->risk_score ?? 0,
+
+                        'risk_level' =>
+                            $risk?->risk_level ?? 'LOW',
+
+                        'temperature' =>
+                            $risk?->temperature,
+
+                        'humidity' =>
+                            $risk?->humidity,
+
+                        'wind_speed' =>
+                            $risk?->wind_speed,
+
+                        'rainfall' =>
+                            $risk?->rainfall,
+                    ];
+
+                }
+            )->values();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RETURN VIEW
+            |--------------------------------------------------------------------------
+            */
+
+            return view(
+                'public_sigma.index',
+                compact(
+                    'profile',
+                    'totalHotspot',
+                    'totalIncident',
+                    'sigmaRegions'
+                )
+            );
+
         })->name('index');
 
 
         /*
         |--------------------------------------------------------------------------
-        | Aspirations
+        | ASPIRATIONS
         |--------------------------------------------------------------------------
         */
 
