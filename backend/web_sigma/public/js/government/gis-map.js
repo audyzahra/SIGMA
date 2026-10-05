@@ -4,9 +4,8 @@ document.addEventListener(
 
 
         const mapElement =
-            document.getElementById(
-                "sigma-map"
-            );
+        document.getElementById("sigma-map") ||
+        document.getElementById("sigma-public-map");
 
 
         /*

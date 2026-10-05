@@ -1,0 +1,378 @@
+/* ========================================
+   SIGMA GOVERNMENT - USER PREFERENCES
+======================================== */
+
+
+:root {
+
+    --sigma-card:
+        var(--sigma-surface);
+
+    --sigma-input:
+        var(--sigma-surface);
+
+    --sigma-hover:
+        #f8fafc;
+
+    --sigma-primary:
+        #c82828;
+
+}
+
+
+/* ========================================
+   THEME - LIGHT
+======================================== */
+
+body.theme-light {
+    --sigma-bg: #f8fafc;
+    --sigma-surface: #ffffff;
+    --sigma-surface-soft: #fafbfc;
+
+    --sigma-text: #172033;
+    --sigma-text-secondary: #374151;
+    --sigma-muted: #6b7280;
+
+    --sigma-border: #e7ebf2;
+    --sigma-border-soft: #eef0f4;
+}
+
+
+/* ========================================
+   THEME - DARK
+======================================== */
+
+body.theme-dark {
+    --sigma-bg: #0f172a;
+    --sigma-surface: #172033;
+    --sigma-surface-soft: #1e293b;
+
+    --sigma-text: #f8fafc;
+    --sigma-text-secondary: #e5e7eb;
+    --sigma-muted: #94a3b8;
+
+    --sigma-border: #334155;
+    --sigma-border-soft: #293548;
+}
+
+
+/* ========================================
+   THEME - SYSTEM
+======================================== */
+
+body.theme-system {
+    --sigma-bg: #f8fafc;
+    --sigma-surface: #ffffff;
+    --sigma-surface-soft: #fafbfc;
+
+    --sigma-text: #172033;
+    --sigma-text-secondary: #374151;
+    --sigma-muted: #6b7280;
+
+    --sigma-border: #e7ebf2;
+    --sigma-border-soft: #eef0f4;
+}
+
+
+/* System dark mode */
+
+@media (prefers-color-scheme: dark) {
+
+    body.theme-system {
+        --sigma-bg: #0f172a;
+        --sigma-surface: #172033;
+        --sigma-surface-soft: #1e293b;
+
+        --sigma-text: #f8fafc;
+        --sigma-text-secondary: #e5e7eb;
+        --sigma-muted: #94a3b8;
+
+        --sigma-border: #334155;
+        --sigma-border-soft: #293548;
+    }
+
+}
+
+
+/* ========================================
+   GLOBAL BACKGROUND
+======================================== */
+
+body.theme-light,
+body.theme-dark,
+body.theme-system {
+    background-color: var(--sigma-bg);
+    color: var(--sigma-text);
+}
+
+
+/* ========================================
+   COMMON GOVERNMENT COMPONENTS
+======================================== */
+
+body.theme-dark .main-wrap,
+body.theme-dark .page-content,
+body.theme-dark .dashboard-page,
+
+body.theme-system .main-wrap,
+body.theme-system .page-content,
+body.theme-system .dashboard-page {
+    background-color: var(--sigma-bg);
+}
+
+
+/* Cards */
+
+body.theme-dark .card,
+body.theme-dark .dashboard-card,
+body.theme-dark .settings-card,
+body.theme-dark .appearance-card,
+
+body.theme-system .card,
+body.theme-system .dashboard-card,
+body.theme-system .settings-card,
+body.theme-system .appearance-card {
+    background-color: var(--sigma-surface);
+    border-color: var(--sigma-border);
+}
+
+
+/* Headings */
+
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h4,
+
+body.theme-system h1,
+body.theme-system h2,
+body.theme-system h3,
+body.theme-system h4 {
+    color: var(--sigma-text);
+}
+
+
+/* Paragraph */
+
+body.theme-dark p,
+body.theme-dark small,
+
+body.theme-system p,
+body.theme-system small {
+    color: var(--sigma-muted);
+}
+
+
+/* Borders */
+
+body.theme-dark hr,
+body.theme-dark .appearance-divider,
+
+body.theme-system hr,
+body.theme-system .appearance-divider {
+    background-color: var(--sigma-border-soft);
+}
+
+
+/* ========================================
+   SIDEBAR
+======================================== */
+
+body.theme-dark .sidebar,
+body.theme-system .sidebar {
+    background-color: #111827;
+}
+
+
+body.theme-dark .nav-link,
+body.theme-system .nav-link {
+    color: #cbd5e1;
+}
+
+
+body.theme-dark .nav-link:hover,
+body.theme-system .nav-link:hover {
+    background-color: #1e293b;
+}
+
+
+/* ========================================
+   TOPBAR
+======================================== */
+
+body.theme-dark .topbar,
+body.theme-system .topbar {
+    background-color: var(--sigma-surface);
+
+    border-bottom-color: var(--sigma-border);
+}
+
+
+body.theme-dark .header-brand span,
+body.theme-system .header-brand span {
+    color: var(--sigma-text);
+}
+
+
+body.theme-dark .system-status,
+body.theme-system .system-status {
+    color: #94a3b8;
+}
+
+
+/* ========================================
+   FORM ELEMENTS
+======================================== */
+
+body.theme-dark input,
+body.theme-dark select,
+body.theme-dark textarea,
+
+body.theme-system input,
+body.theme-system select,
+body.theme-system textarea {
+    background-color: #1e293b;
+
+    color: #f8fafc;
+
+    border-color: #334155;
+}
+
+
+body.theme-dark input::placeholder,
+body.theme-dark textarea::placeholder,
+
+body.theme-system input::placeholder,
+body.theme-system textarea::placeholder {
+    color: #64748b;
+}
+
+
+/* ========================================
+   PROFILE CARD
+======================================== */
+
+body.theme-dark .profile-card,
+body.theme-system .profile-card {
+    border-color: #334155;
+}
+
+
+/* ========================================
+   SETTINGS
+======================================== */
+
+body.theme-dark .settings-card:hover,
+body.theme-system .settings-card:hover {
+    border-color: #475569;
+}
+
+
+body.theme-dark .settings-content h3,
+body.theme-system .settings-content h3 {
+    color: var(--sigma-text);
+}
+
+
+body.theme-dark .settings-content p,
+body.theme-system .settings-content p {
+    color: var(--sigma-muted);
+}
+
+
+/* ========================================
+   APPEARANCE
+======================================== */
+
+body.theme-dark .appearance-section-heading h2,
+body.theme-system .appearance-section-heading h2 {
+    color: var(--sigma-text);
+}
+
+
+body.theme-dark .font-option,
+body.theme-system .font-option,
+
+body.theme-dark .appearance-toggle,
+body.theme-system .appearance-toggle {
+    background-color: var(--sigma-surface);
+    border-color: var(--sigma-border);
+}
+
+
+body.theme-dark .font-option strong,
+body.theme-system .font-option strong,
+
+body.theme-dark .appearance-toggle strong,
+body.theme-system .appearance-toggle strong {
+    color: var(--sigma-text);
+}
+
+
+/* ========================================
+   FONT SIZE
+======================================== */
+
+body.font-small {
+    font-size: 14px;
+}
+
+
+body.font-medium {
+    font-size: 16px;
+}
+
+
+body.font-large {
+    font-size: 18px;
+}
+
+
+/* UI text scaling */
+
+body.font-small .page-content {
+    font-size: 0.92em;
+}
+
+
+body.font-medium .page-content {
+    font-size: 1em;
+}
+
+
+body.font-large .page-content {
+    font-size: 1.08em;
+}
+
+/* ========================================
+   FONT SCALE
+======================================== */
+
+body.font-small .page-content {
+    zoom: 0.94;
+}
+
+body.font-medium .page-content {
+    zoom: 1;
+}
+
+body.font-large .page-content {
+    zoom: 1.06;
+}
+
+
+/* ========================================
+   ANIMATION
+======================================== */
+
+body.no-animations *,
+body.no-animations *::before,
+body.no-animations *::after {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+
+    scroll-behavior: auto !important;
+}

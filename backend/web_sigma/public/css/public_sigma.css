@@ -489,24 +489,30 @@
         2;
 
     display:
-        grid;
-
-    grid-template-columns:
-        1.05fr .95fr;
+        flex;
 
     align-items:
         center;
 
-    gap:
-        70px;
+    justify-content:
+        center;
+
+    text-align:
+        center;
 
 }
 
 
 .public_sigma .hero-content {
 
+    width:
+        100%;
+
     max-width:
-        650px;
+        850px;
+
+    margin:
+        0 auto;
 
 }
 
@@ -550,8 +556,8 @@
     max-width:
         590px;
 
-    margin-bottom:
-        30px;
+    margin:
+        0 auto 30px;
 
     color:
         var(--sigma-muted);
@@ -573,6 +579,9 @@
     align-items:
         center;
 
+    justify-content:
+        center;
+
     gap:
         12px;
 
@@ -581,302 +590,6 @@
 
 }
 
-
-/* =========================================================
-   HERO MAP PREVIEW
-========================================================= */
-
-.public_sigma .hero-visual {
-
-    position:
-        relative;
-
-}
-
-
-.public_sigma .map-preview {
-
-    position:
-        relative;
-
-    min-height:
-        420px;
-
-    overflow:
-        hidden;
-
-    border:
-        1px solid var(--sigma-border);
-
-    border-radius:
-        22px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #EAF1E6,
-            #DCE8D8
-        );
-
-    box-shadow:
-        var(--sigma-shadow-lg);
-
-}
-
-
-.public_sigma .map-preview::before {
-
-    content:
-        "";
-
-    position:
-        absolute;
-
-    inset:
-        0;
-
-    background:
-        linear-gradient(
-            25deg,
-            transparent 35%,
-            rgba(255,255,255,.5) 36%,
-            transparent 38%
-        ),
-        linear-gradient(
-            140deg,
-            transparent 40%,
-            rgba(255,255,255,.45) 41%,
-            transparent 43%
-        );
-
-}
-
-
-/* =========================================================
-   MAP
-========================================================= */
-
-.public_sigma .map-grid {
-
-    position:
-        absolute;
-
-    inset:
-        0;
-
-    background-image:
-
-        linear-gradient(
-            rgba(55,65,81,.09) 1px,
-            transparent 1px
-        ),
-
-        linear-gradient(
-            90deg,
-            rgba(55,65,81,.09) 1px,
-            transparent 1px
-        );
-
-    background-size:
-        42px 42px;
-
-}
-
-
-.public_sigma .map-hotspot {
-
-    position:
-        absolute;
-
-    width:
-        16px;
-
-    height:
-        16px;
-
-    border-radius:
-        50%;
-
-    background:
-        var(--sigma-red);
-
-    border:
-        3px solid
-        rgba(255,255,255,.9);
-
-    box-shadow:
-        0 0 0 7px
-        rgba(200,40,40,.18),
-
-        0 4px 12px
-        rgba(200,40,40,.25);
-
-    animation:
-        sigma-pulse 2s infinite;
-
-}
-
-
-.public_sigma .hotspot-1 {
-
-    top:
-        24%;
-
-    left:
-        27%;
-
-}
-
-
-.public_sigma .hotspot-2 {
-
-    top:
-        42%;
-
-    left:
-        58%;
-
-    animation-delay:
-        .5s;
-
-}
-
-
-.public_sigma .hotspot-3 {
-
-    top:
-        65%;
-
-    left:
-        39%;
-
-    animation-delay:
-        1s;
-
-}
-
-
-.public_sigma .hotspot-4 {
-
-    top:
-        32%;
-
-    right:
-        20%;
-
-    animation-delay:
-        1.4s;
-
-}
-
-
-.public_sigma .hotspot-5 {
-
-    bottom:
-        22%;
-
-    right:
-        34%;
-
-    animation-delay:
-        .8s;
-
-}
-
-
-@keyframes sigma-pulse {
-
-    0% {
-
-        box-shadow:
-            0 0 0 5px
-            rgba(200,40,40,.16);
-
-    }
-
-    50% {
-
-        box-shadow:
-            0 0 0 11px
-            rgba(200,40,40,.03);
-
-    }
-
-    100% {
-
-        box-shadow:
-            0 0 0 5px
-            rgba(200,40,40,.16);
-
-    }
-
-}
-
-
-/* =========================================================
-   MAP LABEL
-========================================================= */
-
-.public_sigma .map-label {
-
-    position:
-        absolute;
-
-    left:
-        20px;
-
-    bottom:
-        20px;
-
-    padding:
-        13px 16px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.8);
-
-    border-radius:
-        10px;
-
-    background:
-        rgba(255,255,255,.94);
-
-    backdrop-filter:
-        blur(10px);
-
-    box-shadow:
-        0 8px 25px
-        rgba(23,32,51,.1);
-
-}
-
-
-.public_sigma .map-label strong {
-
-    display:
-        block;
-
-    margin-bottom:
-        2px;
-
-    color:
-        var(--sigma-dark);
-
-    font-size:
-        13px;
-
-}
-
-
-.public_sigma .map-label span {
-
-    color:
-        var(--sigma-muted);
-
-    font-size:
-        11px;
-
-}
 
 
 /* =========================================================
@@ -1847,38 +1560,6 @@
 
 @media (max-width: 1000px) {
 
-    .public_sigma .hero .container {
-
-        grid-template-columns:
-            1fr;
-
-        gap:
-            45px;
-
-    }
-
-
-    .public_sigma .hero-content {
-
-        max-width:
-            760px;
-
-    }
-
-
-    .public_sigma .hero-visual {
-
-        max-width:
-            700px;
-
-        width:
-            100%;
-
-        margin:
-            0 auto;
-
-    }
-
 
     .public_sigma .stat-grid {
 
@@ -1970,14 +1651,6 @@
 
         width:
             100%;
-
-    }
-
-
-    .public_sigma .map-preview {
-
-        min-height:
-            330px;
 
     }
 

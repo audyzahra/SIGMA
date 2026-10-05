@@ -1,0 +1,237 @@
+.notification-page-card {
+
+    background:
+    var(--sigma-surface);
+
+    border:
+    1px solid var(--sigma-border);
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+}
+
+
+
+.notification-header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:24px;
+
+    border-bottom:
+    1px solid var(--sigma-border);
+
+}
+
+
+
+.notification-header h2 {
+
+    margin:0 0 6px;
+
+    color:
+    var(--sigma-text);
+
+    font-size:18px;
+
+}
+
+
+
+.notification-header p {
+
+    margin:0;
+
+    color:
+    var(--sigma-muted);
+
+    font-size:13px;
+
+}
+
+
+
+.notification-read-button {
+
+    border:none;
+
+    background:#c82828;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:13px;
+
+}
+
+
+
+
+.notification-card {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:20px 24px;
+
+    text-decoration:none;
+
+    color:inherit;
+
+    border-bottom:
+    1px solid var(--sigma-border);
+
+    position:relative;
+
+}
+
+
+
+.notification-card:hover {
+
+    background:
+    var(--sigma-surface-soft);
+
+}
+
+
+
+.notification-card.unread {
+
+    background:
+    rgba(200,40,40,.05);
+
+}
+
+
+
+.notification-icon {
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#fff0f0;
+
+    color:#c82828;
+
+}
+
+
+
+.notification-icon svg {
+
+    width:22px;
+
+}
+
+
+
+.notification-content {
+
+    flex:1;
+
+}
+
+
+
+.notification-content h3 {
+
+    margin:0 0 5px;
+
+    color:
+    var(--sigma-text);
+
+    font-size:15px;
+
+}
+
+
+
+.notification-content p {
+
+    margin:0 0 6px;
+
+    color:
+    var(--sigma-muted);
+
+    font-size:13px;
+
+}
+
+
+
+.notification-content small {
+
+    color:#9ca3af;
+
+}
+
+
+
+.notification-dot {
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+    background:#c82828;
+
+}
+
+
+
+.notification-empty {
+
+    text-align:center;
+
+    padding:60px 20px;
+
+}
+
+
+
+.notification-empty svg {
+
+    width:50px;
+
+    height:50px;
+
+    color:#9ca3af;
+
+}
+
+
+
+.notification-empty h3 {
+
+    margin-top:15px;
+
+    color:
+    var(--sigma-text);
+
+}
