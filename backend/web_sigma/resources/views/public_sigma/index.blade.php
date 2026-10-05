@@ -6,7 +6,17 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/public_sigma.css') }}">
+
+    <link
+        rel="stylesheet"
+        href="{{ asset('css/public_sigma.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
 @endpush
 
 @section('content')
@@ -37,42 +47,11 @@
                             Lihat Monitoring
                         </a>
 
-                        <button type="button" class="btn btn-outline" onclick="scrollToAspirasi()">
+                        <a href="#aspirasi" class="btn btn-outline">
                             Sampaikan Aspirasi
-                        </button>
+                        </a>
 
                     </div>
-
-                </div>
-
-
-                <div class="hero-visual">
-
-                    @if ($profile?->hero_image)
-                        <img src="{{ asset('storage/' . $profile->hero_image) }}" alt="{{ $profile->title ?? 'SIGMA' }}">
-                    @else
-                        <div class="map-preview">
-
-                            <div class="map-grid"></div>
-
-                            <div class="map-hotspot hotspot-1"></div>
-                            <div class="map-hotspot hotspot-2"></div>
-                            <div class="map-hotspot hotspot-3"></div>
-
-                            <div class="map-label">
-
-                                <strong>
-                                    Monitoring Karhutla
-                                </strong>
-
-                                <span>
-                                    Data Geospasial SIGMA
-                                </span>
-
-                            </div>
-
-                        </div>
-                    @endif
 
                 </div>
 
@@ -194,88 +173,88 @@
 
         </section>
 
+                    {{-- ================= MONITORING ================= --}}
 
-        {{-- ================= MONITORING ================= --}}
-        <section id="monitoring" class="monitoring">
+<section id="monitoring" class="monitoring">
 
-            <div class="container">
+<div class="container">
 
-                <div class="section-heading">
+    <div class="section-heading">
 
-                    <span>
-                        MONITORING
-                    </span>
+        <span>
+            MONITORING
+        </span>
 
-                    <h2>
-                        Pantau Kondisi Karhutla
-                    </h2>
+        <h2>
+            Pantau Kondisi Karhutla
+        </h2>
 
-                    <p>
-                        Pantau titik panas dan kejadian kebakaran melalui
-                        informasi geospasial SIGMA.
-                    </p>
+        <p>
+            Pantau kondisi risiko kebakaran hutan dan lahan
+            melalui informasi geospasial SIGMA.
+        </p>
 
-                </div>
-
-
-                <div class="monitoring-card">
-
-                    <div class="map">
-
-                        <div class="map-grid"></div>
-
-                        {{-- Hotspots --}}
-                        <div class="map-hotspot hotspot-1"></div>
-                        <div class="map-hotspot hotspot-2"></div>
-                        <div class="map-hotspot hotspot-3"></div>
-                        <div class="map-hotspot hotspot-4"></div>
-                        <div class="map-hotspot hotspot-5"></div>
+    </div>
 
 
-                        <div class="map-info">
+    <div class="monitoring-card">
 
-                            <strong>
-                                Peta Monitoring SIGMA
-                            </strong>
+        {{-- ================= PETA ================= --}}
+        <div class="map">
 
-                            <span>
-                                Data hotspot dan insiden karhutla
-                            </span>
-
-                        </div>
-
-                    </div>
+            {{-- Peta Leaflet --}}
+            <div
+                id="sigma-public-map"
+                style="width: 100%; height: 520px;"
+            ></div>
 
 
-                    <div class="map-legend">
+            {{-- Informasi Peta --}}
+            <div class="map-info">
 
-                        <div>
-                            <i class="legend-hotspot"></i>
-                            Hotspot
-                        </div>
+                <strong>
+                    Monitoring Karhutla
+                </strong>
 
-                        <div>
-                            <i class="legend-risk"></i>
-                            Zona Risiko
-                        </div>
-
-                        <div>
-                            <i class="legend-incident"></i>
-                            Kejadian
-                        </div>
-
-                        <div>
-                            <i class="legend-region"></i>
-                            Batas Wilayah
-                        </div>
-
-                    </div>
-
-                </div>
+                <span>
+                    Data Geospasial SIGMA
+                </span>
 
             </div>
 
-        </section>
+        </div>
+
+
+        {{-- ================= LEGEND ================= --}}
+        <div class="map-legend">
+
+            <div>
+                <i class="legend-hotspot"></i>
+                Hotspot
+            </div>
+
+            <div>
+                <i class="legend-risk"></i>
+                Zona Risiko
+            </div>
+
+            <div>
+                <i class="legend-incident"></i>
+                Kejadian
+            </div>
+
+            <div>
+                <i class="legend-region"></i>
+                Batas Wilayah
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
 
 
         {{-- ================= INFORMASI ================= --}}
@@ -567,5 +546,21 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/public_sigma.js') }}"></script>
+
+{{-- Data wilayah dari Laravel --}}
+<script>
+    window.sigmaRegions = @json($sigmaRegions);
+</script>
+
+{{-- Leaflet --}}
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+{{-- GIS Map --}}
+<script
+    src="{{ asset('js/government/gis-map.js') }}?v={{ time() }}">
+</script>
+
 @endpush
+
