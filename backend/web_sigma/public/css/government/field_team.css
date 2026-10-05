@@ -224,7 +224,14 @@
     border: 1px solid #e2e8f0;
     border-radius: 10px;
 
-    background: #ffffff;
+    background:
+var(--sigma-surface);
+
+border-color:
+var(--sigma-border);
+
+color:
+var(--sigma-text);
 
     cursor: pointer;
 
@@ -241,6 +248,15 @@
 
 /* Checkbox */
 .checkbox-item input {
+    background:
+var(--sigma-input);
+
+color:
+var(--sigma-text);
+
+border:
+1px solid var(--sigma-border);
+
     width: 16px;
     height: 16px;
 

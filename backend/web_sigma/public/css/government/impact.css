@@ -128,7 +128,8 @@
 }
 
 .impact-component.is-unavailable {
-    background: #f8fafc;
+    background:
+var(--sigma-surface-soft);
 }
 
 .component-head {

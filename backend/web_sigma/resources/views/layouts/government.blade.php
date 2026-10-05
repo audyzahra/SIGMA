@@ -14,9 +14,26 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
     @stack('styles')
+
+    <link rel="stylesheet" href="{{ asset('css/government/preferences.css') }}">
 </head>
 
-<body>
+@php
+    $userPreference = null;
+
+    if (auth()->check()) {
+        $userPreference = auth()->user()->preference;
+    }
+
+    $theme = $userPreference?->theme ?? 'light';
+    $fontSize = $userPreference?->font_size ?? 'medium';
+    $animationsEnabled = $userPreference?->animations_enabled ?? true;
+@endphp
+
+<body
+    class="theme-{{ $theme }}
+           font-{{ $fontSize }}
+           {{ !$animationsEnabled ? 'no-animations' : '' }}">
 
     @php
         $navigation = [
@@ -54,8 +71,7 @@
 
             <nav>
                 @foreach ($navigation as [$route, $label, $icon])
-                    <a href="{{ route($route) }}"
-                        class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}">
+                    <a href="{{ route($route) }}" class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}">
                         <span>{{ $icon }}</span>
                         {{ $label }}
                     </a>
@@ -74,7 +90,7 @@
                 </span>
 
                 <div>
-                    <a href="#" data-toast="Profil Pemerintah SIGMA">
+                    <a href="{{ route('government.account.index') }}">
                         ⚙ Pengaturan
                     </a>
 
@@ -113,11 +129,18 @@
                         ◷ Memuat waktu...
                     </span>
 
-                    <button type="button"
-                        class="icon-button"
-                        data-toast="Tidak ada notifikasi baru">
-                        <i data-lucide="bell"></i>
-                    </button>
+                    <a href="{{ route('government.notifications.index') }}"
+   class="icon-button notification-button">
+
+    <i data-lucide="bell"></i>
+
+    @if(auth()->user()->unreadNotifications->count())
+        <span class="notification-badge">
+            {{ auth()->user()->unreadNotifications->count() }}
+        </span>
+    @endif
+
+</a>
 
                 </div>
 
@@ -137,15 +160,11 @@
             Apakah Anda yakin ingin mengakhiri sesi Pemerintah?
         </p>
 
-        <form method="POST"
-            action="{{ route('logout') }}"
-            class="modal-actions">
+        <form method="POST" action="{{ route('logout') }}" class="modal-actions">
 
             @csrf
 
-            <button type="button"
-                class="button button-light"
-                data-modal-close>
+            <button type="button" class="button button-light" data-modal-close>
                 Batal
             </button>
 
@@ -162,7 +181,7 @@
     {{-- Success Toast dari Session --}}
     @if (session('success'))
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const toast = document.getElementById('toast');
 
                 if (toast) {
@@ -232,58 +251,58 @@
     </script>
 
     <script>
-    function updateClock() {
-        const now = new Date();
+        function updateClock() {
+            const now = new Date();
 
-        const days = [
-            'Minggu',
-            'Senin',
-            'Selasa',
-            'Rabu',
-            'Kamis',
-            'Jumat',
-            'Sabtu'
-        ];
+            const days = [
+                'Minggu',
+                'Senin',
+                'Selasa',
+                'Rabu',
+                'Kamis',
+                'Jumat',
+                'Sabtu'
+            ];
 
-        const months = [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'Mei',
-            'Jun',
-            'Jul',
-            'Agu',
-            'Sep',
-            'Okt',
-            'Nov',
-            'Des'
-        ];
+            const months = [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'Mei',
+                'Jun',
+                'Jul',
+                'Agu',
+                'Sep',
+                'Okt',
+                'Nov',
+                'Des'
+            ];
 
-        // WIB (UTC+7)
-        const wib = new Date(
-            now.toLocaleString('en-US', {
-                timeZone: 'Asia/Jakarta'
-            })
-        );
+            // WIB (UTC+7)
+            const wib = new Date(
+                now.toLocaleString('en-US', {
+                    timeZone: 'Asia/Jakarta'
+                })
+            );
 
-        const day = days[wib.getDay()];
-        const date = wib.getDate();
-        const month = months[wib.getMonth()];
-        const year = wib.getFullYear();
+            const day = days[wib.getDay()];
+            const date = wib.getDate();
+            const month = months[wib.getMonth()];
+            const year = wib.getFullYear();
 
-        const hours = String(wib.getHours()).padStart(2, '0');
-        const minutes = String(wib.getMinutes()).padStart(2, '0');
-        const seconds = String(wib.getSeconds()).padStart(2, '0');
+            const hours = String(wib.getHours()).padStart(2, '0');
+            const minutes = String(wib.getMinutes()).padStart(2, '0');
+            const seconds = String(wib.getSeconds()).padStart(2, '0');
 
-        document.getElementById('realtime-clock').innerHTML =
-            `◷ ${day}, ${date} ${month} ${year} • ${hours}:${minutes}:${seconds} WIB`;
-    }
+            document.getElementById('realtime-clock').innerHTML =
+                `◷ ${day}, ${date} ${month} ${year} • ${hours}:${minutes}:${seconds} WIB`;
+        }
 
-    updateClock();
+        updateClock();
 
-    setInterval(updateClock, 1000);
-</script>
+        setInterval(updateClock, 1000);
+    </script>
 
     @stack('scripts')
 

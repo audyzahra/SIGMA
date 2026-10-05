@@ -8,15 +8,18 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 #[Fillable([
     'name',
     'email',
     'password',
-    'organization_id',                                                                                                                                                  
+    'organization_id',
 ])]
 
 #[Hidden([
@@ -27,7 +30,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, HasRoles, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, LogsActivity;
 
     /**
      * The attributes that should be cast.
@@ -76,5 +79,29 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(
             CitizenReport::class
         );
+    }
+
+    public function preference(): HasOne
+    {
+        return $this->hasOne(UserPreference::class);
+    }
+
+    public function governmentNotificationPreference(): HasOne
+    {
+        return $this->hasOne(
+            GovernmentNotificationPreference::class
+        );
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+                'email',
+                'organization_id',
+            ])
+            ->logOnlyDirty()
+            ->useLogName('user');
     }
 }

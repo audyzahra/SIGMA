@@ -9,6 +9,8 @@ use App\Http\Controllers\Web\Government\RecommendationController;
 use App\Http\Controllers\Web\Government\CitizenReportController;
 use App\Http\Controllers\Web\Government\ResponseAssignmentController;
 use App\Http\Controllers\Web\Government\FieldTeamController;
+use App\Http\Controllers\Web\Government\AccountController;
+use App\Http\Controllers\Web\Government\NotificationController;
 
 use App\Http\Controllers\Web\public_sigma\AspirationController;
 use App\Http\Controllers\Web\SuperAdmin\AIModelController;
@@ -322,6 +324,81 @@ Route::middleware(['auth', 'role:government'])
             FieldTeamController::class,
             'destroy'
         ])->name('field-teams.destroy');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Account
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/account', [
+            AccountController::class,
+            'index'
+        ])->name('account.index');
+
+        Route::get('/account/profile', [
+            AccountController::class,
+            'profile'
+        ])->name('account.profile');
+
+        Route::put('/account/profile', [
+            AccountController::class,
+            'updateProfile'
+        ])->name('account.profile.update');
+
+        Route::get('/account/password', [
+            AccountController::class,
+            'password'
+        ])->name('account.password');
+
+        Route::put('/account/password', [
+            AccountController::class,
+            'updatePassword'
+        ])->name('account.password.update');
+
+
+        Route::get('/account/appearance', [
+            AccountController::class,
+            'appearance'
+        ])->name('account.appearance');
+
+        Route::put('/account/appearance', [
+            AccountController::class,
+            'updateAppearance'
+        ])->name('account.appearance.update');
+
+        Route::get('/account/notifications', [
+            AccountController::class,
+            'notifications'
+        ])->name('account.notifications');
+
+
+        Route::put('/account/notifications', [
+            AccountController::class,
+            'updateNotifications'
+        ])->name('account.notifications.update');
+
+        Route::get('/notifications', [
+            NotificationController::class,
+            'index'
+        ])->name('notifications.index');
+
+
+        Route::post('/notifications/{id}/read', [
+            NotificationController::class,
+            'read'
+        ])->name('notifications.read');
+
+
+        Route::post('/notifications/read-all', [
+            NotificationController::class,
+            'readAll'
+        ])->name('notifications.readAll');
+
+        Route::get('/account/activity', [
+            AccountController::class,
+            'activity'
+        ])->name('account.activity');
     });
 
 /*
@@ -365,54 +442,52 @@ Route::name('public_sigma.')
             AspirationController::class,
             'store'
         ])->name('aspirations.store');
-   });
+    });
 
-    use App\Http\Controllers\AITestController;
-
-
-    Route::get(
-        '/ai-test',
-        [AITestController::class,'test']
-    );
-
-    Route::prefix('regions')->group(function(){
+use App\Http\Controllers\AITestController;
 
 
-        /*
+Route::get(
+    '/ai-test',
+    [AITestController::class, 'test']
+);
+
+Route::prefix('regions')->group(function () {
+
+
+    /*
         |--------------------------------------------------------------------------
         | Semua Provinsi
         |--------------------------------------------------------------------------
         */
 
-        Route::get(
-            '/provinces',
-            [
-                ApiRegionController::class,
-                'provinces'
-            ]
-        );
+    Route::get(
+        '/provinces',
+        [
+            ApiRegionController::class,
+            'provinces'
+        ]
+    );
 
-        /*
+    /*
         |--------------------------------------------------------------------------
         | Child Wilayah
         |--------------------------------------------------------------------------
         */
 
-        Route::get(
-            '/{id}/children',
-            [
-                ApiRegionController::class,
-                'children'
-            ]
-        );
+    Route::get(
+        '/{id}/children',
+        [
+            ApiRegionController::class,
+            'children'
+        ]
+    );
 
-        Route::get(
-            '/hotspots',
-            [
-                HotspotController::class,
-                'index'
-            ]
-        );
-
-
-    });
+    Route::get(
+        '/hotspots',
+        [
+            HotspotController::class,
+            'index'
+        ]
+    );
+});
