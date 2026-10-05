@@ -56,3 +56,19 @@ frontend/apk_sigma/android/local.properties
 
 .DS_Store
 Thumbs.db
+
+# AI datasets
+ai_service/ai_service_sigma/dataset/raw/
+
+# Geospatial / raster datasets
+*.geojson
+*.tif
+*.tiff
+
+# Local ingestion logs
+_tmp_*.log
+
+# Node
+backend/web_sigma/node_modules/
+backend/web_sigma/public/build/
+backend/web_sigma/public/hot

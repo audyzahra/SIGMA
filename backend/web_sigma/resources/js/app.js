@@ -17,29 +17,15 @@ if (regionSelect && window.sigmaRegions) {
     regionSelect.addEventListener('change', updateRegionDetail);
 }
 
-const prioritySearch = document.querySelector('[data-priority-search]');
-const priorityFilter = document.querySelector('[data-priority-filter]');
-const priorityRows = document.querySelectorAll('[data-priority-rows] tr');
+/*
+|--------------------------------------------------------------------------
+| Penyaringan tabel prioritas
+|--------------------------------------------------------------------------
+|
+| Penyaringan dan pencarian tabel Prioritas Penanganan kini dikerjakan
+| server (PriorityCalculationService) lewat query database, sehingga baris
+| tabel tidak lagi disaring di sisi klien. Script halaman tersebut ada di
+| public/js/government/priority.js.
+|
+*/
 
-const filterPriorityRows = () => {
-    const query = prioritySearch?.value.toLowerCase() ?? '';
-    const priority = priorityFilter?.value ?? '';
-
-    priorityRows.forEach((row) => {
-        row.hidden = !(row.dataset.region.includes(query) && (!priority || row.dataset.priority === priority));
-    });
-};
-
-prioritySearch?.addEventListener('input', filterPriorityRows);
-priorityFilter?.addEventListener('change', filterPriorityRows);
-document.querySelector('[data-priority-reset]')?.addEventListener('click', () => {
-    prioritySearch.value = '';
-    priorityFilter.value = '';
-    filterPriorityRows();
-});
-
-document.querySelectorAll('[data-detail]').forEach((button) => {
-    button.addEventListener('click', () => {
-        document.querySelector('[data-priority-detail]').textContent = button.dataset.detail;
-    });
-});

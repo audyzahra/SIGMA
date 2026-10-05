@@ -3,11 +3,14 @@
 namespace App\Services\Impact;
 
 use App\Models\CitizenReport;
+use App\Models\Facility;
 use App\Models\FireRisk;
 use App\Models\Hotspot;
 use App\Models\ImpactAssessment;
 use App\Models\Incident;
 use App\Models\Region;
+use App\Models\RegionLandCover;
+use App\Models\RegionPopulation;
 use App\Services\GIS\RegionGeometry;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -38,25 +41,13 @@ class ImpactAnalysisService
      * Dipakai untuk melaporkan keterbatasan secara jujur ke UI.
      */
     public const MISSING_COMPONENTS = [
-        'population_exposure' => [
-            'label' => 'Penduduk Terpapar',
-            'source' => 'population',
-        ],
         'settlement_exposure' => [
             'label' => 'Permukiman / Bangunan',
             'source' => 'settlement',
         ],
-        'critical_facility_exposure' => [
-            'label' => 'Fasilitas Kritis',
-            'source' => 'critical_facility',
-        ],
         'infrastructure_exposure' => [
             'label' => 'Infrastruktur Jalan',
             'source' => 'infrastructure',
-        ],
-        'environmental_exposure' => [
-            'label' => 'Tutupan Lahan / Hutan',
-            'source' => 'land_cover',
         ],
     ];
 
@@ -385,6 +376,15 @@ class ImpactAnalysisService
 
         $reports = $this->reportContext($latitude, $longitude, $radiusKm);
 
+        /* Dataset spasial yang sudah diimpor ke database SIGMA */
+        $population = $this->populationExposure($affected);
+
+        $households = $this->householdExposure($population);
+
+        $facilities = $this->facilityExposure($geojson);
+
+        $landCover = $this->landCoverExposure($affected);
+
         $score = $this->impactScore($affected, $risk, $hotspots, $incidents);
 
         $focalRisk = $center['region']
@@ -426,7 +426,26 @@ class ImpactAnalysisService
             'incidents' => $incidents,
             'reports' => $reports,
 
-            'metrics' => $this->metrics($affected, $risk, $hotspots, $incidents, $reports, $circleAreaKm2),
+            /* Data paparan dari dataset spasial yang sudah diimpor */
+            'exposure' => [
+                'population' => $population,
+                'household' => $households,
+                'critical_facility' => $facilities,
+                'land_cover' => $landCover,
+            ],
+
+            'metrics' => $this->metrics(
+                $affected,
+                $risk,
+                $hotspots,
+                $incidents,
+                $reports,
+                $circleAreaKm2,
+                $population,
+                $facilities,
+                $households,
+                $landCover
+            ),
 
             'impact_score' => $score,
 
@@ -1195,6 +1214,280 @@ class ImpactAnalysisService
 
         return $this->combineComponents($components, $weights);
     }
+/* ==================================================================
+     | PENDUDUK TERPAPAR (dataset WorldPop -> region_populations)
+     | ================================================================== */
+
+    /**
+     * Perkiraan jumlah penduduk terpapar di dalam zona analisis.
+     *
+     * Metode: jumlah penduduk tiap KECAMATAN yang beririsan dengan zona,
+     * dibobot proporsi luas irisan (intersect_km2 / region_km2). Memakai
+     * level terdalam (kecamatan) agar tidak menghitung ganda antar level
+     * administratif.
+     *
+     * @param array $affected keluaran affectedRegions()
+     */
+    protected function populationExposure(array $affected): array
+    {
+        $entries = $affected['by_level']['district'] ?? [];
+
+        if (empty($entries)) {
+            return [
+                'available' => false,
+                'reason' => 'Tidak ada kecamatan terdampak yang dapat dihitung penduduknya.',
+                'value' => null,
+                'unit' => 'jiwa',
+                'regions_used' => 0,
+                'regions_total' => 0,
+            ];
+        }
+
+        $populations = RegionPopulation::query()
+            ->whereIn('region_id', array_column($entries, 'id'))
+            ->pluck('population', 'region_id');
+
+        if ($populations->isEmpty()) {
+            return [
+                'available' => false,
+                'reason' => 'Dataset penduduk per kecamatan belum tersedia untuk wilayah ini.',
+                'value' => null,
+                'unit' => 'jiwa',
+                'regions_used' => 0,
+                'regions_total' => count($entries),
+            ];
+        }
+
+        $total = 0.0;
+        $used = 0;
+
+        foreach ($entries as $entry) {
+
+            $population = $populations->get($entry['id']);
+
+            if ($population === null) {
+                continue;
+            }
+
+            $regionKm2 = (float) $entry['region_km2'];
+            $intersectKm2 = (float) $entry['intersect_km2'];
+
+            /* proporsi wilayah kecamatan yang masuk zona (maksimal 100%) */
+            $share = $regionKm2 > 0 ? min($intersectKm2 / $regionKm2, 1.0) : 0.0;
+
+            $total += (float) $population * $share;
+
+            $used++;
+        }
+
+        return [
+            'available' => $used > 0,
+            'reason' => $used > 0
+                ? null
+                : 'Dataset penduduk belum tersedia untuk kecamatan terdampak.',
+            'value' => (int) round($total),
+            'unit' => 'jiwa',
+            'regions_used' => $used,
+            'regions_total' => count($entries),
+        ];
+    }
+
+    /* ==================================================================
+     | FASILITAS KRITIS TERDAMPAK (dataset OSM -> facilities)
+     | ================================================================== */
+
+    /**
+     * Hitung fasilitas di dalam zona analisis (radius) beserta kategorinya.
+     *
+     * Memakai ST_Intersects(location, zona) sehingga SPATIAL INDEX pada
+     * kolom facilities.location dipakai (bukan full table scan).
+     *
+     * @param string $circleGeoJson Polygon zona analisis (SRID 4326)
+     */
+    protected function facilityExposure(string $circleGeoJson): array
+    {
+        $empty = [
+            'available' => false,
+            'reason' => $this->dataSources()['critical_facility']['note']
+                ?? 'Dataset fasilitas belum tersedia.',
+            'total' => 0,
+            'by_category' => [],
+            'education' => null,
+            'health' => null,
+        ];
+
+        if (! Facility::query()->limit(1)->exists()) {
+            return $empty;
+        }
+
+        try {
+
+            $rows = DB::select(
+                'SELECT category, COUNT(*) AS total
+                 FROM facilities
+                 WHERE ST_Intersects(location, ST_SRID(ST_GeomFromGeoJSON(?), 4326))
+                 GROUP BY category',
+                [$circleGeoJson]
+            );
+
+        } catch (\Throwable $e) {
+
+            Log::error('Analisis fasilitas dalam radius gagal', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return array_merge($empty, [
+                'reason' => 'Perhitungan fasilitas gagal: ' . $e->getMessage(),
+            ]);
+        }
+
+        $byCategory = [];
+        $total = 0;
+
+        foreach ($rows as $row) {
+            $byCategory[$row->category] = (int) $row->total;
+            $total += (int) $row->total;
+        }
+
+        return [
+            'available' => true,
+            'reason' => null,
+            'total' => $total,
+            'by_category' => $byCategory,
+            'education' => $byCategory['education'] ?? 0,
+            'health' => $byCategory['health'] ?? 0,
+        ];
+    }
+
+    /* ==================================================================
+     | RUMAH TANGGA TERDAMPAK (estimasi dari penduduk)
+     | ================================================================== */
+
+    /**
+     * Estimasi jumlah rumah tangga terdampak.
+     *
+     * Diturunkan dari Penduduk Terpapar dibagi rata-rata jiwa per rumah
+     * tangga (BPS, config sigma_impact.household_size). Nilai ini adalah
+     * ESTIMASI rasio, bukan penghitungan bangunan per titik (dataset
+     * bangunan/permukiman belum tersedia).
+     */
+    protected function householdExposure(?array $population): array
+    {
+        $size = (float) config('sigma_impact.household_size', 3.9);
+
+        $people = $population['value'] ?? null;
+
+        if ($size <= 0 || ! ($population['available'] ?? false) || $people === null) {
+
+            return [
+                'available' => false,
+                'reason' => 'Rumah tangga belum dapat diestimasi karena penduduk terpapar belum tersedia.',
+                'value' => null,
+                'unit' => 'rumah',
+                'household_size' => $size,
+            ];
+        }
+
+        return [
+            'available' => true,
+            'reason' => null,
+            'value' => (int) ceil(((float) $people) / $size),
+            'unit' => 'rumah',
+            'household_size' => $size,
+        ];
+    }
+
+    /* ==================================================================
+     | TUTUPAN LAHAN TERDAMPAK (ESA WorldCover -> region_land_covers)
+     | ================================================================== */
+
+    /**
+     * Luas hutan (kelas 10) dan lahan basah/gambut (kelas 90) di zona analisis.
+     *
+     * Per kecamatan terdampak: fraksi tutupan terhadap luas daratan
+     * terpetakan (forest_ha / valid_ha) dikalikan luas irisan zona.
+     * Fraksi (bukan luas mentah) dipakai agar wilayah yang hanya sebagian
+     * tercakup tile ESA tidak menghasilkan nilai menyesatkan.
+     *
+     * @param array $affected keluaran affectedRegions()
+     */
+    protected function landCoverExposure(array $affected): array
+    {
+        $empty = [
+            'available' => false,
+            'reason' => $this->dataSources()['land_cover']['note']
+                ?? 'Dataset tutupan lahan belum tersedia.',
+            'forest_ha' => null,
+            'wetland_ha' => null,
+            'regions_used' => 0,
+            'regions_total' => 0,
+            'classes' => ['forest' => 10, 'wetland' => 90],
+        ];
+
+        $entries = $affected['by_level']['district'] ?? [];
+
+        if (empty($entries)) {
+            return array_merge($empty, [
+                'reason' => 'Tidak ada kecamatan terdampak yang dapat dihitung tutupan lahannya.',
+            ]);
+        }
+
+        if (! RegionLandCover::query()->limit(1)->exists()) {
+            return array_merge($empty, ['regions_total' => count($entries)]);
+        }
+
+        $covers = RegionLandCover::query()
+            ->whereIn('region_id', array_column($entries, 'id'))
+            ->get()
+            ->keyBy('region_id');
+
+        if ($covers->isEmpty()) {
+            return array_merge($empty, [
+                'reason' => 'Dataset tutupan lahan belum tersedia untuk wilayah ini.',
+                'regions_total' => count($entries),
+            ]);
+        }
+
+        $forestHa = 0.0;
+        $wetlandHa = 0.0;
+        $used = 0;
+
+        foreach ($entries as $entry) {
+
+            $cover = $covers->get($entry['id']);
+
+            if (! $cover) {
+                continue;
+            }
+
+            $validHa = (float) $cover->valid_ha;
+
+            if ($validHa <= 0) {
+                continue;
+            }
+
+            $intersectKm2 = (float) $entry['intersect_km2'];
+
+            /* luas zona (km2) x fraksi tutupan -> km2, dikonversi ke hektar */
+            $forestHa += $intersectKm2 * ((float) $cover->forest_ha / $validHa) * 100;
+            $wetlandHa += $intersectKm2 * ((float) $cover->wetland_ha / $validHa) * 100;
+
+            $used++;
+        }
+
+        return [
+            'available' => $used > 0,
+            'reason' => $used > 0
+                ? null
+                : 'Dataset tutupan lahan belum tersedia untuk kecamatan terdampak.',
+            'forest_ha' => round($forestHa, 2),
+            'wetland_ha' => round($wetlandHa, 2),
+            'regions_used' => $used,
+            'regions_total' => count($entries),
+            'classes' => ['forest' => 10, 'wetland' => 90],
+        ];
+    }
+
 /**
      * Gabungkan komponen menjadi skor akhir 0-100.
      */
@@ -1306,6 +1599,16 @@ class ImpactAnalysisService
 
         $pending = 'Belum ada analisis dijalankan untuk titik ini.';
 
+        /* Dataset yang sudah diimpor: pesan default adalah "belum dianalisis",
+           bukan "belum ada dataset". */
+        $populationReady = ($sources['population']['status'] ?? null) === 'available';
+
+        $facilityReady = ($sources['critical_facility']['status'] ?? null) === 'available';
+
+        $householdReady = ($sources['household']['status'] ?? null) === 'available';
+
+        $landCoverReady = ($sources['land_cover']['status'] ?? null) === 'available';
+
         $entry = function (
             string $key,
             string $label,
@@ -1335,15 +1638,18 @@ class ImpactAnalysisService
             $entry('report_count', 'Laporan Masyarakat', 'citizen_report', 'laporan', $pending),
             $entry('weighted_risk_score', 'Risiko Wilayah Terdampak', 'fire_risk', 'skor 0-100', $pending),
 
+            /* ------ dataset spasial yang sudah diimpor ------ */
+
+            $entry('population_affected', 'Penduduk Terpapar', 'population', 'jiwa', $populationReady ? $pending : null),
+            $entry('affected_households', 'Rumah Tangga Terdampak', 'household', 'rumah', $householdReady ? $pending : null),
+            $entry('school_count', 'Sekolah Terdampak', 'critical_facility', 'sekolah', $facilityReady ? $pending : null),
+            $entry('hospital_count', 'Fasilitas Kesehatan Terdampak', 'critical_facility', 'fasilitas', $facilityReady ? $pending : null),
+            $entry('forest_area', 'Luas Hutan Terdampak', 'land_cover', 'ha', $landCoverReady ? $pending : null),
+            $entry('peatland_area', 'Luas Lahan Gambut Terdampak', 'land_cover', 'ha', $landCoverReady ? $pending : null),
+
             /* ------ dataset yang belum tersedia di SIGMA ------ */
 
-            $entry('population_affected', 'Penduduk Terpapar', 'population', 'jiwa', null),
-            $entry('affected_households', 'Rumah Tangga Terdampak', 'settlement', 'rumah', null),
-            $entry('school_count', 'Sekolah Terdampak', 'critical_facility', 'sekolah', null),
-            $entry('hospital_count', 'Fasilitas Kesehatan Terdampak', 'critical_facility', 'fasilitas', null),
             $entry('road_distance', 'Jarak ke Jalan Terdekat', 'infrastructure', 'km', null),
-            $entry('forest_area', 'Luas Hutan Terdampak', 'land_cover', 'ha', null),
-            $entry('peatland_area', 'Luas Lahan Gambut Terdampak', 'land_cover', 'ha', null),
         ];
     }
 
@@ -1353,7 +1659,11 @@ class ImpactAnalysisService
         array $hotspots,
         array $incidents,
         array $reports,
-        float $circleAreaKm2
+        float $circleAreaKm2,
+        ?array $population = null,
+        ?array $facilities = null,
+        ?array $households = null,
+        ?array $landCover = null
     ): array {
         $sources = $this->dataSources();
 
@@ -1459,15 +1769,91 @@ class ImpactAnalysisService
                 ],
             ],
 
+            /* ------ hasil dari dataset spasial yang sudah diimpor ------ */
+
+            [
+                'key' => 'population_affected',
+                'label' => 'Penduduk Terpapar',
+                'value' => $population['value'] ?? null,
+                'unit' => 'jiwa',
+                'available' => (bool) ($population['available'] ?? false),
+                'reason' => $population['reason'] ?? null,
+                'source' => 'population',
+                'extra' => [
+                    'regions_used' => $population['regions_used'] ?? 0,
+                    'regions_total' => $population['regions_total'] ?? 0,
+                    'method' => 'WorldPop 2020 dijumlahkan per kecamatan, dibobot luas irisan zona.',
+                ],
+            ],
+            [
+                'key' => 'school_count',
+                'label' => 'Sekolah Terdampak',
+                'value' => $facilities['education'] ?? null,
+                'unit' => 'sekolah',
+                'available' => (bool) ($facilities['available'] ?? false),
+                'reason' => $facilities['reason'] ?? null,
+                'source' => 'critical_facility',
+                'extra' => [
+                    'category' => 'education',
+                    'facilities_total' => $facilities['total'] ?? 0,
+                ],
+            ],
+            [
+                'key' => 'hospital_count',
+                'label' => 'Fasilitas Kesehatan Terdampak',
+                'value' => $facilities['health'] ?? null,
+                'unit' => 'fasilitas',
+                'available' => (bool) ($facilities['available'] ?? false),
+                'reason' => $facilities['reason'] ?? null,
+                'source' => 'critical_facility',
+                'extra' => [
+                    'category' => 'health',
+                    'facilities_total' => $facilities['total'] ?? 0,
+                ],
+            ],
+            [
+                'key' => 'affected_households',
+                'label' => 'Rumah Tangga Terdampak',
+                'value' => $households['value'] ?? null,
+                'unit' => 'rumah',
+                'available' => (bool) ($households['available'] ?? false),
+                'reason' => $households['reason'] ?? null,
+                'source' => 'household',
+                'extra' => [
+                    'household_size' => $households['household_size'] ?? config('sigma_impact.household_size'),
+                    'method' => 'Estimasi: Penduduk Terpapar dibagi rata-rata jiwa per rumah tangga (BPS).',
+                ],
+            ],
+            [
+                'key' => 'forest_area',
+                'label' => 'Luas Hutan Terdampak',
+                'value' => $landCover['forest_ha'] ?? null,
+                'unit' => 'ha',
+                'available' => (bool) ($landCover['available'] ?? false),
+                'reason' => $landCover['reason'] ?? null,
+                'source' => 'land_cover',
+                'extra' => [
+                    'esa_class' => 10,
+                    'regions_used' => $landCover['regions_used'] ?? 0,
+                ],
+            ],
+            [
+                'key' => 'peatland_area',
+                'label' => 'Luas Lahan Gambut Terdampak',
+                'value' => $landCover['wetland_ha'] ?? null,
+                'unit' => 'ha',
+                'available' => (bool) ($landCover['available'] ?? false),
+                'reason' => $landCover['reason'] ?? null,
+                'source' => 'land_cover',
+                'extra' => [
+                    'esa_class' => 90,
+                    'regions_used' => $landCover['regions_used'] ?? 0,
+                ],
+            ],
+
             /* ------ dataset yang belum tersedia di SIGMA ------ */
 
-            $unavailable('population_affected', 'Penduduk Terpapar', 'population', 'jiwa'),
-            $unavailable('affected_households', 'Rumah Tangga Terdampak', 'settlement', 'rumah'),
-            $unavailable('school_count', 'Sekolah Terdampak', 'critical_facility', 'sekolah'),
-            $unavailable('hospital_count', 'Fasilitas Kesehatan Terdampak', 'critical_facility', 'fasilitas'),
             $unavailable('road_distance', 'Jarak ke Jalan Terdekat', 'infrastructure', 'km'),
-            $unavailable('forest_area', 'Luas Hutan Terdampak', 'land_cover', 'ha'),
-            $unavailable('peatland_area', 'Luas Lahan Gambut Terdampak', 'land_cover', 'ha'),
         ];
     }
 /* ==================================================================
@@ -1527,12 +1913,25 @@ class ImpactAnalysisService
             'impact_level' => $analysis['impact_score']['level'] ?? null,
             'methodology_version' => $analysis['methodology_version'],
             'components' => $analysis['impact_score'],
+
+            /* Angka dampak dari dataset spasial (null bila belum tersedia) */
+            'affected_population' => $analysis['exposure']['population']['value'] ?? null,
+            'affected_households' => $analysis['exposure']['household']['value'] ?? null,
+            'school_count' => $analysis['exposure']['critical_facility']['education'] ?? null,
+            'hospital_count' => $analysis['exposure']['critical_facility']['health'] ?? null,
+            'forest_area' => $analysis['exposure']['land_cover']['forest_ha'] ?? null,
+            'peatland_area' => $analysis['exposure']['land_cover']['wetland_ha'] ?? null,
+
             'exposure' => [
                 'affected_regions' => $analysis['affected_regions'],
                 'hotspots' => $analysis['hotspots'],
                 'incidents' => $analysis['incidents'],
                 'reports' => $analysis['reports'],
                 'risk' => $analysis['risk'],
+                'population' => $analysis['exposure']['population'] ?? null,
+                'household' => $analysis['exposure']['household'] ?? null,
+                'critical_facility' => $analysis['exposure']['critical_facility'] ?? null,
+                'land_cover' => $analysis['exposure']['land_cover'] ?? null,
             ],
             'data_sources' => $analysis['data_sources'],
             'calculated_at' => now(),

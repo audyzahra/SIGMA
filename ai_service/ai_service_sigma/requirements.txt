@@ -20,3 +20,11 @@ sqlalchemy
 psycopg2-binary
 
 python-multipart
+
+# ===== SIGMA spatial data ingestion =====
+# Streaming parser GeoJSON raksasa (dataset fasilitas bisa > 2 GB per file)
+ijson
+
+# Driver MySQL (database SIGMA memakai MySQL 8, bukan PostgreSQL)
+PyMySQL
+cryptography

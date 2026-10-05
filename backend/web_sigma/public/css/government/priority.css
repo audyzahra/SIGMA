@@ -1,0 +1,493 @@
+/*
+|--------------------------------------------------------------------------
+| Prioritas Penanganan — Government
+|--------------------------------------------------------------------------
+|
+| Melengkapi kelas dasar app.css (.panel, .data-table, .pagination,
+| .priority-badge, .source-cards, .parameter, .button, .status).
+|
+| Hanya menambah hal yang khusus halaman Prioritas Penanganan, memakai
+| palet SIGMA:
+|   primary #C82828 | orange #F97316 | blue #2563EB
+|   yellow  #EAB308 | dark   #172033 | background #F8FAFC
+|
+| Tidak ada perhitungan yang dikerjakan CSS: lebar batang komponen datang
+| dari server (nilai sudah dinormalisasi service).
+|
+*/
+
+/* ------------------------------------------------------------ HEADER */
+
+.priority-heading {
+    align-items: center;
+}
+
+.priority-heading .heading-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.priority-heading .inline-form {
+    margin: 0;
+}
+
+.rank-highlight {
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+
+/* ------------------------------------------------------ SUMMARY CARD */
+
+.priority-stats {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+/*
+| Varian kartu ringkasan.
+|
+| Nama varian berasal dari config/sigma_priority.php (levels.*.accent),
+| sehingga warna kartu mengikuti kategori prioritas di konfigurasi:
+|   danger  = Kritis  (#C82828, primary SIGMA)
+|   orange  = Tinggi  (#F97316)
+|   warning = Sedang  (#EAB308)
+|   green   = Rendah  (#087C43)
+|   info    = Belum dianalisis (#2563EB)
+*/
+
+.priority-stats .stat-card.danger strong {
+    color: #c82828;
+}
+
+.priority-stats .stat-card.danger .stat-icon {
+    background: #fee2e2;
+    color: #c82828;
+}
+
+.priority-stats .stat-card.warning strong {
+    color: #b45309;
+}
+
+.priority-stats .stat-card.warning .stat-icon {
+    background: #fef3c7;
+    color: #eab308;
+}
+
+.priority-stats .stat-card.info strong {
+    color: #2563eb;
+}
+
+.priority-stats .stat-card.info .stat-icon {
+    background: #e0ecff;
+    color: #2563eb;
+}
+
+/* ------------------------------------------------------------ FILTER */
+
+.priority-filter {
+    margin-bottom: 20px;
+}
+
+.priority-filter-form {
+    display: grid;
+    grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(150px, 1fr)) auto;
+    gap: 14px;
+    align-items: end;
+    margin-top: 18px;
+}
+
+.priority-filter-form label {
+    display: grid;
+    gap: 6px;
+}
+
+.priority-filter-form label > span {
+    color: #6b5755;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.priority-filter-form input,
+.priority-filter-form select {
+    width: 100%;
+    min-width: 0;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.priority-filter-form select:disabled {
+    color: #97a0ad;
+    cursor: not-allowed;
+}
+
+.priority-filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.priority-filter-actions .button {
+    width: 100%;
+    white-space: nowrap;
+}
+
+/* ------------------------------------------------------ TABEL RANKING */
+
+.priority-table .panel-title {
+    margin-bottom: 16px;
+}
+
+.priority-rank-table th:first-child,
+.priority-rank-table td:first-child {
+    width: 84px;
+    text-align: center;
+}
+
+.priority-rank-table .rank-cell b {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin: auto;
+    border-radius: 10px;
+    background: #172033;
+    color: #ffffff;
+    font-size: 13px;
+}
+
+.priority-rank-table .region-cell b {
+    display: block;
+    font-size: 13px;
+}
+
+.priority-rank-table .region-cell small,
+.priority-rank-table .level-cell small {
+    display: block;
+    margin-top: 3px;
+    color: #7a6a68;
+    font-size: 11px;
+}
+
+.priority-rank-table .score-cell .score-value b {
+    font-size: 18px;
+    color: #c82828;
+}
+
+.priority-rank-table .empty-cell {
+    padding: 34px 16px;
+    text-align: center;
+}
+
+.priority-rank-table .empty-cell b {
+    display: block;
+    font-size: 14px;
+}
+
+.priority-rank-table .empty-cell small {
+    display: block;
+    margin-top: 6px;
+    color: #7a6a68;
+    font-size: 12px;
+}
+
+/* --------------------------------------------------------- NILAI SKOR */
+
+.score-value {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.score-value b {
+    font-size: 15px;
+    color: var(--ink);
+}
+
+.score-value small {
+    color: #7a6a68;
+    font-size: 11px;
+}
+
+.parameter .score-value {
+    justify-content: flex-end;
+}
+
+.data-unavailable {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eef1f6;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.priority-badge.priority-unknown {
+    background: #94a3b8;
+
+/* ------------------------------------------------------- HALAMAN DETAIL */
+
+.priority-detail-grid,
+.priority-analysis-grid {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.priority-detail-grid {
+    grid-template-columns: 1.35fr 1fr;
+}
+
+.priority-analysis-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.priority-score-panel .priority-score-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 6px 0 10px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fff5f5, #f8fafc);
+    border: 1px solid #fde2e2;
+}
+
+.priority-score-main .score-big b {
+    font-size: 38px;
+    line-height: 1;
+    color: #c82828;
+}
+
+.priority-score-main .score-big small {
+    font-size: 13px;
+}
+
+.priority-level-note {
+    margin: 0 0 6px;
+    color: #6c5a58;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.panel-note {
+    margin: 12px 0 0;
+    color: #6c5a58;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.panel-note code {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    font-size: 11px;
+}
+
+.factor-note {
+    margin: -4px 0 10px;
+    color: #8b7b78;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* ------------------------------------------------- KOMPONEN DAMPAK */
+
+.component-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 15px;
+    margin-bottom: 10px;
+}
+
+.component-item.is-unavailable {
+    background: #f8fafc;
+}
+
+.component-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.component-head span {
+    color: #c82828;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.component-item.is-unavailable .component-head span {
+    color: #7a838f;
+}
+
+.component-bar {
+    height: 6px;
+    margin: 9px 0 7px;
+    border-radius: 6px;
+    background: #eef1f6;
+    overflow: hidden;
+}
+
+.component-bar i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #f97316, #c82828);
+}
+
+.component-item small {
+    display: block;
+    color: #6c5a58;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* ------------------------------------------------- INDIKATOR DAMPAK */
+
+.priority-indicator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0 26px;
+}
+
+/* ------------------------------------------------------ LEGENDA LEVEL */
+
+.priority-level-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 6px 0 14px;
+}
+
+.priority-level-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.priority-level-legend small {
+    color: #7a6a68;
+    font-size: 11px;
+}
+
+.methodology-notes {
+    margin: 0;
+    padding-left: 18px;
+    color: #5d4d4b;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.priority-detail-note {
+    margin: 14px 0 0;
+    color: #6c5a58;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+/* ------------------------------------------------------- SUMBER DATA */
+
+.priority-sources {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-top: 4px;
+}
+
+.priority-sources .source-card {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 6px;
+    padding: 14px 16px;
+}
+
+.priority-sources .source-card h3 {
+    font-size: 13px;
+}
+
+.priority-sources .source-card p {
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.priority-sources .status {
+    justify-self: start;
+}
+
+.source-role {
+    display: block;
+    color: #8b7b78;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* --------------------------------------------------- PAYLOAD AI (JSON) */
+
+.payload-details {
+    margin-top: 6px;
+}
+
+.payload-details summary {
+    cursor: pointer;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.payload-details pre {
+    margin: 12px 0 0;
+    padding: 14px;
+    max-height: 340px;
+    overflow: auto;
+    border-radius: 12px;
+    background: #172033;
+    color: #e2e8f0;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* ----------------------------------------------------------- RESPONSIF */
+
+@media (max-width: 1180px) {
+
+    .priority-filter-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .priority-filter-actions {
+        grid-column: 1 / -1;
+    }
+
+    .priority-detail-grid,
+    .priority-analysis-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+
+    .priority-filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .priority-heading {
+        align-items: flex-start;
+    }
+
+    .priority-heading .heading-actions {
+        width: 100%;
+    }
+}
+
+}

@@ -44,6 +44,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Rata-rata jumlah jiwa per rumah tangga (BPS)
+    |--------------------------------------------------------------------------
+    |
+    | Dipakai menurunkan "Rumah Tangga Terdampak" dari "Penduduk Terpapar":
+    |   rumah_tangga = ceil(penduduk / household_size)
+    |
+    | Angka BPS (Susenas) berkisar 3,9-4,0. Nilai ini hanya rasio turunan,
+    | bukan hitungan rumah/bangunan per titik, sehingga hasilnya
+    | dilaporkan sebagai ESTIMASI (lihat catatan metrik).
+    |
+    */
+
+    'household_size' => 3.9,
+
+    /*
+    |--------------------------------------------------------------------------
     | Bobot komponen Impact Score
     |--------------------------------------------------------------------------
     |
@@ -179,8 +195,8 @@ return [
 
         'population' => [
             'label' => 'Data Penduduk',
-            'status' => 'unavailable',
-            'note' => 'Belum ada dataset penduduk (grid/BPS) di database SIGMA.',
+            'status' => 'available',
+            'note' => 'Agregasi WorldPop UN-adjusted 2020 (~100 m) per wilayah pada tabel region_populations.',
         ],
 
         'settlement' => [
@@ -189,10 +205,16 @@ return [
             'note' => 'Belum ada dataset bangunan/permukiman di database SIGMA.',
         ],
 
+        'household' => [
+            'label' => 'Rumah Tangga (Estimasi)',
+            'status' => 'available',
+            'note' => 'Estimasi dari Penduduk Terpapar dibagi rata-rata jiwa per rumah tangga BPS (lihat sigma_impact.household_size).',
+        ],
+
         'critical_facility' => [
             'label' => 'Fasilitas Kritis (Sekolah, Kesehatan)',
-            'status' => 'unavailable',
-            'note' => 'Belum ada dataset fasilitas pendidikan/kesehatan di database SIGMA.',
+            'status' => 'available',
+            'note' => 'Fasilitas OSM/HOTOSM hasil impor pada tabel facilities (kategori education & health).',
         ],
 
         'infrastructure' => [
@@ -203,8 +225,8 @@ return [
 
         'land_cover' => [
             'label' => 'Tutupan Lahan / Hutan',
-            'status' => 'unavailable',
-            'note' => 'ESA WorldCover masih raster di ai_service, belum diimpor ke database SIGMA.',
+            'status' => 'available',
+            'note' => 'ESA WorldCover 2021 (~10 m) hasil impor pada tabel region_land_covers (kelas 10 hutan, kelas 90 lahan basah/gambut).',
         ],
     ],
 ];

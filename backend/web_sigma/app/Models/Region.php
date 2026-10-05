@@ -102,6 +102,23 @@ class Region extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Priority Result
+    |--------------------------------------------------------------------------
+    |
+    | Hasil Priority Calculation Engine terbaru untuk wilayah ini.
+    | Wilayah tanpa data risiko maupun dampak tidak memiliki baris di sini.
+    |
+    */
+
+    public function priorityResult()
+    {
+        return $this->hasOne(
+            PriorityResult::class
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Geometry GeoJSON
     |--------------------------------------------------------------------------
     |

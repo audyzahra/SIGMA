@@ -218,10 +218,38 @@ Route::middleware(['auth', 'role:government'])
             'analyze'
         ])->name('impact.analyze');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Prioritas Penanganan
+        |--------------------------------------------------------------------------
+        |
+        | Ranking wilayah berdasarkan risiko karhutla dan dampak yang
+        | ditimbulkan. Semua angka berasal dari PriorityCalculationService.
+        |
+        */
+
         Route::get('/priority', [
             PriorityController::class,
             'index'
         ])->name('priority');
+
+        /* Hitung ulang prioritas seluruh wilayah */
+        Route::post('/priority/recalculate', [
+            PriorityController::class,
+            'recalculate'
+        ])->name('priority.recalculate');
+
+        /* Data JSON satu wilayah (konsumsi AI Service / GIS) */
+        Route::get('/priority/{priority}/data', [
+            PriorityController::class,
+            'payload'
+        ])->name('priority.payload');
+
+        /* Detail prioritas satu wilayah */
+        Route::get('/priority/{priority}', [
+            PriorityController::class,
+            'show'
+        ])->name('priority.show');
 
         Route::get('/recommendation', [
             RecommendationController::class,
