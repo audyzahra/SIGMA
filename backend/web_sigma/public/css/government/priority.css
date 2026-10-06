@@ -46,7 +46,22 @@
 /* ------------------------------------------------------ SUMMARY CARD */
 
 .priority-stats {
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+}
+
+@media (max-width: 1180px) {
+    .priority-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .priority-stats {
+        grid-template-columns: 1fr;
+    }
 }
 
 /*
@@ -86,6 +101,26 @@
 .priority-stats .stat-card.info .stat-icon {
     background: #e0ecff;
     color: #2563eb;
+}
+/* Ukuran kartu statistik agar teks dan icon tidak saling menekan */
+.priority-stats .stat-card {
+    padding: 16px;
+    gap: 5px;
+}
+
+/* Teks judul dibuat sedikit lebih kecil */
+.priority-stats .stat-card p {
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+/* Icon tetap benar-benar persegi */
+.priority-stats .stat-card .stat-icon {
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 19px;
 }
 
 /* ------------------------------------------------------------ FILTER */
@@ -140,6 +175,10 @@
 }
 
 /* ------------------------------------------------------ TABEL RANKING */
+
+.priority-table {
+    margin-bottom: 24px;
+}
 
 .priority-table .panel-title {
     margin-bottom: 16px;

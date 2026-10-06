@@ -369,7 +369,7 @@
      TRANSPARANSI SUMBER DATA
 ============================================================ --}}
 
-<section class="panel">
+<section class="panel priority-sources-panel">
 
     <div class="panel-title">
 

@@ -961,10 +961,33 @@ label input {
     1fr)
 }
 .source-card {
-    display:grid;
-    grid-template-columns:42px 1fr;
-    gap:10px
+    position: relative;
 }
+
+.source-card::after {
+    content: "Tersedia";
+
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+    padding: 5px 9px;
+    border-radius: 999px;
+
+    background: #c9f9d7;
+    color: #04753d;
+
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.source-card h3 {
+    padding-right: 85px;
+}
+
 .source-card button {
     grid-column:1/-1;
     border:0;
@@ -1598,4 +1621,320 @@ label input {
 .recommendation-footer p {
     color:#725b58;
     margin:3px 0 0
+}
+
+/* =========================================================
+   TRANSPARANSI SUMBER DATA - PRIORITAS PENANGANAN
+   Hanya halaman Prioritas
+   ========================================================= */
+
+.priority-sources-panel .source-card::after {
+    display: none;
+}
+
+.priority-sources-panel .source-card h3 {
+    padding-right: 0;
+}
+
+.priority-sources-panel .source-card .status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: fit-content;
+
+    margin: 0;
+    padding: 3px 7px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.priority-sources-panel .source-card .status.aktif {
+    background: #c9f9d7;
+    color: #04753d;
+}
+
+.priority-sources-panel .source-card .status.pending {
+    background: #fff0df;
+    color: #bd5700;
+}
+/* =========================================================
+   TRANSPARANSI SUMBER DATA
+   Hilangkan badge ::after bawaan
+   ========================================================= */
+
+/* ANALISIS DAMPAK */
+.impact-sources .source-card::after {
+    display: none;
+}
+
+/* PRIORITAS PENANGANAN */
+.priority-sources-panel .source-card::after {
+    display: none;
+}
+
+
+/* =========================================================
+   STATUS ASLI - ANALISIS DAMPAK
+   ========================================================= */
+
+.impact-sources .source-card .status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 4px 8px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+
+/* Tersedia */
+.impact-sources .source-card .status.aktif {
+    background: #c9f9d7;
+    color: #04753d;
+}
+
+
+/* Belum tersedia */
+.impact-sources .source-card .status.pending {
+    background: #fff0df;
+    color: #bd5700;
+}
+
+
+/* =========================================================
+   STATUS ASLI - PRIORITAS
+   ========================================================= */
+
+.priority-sources-panel .source-card .status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 4px 8px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.priority-sources-panel .source-card .status.aktif {
+    background: #c9f9d7;
+    color: #04753d;
+}
+
+.priority-sources-panel .source-card .status.pending {
+    background: #fff0df;
+    color: #bd5700;
+}
+
+/* Jarak antara Transparansi Sumber Data dan Metodologi */
+.priority-sources-panel {
+    margin-bottom: 28px;
+}
+
+/* =========================================================
+   METODOLOGI PRIORITAS PENANGANAN
+   ========================================================= */
+
+.priority-level-legend {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+
+    margin: 16px 0 18px;
+}
+
+.priority-level-legend .legend-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+
+    min-height: 62px;
+    padding: 10px 12px;
+
+    border: 1px solid #e5e9f0;
+    border-radius: 10px;
+    background: #f8fafc;
+
+    box-sizing: border-box;
+}
+
+.priority-level-legend .legend-item .priority-badge {
+    margin-bottom: 5px;
+}
+
+.priority-level-legend small {
+    display: block;
+
+    margin: 0;
+
+    color: #667085;
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   CATATAN METODOLOGI
+   ========================================================= */
+
+.methodology-notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px 24px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    color: #59636f;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.methodology-notes li {
+    position: relative;
+
+    padding-left: 14px;
+}
+
+.methodology-notes li::before {
+    content: "•";
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    color: #c82828;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   KETERANGAN PENUTUP
+   ========================================================= */
+
+.priority-detail-note {
+    margin: 16px 0 0;
+    padding: 11px 13px;
+
+    border-left: 3px solid #c82828;
+    border-radius: 6px;
+
+    background: #f8fafc;
+
+    color: #667085;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   VERSI METODOLOGI
+   ========================================================= */
+
+.methodology-version {
+    color: #475467;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .priority-level-legend {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .methodology-notes {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .priority-level-legend {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   TRANSPARANSI SUMBER DATA - OVERRIDE GLOBAL
+   ========================================================= */
+
+.source-card::after {
+    display: none !important;
+}
+
+.source-card {
+    position: relative;
+}
+
+.source-card .status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: fit-content;
+    margin: 0;
+    padding: 3px 7px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.source-card .status.aktif {
+    background: #c9f9d7;
+    color: #04753d;
+}
+
+.source-card .status.pending {
+    background: #fff0df;
+    color: #bd5700;
 }

@@ -75,7 +75,7 @@
 
 <div class="priority-detail-grid">
 
-    <section class="panel">
+    <section class="panel priority-detail-sources-panel">
 
         <div class="panel-title">
             <div>

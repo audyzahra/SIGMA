@@ -325,7 +325,7 @@
 </section>
 
 {{-- WILAYAH TERDAMPAK --}}
-<section class="panel">
+<section class="panel impact-sources-panel">
     <div class="panel-title">
         <h3>Wilayah Terdampak</h3>
 
