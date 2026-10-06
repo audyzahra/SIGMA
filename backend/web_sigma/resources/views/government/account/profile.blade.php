@@ -3,91 +3,100 @@
 @section('title', 'Profil Saya | SIGMA')
 
 @section('content')
+    <link rel="stylesheet" href="{{ asset('css/government/account/profile.css') }}">
 
-<div class="dashboard-page">
+    <div class="dashboard-page">
 
-    <section class="page-heading">
-        <div>
-            <p class="breadcrumb">Beranda › Pengaturan › Profil Saya</p>
+        <section class="page-heading">
+            <div>
+                <p class="breadcrumb">Beranda › Pengaturan › Profil Saya</p>
 
-            <h1>Profil Saya</h1>
+                <h1>Profil Saya</h1>
 
-            <p>
-                Kelola informasi akun Pemerintah SIGMA.
-            </p>
-        </div>
-    </section>
-
-
-    <section class="dashboard-card">
-
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
+                <p>
+                    Kelola informasi akun Pemerintah SIGMA.
+                </p>
             </div>
-        @endif
+        </section>
 
-        <form
-            action="{{ route('government.account.profile.update') }}"
-            method="POST"
-        >
-            @csrf
-            @method('PUT')
+        {{-- Back --}}
+            <a href="{{ route('government.account.index') }}" class="settings-back">
+                <i data-lucide="arrow-left"></i>
+                Kembali ke Pengaturan
+            </a>
 
-            <div class="form-group">
-                <label for="name">
-                    Nama
-                </label>
+        <section class="government-profile-card">
 
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value="{{ old('name', $user->name) }}"
-                    required
-                >
+            {{-- Success Message --}}
+            @if (session('success'))
+                <div class="government-profile-alert government-profile-alert--success">
+                    <span class="government-profile-alert__icon">
+                        ✓
+                    </span>
 
-                @error('name')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
-            </div>
+                    <span>
+                        {{ session('success') }}
+                    </span>
+                </div>
+            @endif
+
+            <form action="{{ route('government.account.profile.update') }}" method="POST" class="government-profile-form">
+                @csrf
+                @method('PUT')
 
 
-            <div class="form-group">
-                <label for="email">
-                    Email
-                </label>
+                {{-- Nama --}}
+                <div class="government-profile-field">
 
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="{{ old('email', $user->email) }}"
-                    required
-                >
+                    <label for="name">
+                        Nama
+                    </label>
 
-                @error('email')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
-            </div>
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
+                        placeholder="Masukkan nama" autocomplete="name" required>
+
+                    @error('name')
+                        <small class="government-profile-error">
+                            {{ $message }}
+                        </small>
+                    @enderror
+
+                </div>
 
 
-            <div class="form-actions">
+                {{-- Email --}}
+                <div class="government-profile-field">
 
-                <button type="submit">
-                    Simpan Perubahan
-                </button>
+                    <label for="email">
+                        Email
+                    </label>
 
-            </div>
+                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
+                        placeholder="Masukkan email" autocomplete="email" required>
 
-        </form>
+                    @error('email')
+                        <small class="government-profile-error">
+                            {{ $message }}
+                        </small>
+                    @enderror
 
-    </section>
+                </div>
 
-</div>
+
+                {{-- Button --}}
+                <div class="government-profile-actions">
+
+                    <button type="submit" class="government-profile-button">
+                        <i data-lucide="save"></i>
+                        Simpan Perubahan
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
 
 @endsection

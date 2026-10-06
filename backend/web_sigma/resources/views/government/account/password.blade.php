@@ -2,115 +2,107 @@
 
 @section('title', 'Keamanan Akun | SIGMA')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/government/account/password.css') }}">
+@endpush
+
 @section('content')
 
-<div class="dashboard-page">
+    <div class="dashboard-page">
 
-    <section class="page-heading">
-        <div>
-            <p class="breadcrumb">
-                Beranda › Pengaturan › Keamanan
-            </p>
+        <section class="page-heading">
+            <div>
+                <p class="breadcrumb">
+                    Beranda › Pengaturan › Keamanan
+                </p>
 
-            <h1>Keamanan Akun</h1>
+                <h1>Keamanan Akun</h1>
 
-            <p>
-                Kelola keamanan dan password akun Pemerintah SIGMA.
-            </p>
-        </div>
-    </section>
-
-
-    <section class="dashboard-card">
-
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
+                <p>
+                    Kelola keamanan dan password akun Pemerintah SIGMA.
+                </p>
             </div>
-        @endif
+        </section>
+
+        {{-- Back --}}
+            <a href="{{ route('government.account.index') }}" class="settings-back">
+                <i data-lucide="arrow-left"></i>
+                Kembali ke Pengaturan
+            </a>
+
+        <section class="dashboard-card">
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
 
 
-        <form
-            action="{{ route('government.account.password.update') }}"
-            method="POST"
-        >
+            <form action="{{ route('government.account.password.update') }}" method="POST">
 
-            @csrf
-            @method('PUT')
+                @csrf
+                @method('PUT')
 
 
-            <div class="form-group">
+                <div class="form-group">
 
-                <label for="current_password">
-                    Password Saat Ini
-                </label>
+                    <label for="current_password">
+                        Password Saat Ini
+                    </label>
 
-                <input
-                    type="password"
-                    id="current_password"
-                    name="current_password"
-                    required
-                >
+                    <input type="password" id="current_password" name="current_password" required>
 
-                @error('current_password')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
+                    @error('current_password')
+                        <small class="text-danger">
+                            {{ $message }}
+                        </small>
+                    @enderror
 
-            </div>
+                </div>
 
 
-            <div class="form-group">
+                <div class="form-group">
 
-                <label for="password">
-                    Password Baru
-                </label>
+                    <label for="password">
+                        Password Baru
+                    </label>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                >
+                    <input type="password" id="password" name="password" required>
 
-                @error('password')
-                    <small class="text-danger">
-                        {{ $message }}
-                    </small>
-                @enderror
+                    @error('password')
+                        <small class="text-danger">
+                            {{ $message }}
+                        </small>
+                    @enderror
 
-            </div>
+                </div>
 
 
-            <div class="form-group">
+                <div class="form-group">
 
-                <label for="password_confirmation">
-                    Konfirmasi Password Baru
-                </label>
+                    <label for="password_confirmation">
+                        Konfirmasi Password Baru
+                    </label>
 
-                <input
-                    type="password"
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    required
-                >
+                    <input type="password" id="password_confirmation" name="password_confirmation" required>
 
-            </div>
+                </div>
 
 
-            <div class="form-actions">
+                <div class="form-actions">
 
-                <button type="submit">
-                    Ubah Password
-                </button>
+                    <button type="submit">
+                        <i data-lucide="save"></i>
+                        Simpan Password
+                    </button>
 
-            </div>
+                </div>
 
-        </form>
+            </form>
 
-    </section>
+        </section>
 
-</div>
+    </div>
 
 @endsection

@@ -11,36 +11,24 @@
     <div class="activity-page">
 
         {{-- Header --}}
+
         <section class="page-heading">
-
             <div>
-                <p class="breadcrumb">
-                    BERANDA › PENGATURAN › RIWAYAT AKTIVITAS
+                <p class="breadcrumb">Beranda › Pengaturan › Riwayat Aktivitas</p>
+
+                <h1>Riwayat Aktivitas</h1>
+
+                <p>
+                    Pantau aktivitas yang dilakukan pada akun Pemerintah SIGMA.
                 </p>
-
-                <div class="heading-row">
-
-                    <div>
-                        <h1>Riwayat Aktivitas</h1>
-
-                        <p>
-                            Pantau aktivitas yang dilakukan pada akun Pemerintah SIGMA.
-                        </p>
-                    </div>
-
-                    <a
-                        href="{{ route('government.account.index') }}"
-                        class="back-button"
-                    >
-                        <i data-lucide="arrow-left"></i>
-                        <span>Kembali</span>
-                    </a>
-
-                </div>
             </div>
-
         </section>
 
+        {{-- Back --}}
+            <a href="{{ route('government.account.index') }}" class="settings-back">
+                <i data-lucide="arrow-left"></i>
+                Kembali ke Pengaturan
+            </a>
 
         {{-- Filter --}}
         <section class="activity-filter">
