@@ -15,9 +15,16 @@
 .map-panel{
 
     padding:20px;
+    align-self: start;
+    height: fit-content;
 
 }
 
+.detail-panel {
+    max-height: 640px;
+    overflow-y: auto;
+    padding: 20px;
+}
 
 
 .leaflet-container{

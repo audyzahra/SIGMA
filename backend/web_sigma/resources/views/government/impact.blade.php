@@ -183,14 +183,6 @@
     <section class="panel map-panel">
         <div id="sigma-impact-map"></div>
 
-        <div class="map-legend">
-            <span class="legend-fire">● Titik analisis</span>
-            <span class="legend-zone">● Zona radius</span>
-            <span class="legend-affected">● Wilayah terdampak</span>
-            <span class="legend-hotspot">● Hotspot</span>
-            <span class="legend-incident">● Insiden</span>
-            <span class="legend-report">● Laporan</span>
-        </div>
     </section>
 
     <aside class="panel impact-detail">
@@ -276,7 +268,6 @@
     <div class="panel-title">
         <h3>Rincian Impact Score</h3>
 
-        <span class="methodology-version">Metodologi: {{ $methodologyVersion }}</span>
     </div>
 
     <div class="component-list" id="impact-components">
@@ -379,7 +370,6 @@
     <div class="panel-title">
         <h3>Analisis Tersimpan</h3>
 
-        <span>{{ $recentAnalyses->count() }} hasil terakhir</span>
     </div>
 
     <x-sigma.data-table>
@@ -436,10 +426,6 @@
     <section class="panel">
         <div class="panel-title">
             <h3>Hotspot di Radius</h3>
-
-            <span data-hotspot-summary>
-                {{ $hotspotContext ? $hotspotContext['count'] . ' titik' : 'Belum ada analisis' }}
-            </span>
         </div>
 
         <x-sigma.data-table>
@@ -476,10 +462,6 @@
     <section class="panel">
         <div class="panel-title">
             <h3>Insiden &amp; Laporan di Radius</h3>
-
-            <span data-incident-summary>
-                {{ $incidentContext ? $incidentContext['count'] . ' insiden' : 'Belum ada analisis' }}
-            </span>
         </div>
 
         <x-sigma.data-table>
@@ -542,10 +524,6 @@
     <div class="panel-title">
         <h3>Transparansi Sumber Data</h3>
 
-        <span>
-            Metrik yang datasetnya belum tersedia dilaporkan apa adanya,
-            tidak diisi angka perkiraan.
-        </span>
     </div>
 
     <div class="source-cards impact-sources">
@@ -568,7 +546,6 @@
     <div class="panel-title">
         <h3>Metodologi Perhitungan</h3>
 
-        <span class="methodology-version">{{ $methodologyVersion }}</span>
     </div>
 
     <ul class="methodology-notes">

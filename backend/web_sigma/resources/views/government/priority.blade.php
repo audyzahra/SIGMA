@@ -239,8 +239,6 @@
             </p>
         </div>
 
-        <span class="methodology-version">{{ $methodologyVersion }}</span>
-
     </div>
 
     <x-sigma.data-table class="priority-rank-table">
@@ -399,8 +397,6 @@
         <div>
             <h3>Metodologi Perhitungan Prioritas</h3>
         </div>
-
-        <span class="methodology-version">{{ $methodologyVersion }}</span>
 
     </div>
 
