@@ -35,6 +35,11 @@
 
         </section>
 
+        {{-- Back --}}
+            <a href="{{ route('government.account.index') }}" class="settings-back">
+                <i data-lucide="arrow-left"></i>
+                Kembali ke Pengaturan
+            </a>
 
         <section class="notification-page-card">
 
