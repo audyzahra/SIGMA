@@ -18,6 +18,7 @@ class StoreReportRequest extends FormRequest
             'report_type' => ['required', 'in:fire,smoke,burning_activity,other'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'description' => ['nullable', 'string', 'max:5000'],
         ];
     }

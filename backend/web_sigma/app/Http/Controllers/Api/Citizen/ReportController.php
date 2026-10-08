@@ -29,14 +29,43 @@ class ReportController extends Controller
         abort_unless($report->user_id === $request->user()->id, 404);
         $report->load(['incident', 'statusHistories.updater']);
 
-        return response()->json(['report' => (new ReportResource($report))->resolve()]);
+        return response()->json([
+            'report' => (new ReportResource($report))->resolve(),
+        ]);
+    }
+
+    public function photo(Request $request, CitizenReport $report)
+    {
+        abort_unless($report->user_id === $request->user()->id, 404);
+
+        if (!$report->photo) {
+            abort(404);
+        }
+
+        $path = storage_path('app/public/'.$report->photo);
+
+        abort_unless(is_file($path), 404);
+
+        return response()->file($path, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+            'Access-Control-Allow-Headers' => '*',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
     }
 
     public function store(StoreReportRequest $request): JsonResponse
     {
-        $report = $this->reports->create($request->user(), $request->safe()->only([
-            'report_type', 'latitude', 'longitude', 'description',
-        ]));
+        $report = $this->reports->create(
+            $request->user(),
+            $request->safe()->only([
+                'report_type',
+                'latitude',
+                'longitude',
+                'description',
+            ]),
+            $request->file('photo'),
+        );
 
         return response()->json([
             'message' => 'Laporan berhasil dikirim.',

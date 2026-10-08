@@ -25,8 +25,7 @@ class ApiClient {
     Object? body,
   }) async {
     final requestUri = uri(path);
-    final request = http.Request(method, requestUri)
-      ..headers.addAll(headers);
+    final request = http.Request(method, requestUri)..headers.addAll(headers);
     if (body != null) {
       request.headers['Content-Type'] = 'application/json';
       request.body = jsonEncode(body);
@@ -36,11 +35,55 @@ class ApiClient {
       if (body != null) debugPrint('API request body: ${jsonEncode(body)}');
     }
     try {
-      final response = await http.Response.fromStream(await _client.send(request));
+      final response = await http.Response.fromStream(
+        await _client.send(request),
+      );
       if (kDebugMode) {
         debugPrint('API $method $requestUri -> HTTP ${response.statusCode}');
         debugPrint('API response: ${response.body}');
       }
+      return response;
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('API $method $requestUri failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      rethrow;
+    }
+  }
+
+  Future<http.Response> sendMultipart(
+    String method,
+    String path, {
+    Map<String, String> headers = const {},
+    Map<String, String> fields = const {},
+    Map<String, String> files = const {},
+  }) async {
+    final requestUri = uri(path);
+    final request = http.MultipartRequest(method, requestUri)
+      ..headers.addAll(headers)
+      ..fields.addAll(fields);
+
+    for (final entry in files.entries) {
+      request.files.add(
+        await http.MultipartFile.fromPath(entry.key, entry.value),
+      );
+    }
+
+    if (kDebugMode) {
+      debugPrint('API $method $requestUri');
+      debugPrint('API multipart fields: $fields');
+      debugPrint('API multipart files: ${files.keys}');
+    }
+
+    try {
+      final response = await http.Response.fromStream(await request.send());
+
+      if (kDebugMode) {
+        debugPrint('API $method $requestUri -> HTTP ${response.statusCode}');
+        debugPrint('API response: ${response.body}');
+      }
+
       return response;
     } catch (error, stackTrace) {
       if (kDebugMode) {

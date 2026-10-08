@@ -26,17 +26,30 @@ class ReportResource extends JsonResource
             'latitude' => (float) $report->latitude,
             'longitude' => (float) $report->longitude,
             'description' => $report->description,
-            'photo_url' => $report->photo ? url('storage/'.$report->photo) : null,
+            'photo_url' => $report->photo
+                ? $request->getSchemeAndHttpHost().'/api/citizen/reports/'.$report->id.'/photo'
+                : null,
             'verification_status' => $report->verification_status,
             'status' => $status,
             'created_at' => $report->created_at?->toIso8601String(),
             'updated_at' => $report->updated_at?->toIso8601String(),
-            'incident' => $this->whenLoaded('incident', fn () => $report->incident ? new IncidentResource($report->incident) : null),
-            'history' => $this->when($report->relationLoaded('statusHistories'), fn () => $report->statusHistories->sortBy('created_at')->values()->map(fn (ReportStatusHistory $history): array => [
-                'status' => $history->status,
-                'description' => $history->description,
-                'updated_at' => $history->created_at?->toIso8601String(),
-            ])),
+            'incident' => $this->whenLoaded(
+                'incident',
+                fn () => $report->incident ? new IncidentResource($report->incident) : null
+            ),
+            'history' => $this->when(
+                $report->relationLoaded('statusHistories'),
+                fn () => $report->statusHistories
+                    ->sortBy('created_at')
+                    ->values()
+                    ->map(
+                        fn (ReportStatusHistory $history): array => [
+                            'status' => $history->status,
+                            'description' => $history->description,
+                            'updated_at' => $history->created_at?->toIso8601String(),
+                        ]
+                    )
+            ),
         ];
     }
 }

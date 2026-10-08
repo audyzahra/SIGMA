@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
 class CitizenReportService
 {
     /** @return Collection<int, CitizenReport> */
@@ -21,24 +24,42 @@ class CitizenReportService
     }
 
     /** @param array{report_type: string, latitude: float|int|string, longitude: float|int|string, description?: string|null} $attributes */
-    public function create(User $user, array $attributes): CitizenReport
-    {
-        return DB::transaction(function () use ($attributes, $user): CitizenReport {
-            $report = CitizenReport::create([
-                ...$attributes,
-                'user_id' => $user->id,
-                'verification_status' => 'pending',
-            ]);
+    public function create(
+        User $user,
+        array $attributes,
+        ?UploadedFile $photo = null
+    ): CitizenReport {
+        $photoPath = null;
 
-            ReportStatusHistory::create([
-                'citizen_report_id' => $report->id,
-                'status' => 'submitted',
-                'description' => 'Laporan diterima oleh sistem SIGMA.',
-                'updated_by' => $user->id,
-            ]);
+        try {
+            if ($photo) {
+                $photoPath = $photo->store('reports/photos', 'public');
+            }
 
-            return $report->load('statusHistories');
-        });
+            return DB::transaction(function () use ($attributes, $user, $photoPath): CitizenReport {
+                $report = CitizenReport::create([
+                    ...$attributes,
+                    'user_id' => $user->id,
+                    'photo' => $photoPath,
+                    'verification_status' => 'pending',
+                ]);
+
+                ReportStatusHistory::create([
+                    'citizen_report_id' => $report->id,
+                    'status' => 'submitted',
+                    'description' => 'Laporan diterima oleh sistem SIGMA.',
+                    'updated_by' => $user->id,
+                ]);
+
+                return $report->load('statusHistories');
+            });
+        } catch (\Throwable $exception) {
+            if ($photoPath) {
+                Storage::disk('public')->delete($photoPath);
+            }
+
+            throw $exception;
+        }
     }
 
     /** @return array<string, int> */

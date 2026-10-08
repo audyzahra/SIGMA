@@ -12,6 +12,7 @@ Route::middleware('role:citizen')->prefix('citizen')->group(function (): void {
     Route::get('/dashboard', DashboardController::class);
     Route::get('/reports', [ReportController::class, 'index']);
     Route::post('/reports', [ReportController::class, 'store']);
+    Route::get('/reports/{report}/photo', [ReportController::class, 'photo']);
     Route::get('/reports/{report}', [ReportController::class, 'show']);
     Route::get('/map', MapController::class);
     Route::get('/notifications', [NotificationController::class, 'index']);
