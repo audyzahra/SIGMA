@@ -116,6 +116,7 @@ class CitizenReport {
     required this.latitude,
     required this.longitude,
     required this.createdAt,
+    this.photoUrl,
     this.history = const [],
   });
   factory CitizenReport.fromJson(Map<String, dynamic> json) => CitizenReport(
@@ -129,6 +130,7 @@ class CitizenReport {
     createdAt:
         DateTime.tryParse(json['created_at'] as String? ?? '') ??
         DateTime.now(),
+    photoUrl: json['photo_url'] as String?,
     history: (json['history'] as List<dynamic>? ?? [])
         .map((item) => ReportHistory.fromJson(item as Map<String, dynamic>))
         .toList(),
@@ -136,6 +138,7 @@ class CitizenReport {
   final String id, number, type, status, description;
   final double latitude, longitude;
   final DateTime createdAt;
+  final String? photoUrl;
   final List<ReportHistory> history;
 }
 
