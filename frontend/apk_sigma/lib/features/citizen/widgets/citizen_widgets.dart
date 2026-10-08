@@ -36,7 +36,14 @@ class CitizenHeader extends StatelessWidget {
           children: [
             if (!back)
               const Text('SIGMA WARGA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: SigmaColors.primary)),
-            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: SigmaColors.ink)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
           ],
         ),
       ),
@@ -55,7 +62,7 @@ class CitizenHeader extends StatelessWidget {
             child: const Icon(Icons.notifications_none_rounded),
           ),
         ),
-        const CircleAvatar(radius: 17, backgroundColor: Color(0xFFF1F5F9), foregroundColor: SigmaColors.ink, child: Icon(Icons.person_outline, size: 20)),
+        
       ],
     ]);
   }
@@ -74,13 +81,15 @@ class CitizenSurface extends StatelessWidget {
     margin: const EdgeInsets.only(bottom: 12),
     padding: padding,
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(16),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(
-          color: Color(0x0A172033),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black.withValues(alpha: 0.2)
+              : const Color(0x0A172033),
           blurRadius: 12,
-          offset: Offset(0, 4),
+          offset: const Offset(0, 4),
         ),
       ],
     ),
@@ -123,7 +132,9 @@ class EmptyState extends StatelessWidget {
       child: Text(
         message,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: SigmaColors.muted),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
       ),
     ),
   );

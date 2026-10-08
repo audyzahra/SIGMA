@@ -3,16 +3,19 @@ class CitizenProfile {
     required this.name,
     required this.email,
     required this.verified,
+    this.phone,
     this.region,
   });
   factory CitizenProfile.fromJson(Map<String, dynamic> json) => CitizenProfile(
     name: json['name'] as String,
     email: json['email'] as String,
     verified: json['email_verified'] as bool? ?? false,
+    phone: json['phone'] as String?,
     region: json['region'] as String?,
   );
   final String name, email;
   final bool verified;
+  final String? phone;
   final String? region;
 }
 
