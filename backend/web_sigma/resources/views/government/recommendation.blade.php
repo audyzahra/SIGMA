@@ -5,73 +5,105 @@
 @section('content')
 
     @php
+        /*
+        |--------------------------------------------------------------------------
+        | PRIORITAS AKTIF
+        |--------------------------------------------------------------------------
+        |
+        | Sumber wilayah sekarang:
+        |
+        | PriorityResult
+        |      ↓
+        | region_id
+        |      ↓
+        | Region
+        |      ↓
+        | name
+        |
+        | Tidak lagi mengambil nama wilayah dari Incident.
+        |
+        */
+
+        $priority = $activePriority ?? null;
+
+        $region = $priority?->region;
 
         /*
-    |--------------------------------------------------------------------------
-    | Incident utama
-    |--------------------------------------------------------------------------
-    | Recommendation pertama digunakan untuk menentukan
-    | incident yang sedang ditampilkan.
-    */
+        |--------------------------------------------------------------------------
+        | Kompatibilitas form Kirim Petugas
+        |--------------------------------------------------------------------------
+        |
+        | PriorityResult tidak memiliki relasi incident.
+        | Variabel tetap disediakan supaya bagian form tidak error.
+        |
+        */
 
-        $recommendation = $recommendations->first();
-
-        $incident = $recommendation?->incident;
-
-        $priority = $incident?->priority;
+        $incident = null;
 
         /*
-    |--------------------------------------------------------------------------
-    | Data incident
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | IDENTITAS WILAYAH
+        |--------------------------------------------------------------------------
+        */
 
-        $location = $incident?->location_description ?? 'Lokasi belum tersedia';
-
-        /*
-    |--------------------------------------------------------------------------
-    | Priority
-    |--------------------------------------------------------------------------
-    */
+        $location = $region?->name
+            ?? 'Lokasi belum tersedia';
 
         $priorityLevel = $priority?->priority_level;
 
         $priorityLabel = match ($priorityLevel) {
             'critical' => 'Kritis',
-
             'high' => 'Tinggi',
-
             'medium' => 'Sedang',
-
             'low' => 'Rendah',
-
             default => 'Belum tersedia',
         };
 
         /*
-    |--------------------------------------------------------------------------
-    | Semua rekomendasi untuk incident yang sama
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | SKOR PRIORITAS
+        |--------------------------------------------------------------------------
+        */
 
-        $incidentRecommendations = $recommendations->where('incident_id', $incident?->id)->values();
+        $riskScore = $priority?->risk_score;
+
+        $impactScore = $priority?->impact_score;
+
+        $priorityScore = $priority?->priority_score;
+
+        $rankingPosition = $priority?->ranking_position;
 
         /*
-    |--------------------------------------------------------------------------
-    | Status keputusan
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | DATA AI
+        |--------------------------------------------------------------------------
+        */
 
-        $decisionStatus = match ($recommendation?->decision_status) {
-            'pending' => 'Menunggu Persetujuan',
+        $aiOutput = is_array($aiOutput ?? null)
+            ? $aiOutput
+            : [];
 
-            'accepted' => 'Disetujui',
+        $aiActions = is_array($aiOutput['actions'] ?? null)
+            ? $aiOutput['actions']
+            : [];
 
-            'rejected' => 'Ditolak',
+        $aiRecommendation =
+            $aiOutput['recommendation'] ?? null;
 
-            default => 'Belum tersedia',
-        };
+        $aiPriorityAction =
+            $aiOutput['priority_action'] ?? null;
 
+        $aiReasoning =
+            $aiOutput['reasoning'] ?? null;
+
+        $aiAvailable =
+            (bool) ($aiOutput['available'] ?? false);
+
+        $queue = $queue ?? collect();
+
+        $aiStatusLabel = $aiAvailable
+            ? 'AI Engine Aktif'
+            : 'AI Engine';
     @endphp
 
 
@@ -97,13 +129,11 @@
 
         </div>
 
-
         <span class="system-status">
-            ● AI Engine Aktif
+            ● {{ $aiStatusLabel }}
         </span>
 
     </section>
-
 
 
     {{-- ===================================================================== --}}
@@ -125,11 +155,9 @@
                     ♨
                 </span>
 
-
                 <h3>
                     {{ $location }}
                 </h3>
-
 
                 <span class="priority-badge priority-{{ strtolower($priorityLabel) }}">
                     {{ $priorityLabel }}
@@ -148,7 +176,7 @@
                     Risk
 
                     <b>
-                        {{ $priority?->risk_score ?? 0 }}
+                        {{ $riskScore !== null ? $riskScore : 'Belum tersedia' }}
                     </b>
 
                 </span>
@@ -159,7 +187,7 @@
                     Impact
 
                     <b>
-                        {{ $priority?->impact_score ?? 0 }}
+                        {{ $impactScore !== null ? $impactScore : 'Belum tersedia' }}
                     </b>
 
                 </span>
@@ -167,7 +195,6 @@
             </div>
 
         </section>
-
 
 
         {{-- ================================================================ --}}
@@ -183,85 +210,139 @@
 
             <div class="recommendation-actions">
 
-
-                @forelse($incidentRecommendations as $item)
-                    @php
-
-                        $action = match ($item->recommendation_type) {
-                            'deploy_team' => [
-                                'icon' => '♙',
-                                'label' => 'Kirim Tim Pemadam',
-                                'detail' => '2 tim',
-                            ],
-
-                            'aerial_patrol' => [
-                                'icon' => '⌁',
-                                'label' => 'Patroli Udara',
-                                'detail' => 'Drone / Helikopter',
-                            ],
-
-                            'community_alert' => [
-                                'icon' => '♬',
-                                'label' => 'Peringatan Masyarakat',
-                                'detail' => 'Wilayah sekitar',
-                            ],
-
-                            'water_source_check' => [
-                                'icon' => '◉',
-                                'label' => 'Cek Sumber Air',
-                                'detail' => 'Radius 10 km',
-                            ],
-
-                            'evacuation' => [
-                                'icon' => '♧',
-                                'label' => 'Evakuasi',
-                                'detail' => 'Wilayah terdampak',
-                            ],
-
-                            default => [
-                                'icon' => '•',
-                                'label' => 'Rekomendasi Tindakan',
-                                'detail' => 'AI',
-                            ],
-                        };
-
-                    @endphp
-
-
-                    <button type="button" data-modal="send-officer-modal">
-
-                        <b>
-                            {{ $action['icon'] }}
-                        </b>
-
-
-                        <span>
-
-                            {{ $action['label'] }}
-
-                            <small>
-                                {{ $action['detail'] }}
-                            </small>
-
-                        </span>
-
-                    </button>
-
-
-                @empty
+                @if (! $activePriority)
 
                     <p>
-                        Belum ada rekomendasi AI yang tersedia.
+                        Belum ada wilayah dengan prioritas CRITICAL atau HIGH.
                     </p>
-                @endforelse
 
+
+                @elseif (! $aiAvailable)
+
+                    <p>
+                        Rekomendasi AI belum tersedia.
+                    </p>
+
+
+                @else
+
+                    @forelse ($aiActions as $item)
+
+                        @php
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Normalisasi output AI
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $actionType =
+                                $item['type']
+                                ?? 'field_response';
+
+                            $actionTitle =
+                                $item['title']
+                                ?? 'Rekomendasi Tindakan';
+
+                            $actionDetail =
+                                $item['detail']
+                                ?? 'Tindakan berdasarkan analisis AI.';
+
+                            $actionPriority =
+                                $item['priority']
+                                ?? $priorityLevel
+                                ?? 'medium';
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Icon
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $actionIcon = match ($actionType) {
+
+                                'field_response' => '♙',
+
+                                'monitoring' => '⌁',
+
+                                'public_safety' => '♬',
+
+                                'coordination' => '◉',
+
+                                'resource' => '♧',
+
+                                default => '•',
+
+                            };
+
+                        @endphp
+
+
+                        <button
+                            type="button"
+                            data-modal="send-officer-modal"
+                        >
+
+                            <b>
+                                {{ $actionIcon }}
+                            </b>
+
+
+                            <span>
+
+                                {{ $actionTitle }}
+
+                                <small>
+                                    {{ $actionDetail }}
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                    @empty
+
+                        @if ($aiPriorityAction)
+
+                            <button
+                                type="button"
+                                data-modal="send-officer-modal"
+                            >
+
+                                <b>
+                                    ♙
+                                </b>
+
+                                <span>
+
+                                    {{ $aiPriorityAction }}
+
+                                    <small>
+                                        Prioritas AI
+                                    </small>
+
+                                </span>
+
+                            </button>
+
+                        @else
+
+                            <p>
+                                Belum ada rekomendasi AI yang tersedia.
+                            </p>
+
+                        @endif
+
+                    @endforelse
+
+                @endif
 
             </div>
 
         </section>
 
     </div>
-
 
 
     {{-- ===================================================================== --}}
@@ -280,27 +361,124 @@
             <div class="quick-info">
 
                 <p>
-                    <strong>Lokasi:</strong>
+
+                    <strong>
+                        Lokasi:
+                    </strong>
+
                     {{ $location }}
+
                 </p>
 
 
                 <p>
-                    <strong>Status Risiko:</strong>
+
+                    <strong>
+                        Status Risiko:
+                    </strong>
+
                     {{ $priorityLabel }}
+
                 </p>
 
 
                 <p>
-                    <strong>Analisis AI:</strong>
-                    {{ $recommendation?->recommendation_text ?? 'Belum tersedia' }}
+
+                    <strong>
+                        Skor Risiko:
+                    </strong>
+
+                    {{ $riskScore !== null
+                        ? $riskScore
+                        : 'Belum tersedia'
+                    }}
+
                 </p>
 
 
                 <p>
-                    <strong>Instruksi:</strong>
-                    Tim pemadam diarahkan untuk melakukan verifikasi lokasi,
-                    pemadaman awal, dan mitigasi penyebaran api.
+
+                    <strong>
+                        Skor Dampak:
+                    </strong>
+
+                    {{ $impactScore !== null
+                        ? $impactScore
+                        : 'Belum tersedia'
+                    }}
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Skor Prioritas:
+                    </strong>
+
+                    {{ $priorityScore !== null
+                        ? $priorityScore
+                        : 'Belum tersedia'
+                    }}
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Peringkat:
+                    </strong>
+
+                    {{ $rankingPosition !== null
+                        ? '#' . $rankingPosition
+                        : 'Belum tersedia'
+                    }}
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Analisis AI:
+                    </strong>
+
+
+                    @if ($aiRecommendation)
+
+                        {{ $aiRecommendation }}
+
+                    @elseif ($aiPriorityAction)
+
+                        {{ $aiPriorityAction }}
+
+                    @else
+
+                        Belum tersedia
+
+                    @endif
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Instruksi:
+                    </strong>
+
+
+                    @if ($aiReasoning)
+
+                        {{ $aiReasoning }}
+
+                    @else
+
+                        Belum tersedia dari analisis AI.
+
+                    @endif
+
                 </p>
 
 
@@ -309,27 +487,138 @@
         </div>
 
 
-        <button class="button button-primary" data-modal="send-officer-modal">
+        <button
+            class="button button-primary"
+            data-modal="send-officer-modal"
+        >
             Kirim Petugas →
         </button>
-
 
     </section>
 
 
+    {{-- ===================================================================== --}}
+    {{-- QUEUE PRIORITAS --}}
+    {{-- ===================================================================== --}}
+
+    @if ($queue->count() > 0)
+
+        <section class="panel">
+
+            <h3>
+                Antrian Prioritas Berikutnya
+            </h3>
+
+
+            <div class="quick-info">
+
+                @foreach ($queue as $queuedPriority)
+
+                    @php
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Queue sekarang juga memakai PriorityResult -> Region
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $queuedRegion =
+                            $queuedPriority->region;
+
+                        $queuedLocation =
+                            $queuedRegion?->name
+                            ?? 'Lokasi belum tersedia';
+
+                        $queuedLevel =
+                            $queuedPriority->priority_level;
+
+                        $queuedLabel = match ($queuedLevel) {
+
+                            'critical' => 'Kritis',
+
+                            'high' => 'Tinggi',
+
+                            'medium' => 'Sedang',
+
+                            'low' => 'Rendah',
+
+                            default =>
+                                ucfirst(
+                                    $queuedLevel
+                                    ?? 'Belum tersedia'
+                                ),
+
+                        };
+
+                    @endphp
+
+
+                    <p>
+
+                        <strong>
+                            {{ $queuedLabel }}
+                        </strong>
+
+                        —
+
+                        {{ $queuedLocation }}
+
+                        —
+
+                        Score:
+
+                        {{
+                            $queuedPriority->priority_score !== null
+                                ? $queuedPriority->priority_score
+                                : 'Belum tersedia'
+                        }}
+
+                    </p>
+
+                @endforeach
+
+            </div>
+
+        </section>
+
+    @endif
+
 
     {{-- ===================================================================== --}}
-    {{-- MODAL DETAIL --}}
+    {{-- MODAL DETAIL / KIRIM PETUGAS --}}
     {{-- ===================================================================== --}}
 
-    <x-sigma.modal id="send-officer-modal" title="Kirim Petugas Penanganan">
+    <x-sigma.modal
+        id="send-officer-modal"
+        title="Kirim Petugas Penanganan"
+    >
 
+        <form
+            method="POST"
+            action="{{ route('government.recommendation.assign') }}"
+        >
 
-        <form method="POST" action="{{ route('government.recommendation.assign') }}">
             @csrf
 
-            <input type="hidden" name="incident_id" value="{{ $incident->id }}">
 
+            {{-- ============================================================ --}}
+            {{-- INCIDENT --}}
+            {{-- ============================================================ --}}
+
+            @if ($incident)
+
+                <input
+                    type="hidden"
+                    name="incident_id"
+                    value="{{ $incident->id }}"
+                >
+
+            @endif
+
+
+            {{-- ============================================================ --}}
+            {{-- WILAYAH --}}
+            {{-- ============================================================ --}}
 
             <div class="form-group">
 
@@ -338,28 +627,37 @@
                 </label>
 
 
-                <select name="region" class="form-control">
-
+                <select
+                    name="region"
+                    class="form-control"
+                >
 
                     <option value="">
                         Pilih Wilayah
                     </option>
 
 
-                    @foreach ($regions as $region)
-                        <option value="{{ $region->name }}">
+                    @foreach ($regions as $regionOption)
 
-                            {{ $region->name }}
-
+                        <option
+                            value="{{ $regionOption->name }}"
+                            @selected(
+                                $regionOption->id === $region?->id
+                            )
+                        >
+                            {{ $regionOption->name }}
                         </option>
-                    @endforeach
 
+                    @endforeach
 
                 </select>
 
             </div>
 
 
+            {{-- ============================================================ --}}
+            {{-- PETUGAS --}}
+            {{-- ============================================================ --}}
 
             <div class="form-group">
 
@@ -368,8 +666,10 @@
                 </label>
 
 
-                <select name="team_id" class="form-control">
-
+                <select
+                    name="team_id"
+                    class="form-control"
+                >
 
                     <option value="">
                         Pilih Tim Pemadam
@@ -377,19 +677,21 @@
 
 
                     @foreach ($teams as $team)
+
                         <option value="{{ $team->id }}">
-
                             {{ $team->team_name }}
-
                         </option>
-                    @endforeach
 
+                    @endforeach
 
                 </select>
 
             </div>
 
 
+            {{-- ============================================================ --}}
+            {{-- JENIS PENANGANAN --}}
+            {{-- ============================================================ --}}
 
             <div class="form-group">
 
@@ -398,8 +700,10 @@
                 </label>
 
 
-                <select name="action_type" class="form-control">
-
+                <select
+                    name="action_type"
+                    class="form-control"
+                >
 
                     <option value="">
                         Pilih Jenis Penanganan
@@ -407,19 +711,21 @@
 
 
                     @foreach ($actions as $action)
+
                         <option value="{{ $action->name }}">
-
                             {{ $action->name }}
-
                         </option>
-                    @endforeach
 
+                    @endforeach
 
                 </select>
 
             </div>
 
 
+            {{-- ============================================================ --}}
+            {{-- INSTRUKSI --}}
+            {{-- ============================================================ --}}
 
             <div class="form-group">
 
@@ -428,39 +734,43 @@
                 </label>
 
 
-                <textarea name="instruction" class="form-control" rows="3" placeholder="Masukkan arahan untuk petugas">
-</textarea>
-
+                <textarea
+                    name="instruction"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Masukkan arahan untuk petugas"
+                ></textarea>
 
             </div>
 
 
-
+            {{-- ============================================================ --}}
+            {{-- ACTION --}}
+            {{-- ============================================================ --}}
 
             <div class="modal-actions">
 
-
-                <button type="button" class="button button-light" data-modal-close>
+                <button
+                    type="button"
+                    class="button button-light"
+                    data-modal-close
+                >
                     Batal
                 </button>
 
 
-
-                <button type="submit" class="button button-primary">
-
+                <button
+                    type="submit"
+                    class="button button-primary"
+                >
                     Kirim Petugas
-
                 </button>
-
-
 
             </div>
 
 
         </form>
 
-
     </x-sigma.modal>
-
 
 @endsection

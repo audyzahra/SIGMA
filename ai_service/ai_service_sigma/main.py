@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from config import setup_logging
 
 from routers.fire_risk import router as fire_risk_router
+from routers.recommendation import router as recommendation_router
 
 
 setup_logging()
@@ -39,6 +40,14 @@ app.include_router(
 
 )
 
+# ==================================================
+# Recommendation Endpoint
+# ==================================================
+
+app.include_router(
+    recommendation_router
+)
+
 
 # ==================================================
 # Root
@@ -51,6 +60,12 @@ def home():
 
         "status": "running",
 
-        "service": "SIGMA AI Fire Risk"
+        "service": "SIGMA AI Fire Risk",
+
+         "endpoints": [
+            "/predict-risk",
+            "/predict-region",
+            "/recommend-action",
+        ],
 
     }
