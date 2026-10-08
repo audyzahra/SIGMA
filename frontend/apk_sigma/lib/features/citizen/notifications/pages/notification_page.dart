@@ -32,12 +32,12 @@ class NotificationPage extends StatelessWidget {
                           icon: const Icon(Icons.arrow_back),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Notifikasi',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            color: SigmaColors.ink,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -81,42 +81,79 @@ class NotificationPage extends StatelessWidget {
 }
 
 class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({required this.item, required this.onTap});
+  const _NotificationTile({
+    required this.item,
+    required this.onTap,
+  });
+
   final CitizenNotification item;
   final VoidCallback onTap;
+
   @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: item.title,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          decoration: BoxDecoration(
-            color: item.isRead ? Colors.white : const Color(0xFFFFF5F5),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: item.isRead ? const Color(0xFFE7EAF0) : const Color(0xFFF3C6C6),
-            ),
-          ),
-          child: ListTile(
-            onTap: onTap,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: CircleAvatar(
-              backgroundColor: SigmaColors.primary.withValues(alpha: .1),
-              foregroundColor: SigmaColors.primary,
-              child: Icon(item.status == 'completed'
-                  ? Icons.task_alt_outlined
-                  : Icons.notifications_active_outlined),
-            ),
-            title: Text(item.title, style: TextStyle(fontWeight: item.isRead ? FontWeight.w700 : FontWeight.w900)),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text('${item.message}\n${_relative(item.createdAt)}'),
-            ),
-            isThreeLine: true,
-            trailing: item.isRead ? null : const Icon(Icons.circle, size: 10, color: SigmaColors.primary),
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Semantics(
+      button: true,
+      label: item.title,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: item.isRead
+              ? colorScheme.surface
+              : colorScheme.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: item.isRead
+                ? colorScheme.outline.withValues(alpha: 0.4)
+                : colorScheme.primary.withValues(alpha: 0.25),
           ),
         ),
-      );
+        child: ListTile(
+          onTap: onTap,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          leading: CircleAvatar(
+            backgroundColor: SigmaColors.primary.withValues(alpha: .1),
+            foregroundColor: SigmaColors.primary,
+            child: Icon(
+              item.status == 'completed'
+                  ? Icons.task_alt_outlined
+                  : Icons.notifications_active_outlined,
+            ),
+          ),
+          title: Text(
+            item.title,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontWeight: item.isRead
+                  ? FontWeight.w700
+                  : FontWeight.w900,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '${item.message}\n${_relative(item.createdAt)}',
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          isThreeLine: true,
+          trailing: item.isRead
+              ? null
+              : const Icon(
+                  Icons.circle,
+                  size: 10,
+                  color: SigmaColors.primary,
+                ),
+        ),
+      ),
+    );
+  }
 }
 
 String _relative(DateTime value) {

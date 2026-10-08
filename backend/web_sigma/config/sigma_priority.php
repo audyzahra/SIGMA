@@ -349,7 +349,7 @@ return [
     */
 
     'ai_recommendation' => [
-        'enabled' => false,
+        'enabled' => true,
         'provider' => 'gemini',
         'endpoint' => env('AI_RECOMMENDATION_URL'),
         'timeout' => 30,

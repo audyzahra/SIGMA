@@ -112,6 +112,23 @@ class CitizenApi {
         (await _request('PATCH', '/profile', body: {'name': name}))['profile']
             as Map<String, dynamic>,
       );
+  Future<CitizenProfile> updateProfile({
+  required String name,
+  required String phone,
+  required String region,
+}) async =>
+    CitizenProfile.fromJson(
+      (await _request(
+        'PATCH',
+        '/profile',
+        body: {
+          'name': name,
+          'phone': phone,
+          'region': region,
+        },
+      ))['profile'] as Map<String, dynamic>,
+    );
+
   Future<List<CitizenNotification>> notifications() async {
     final data = await _request('GET', '/notifications');
     return (data['notifications'] as List<dynamic>)

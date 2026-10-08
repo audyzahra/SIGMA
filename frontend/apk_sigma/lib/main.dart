@@ -13,14 +13,21 @@ class SigmaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SIGMA Disaster Intelligence',
-      debugShowCheckedModeBanner: false,
-      theme: SigmaTheme.light,
-      routes: {
-        '/officer/home': (_) => const OfficerShell(name: 'Budi Pratama'),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: SigmaThemeController.mode,
+      builder: (context, themeMode, _) {
+        return MaterialApp(
+          title: 'SIGMA Disaster Intelligence',
+          debugShowCheckedModeBanner: false,
+          theme: SigmaTheme.light,
+          darkTheme: SigmaTheme.dark,
+          themeMode: themeMode,
+          routes: {
+            '/officer/home': (_) => const OfficerShell(name: 'Budi Pratama'),
+          },
+          home: const RoleSelectionPage(),
+        );
       },
-      home: const RoleSelectionPage(),
     );
   }
 }
