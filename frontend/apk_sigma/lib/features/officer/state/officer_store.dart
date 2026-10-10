@@ -41,6 +41,17 @@ class OfficerStore extends ChangeNotifier {
     }
   }
 
+  // Ubah kata sandi akun petugas.
+  Future<void> updatePassword({
+    required String newPassword,
+    required String passwordConfirmation,
+  }) async {
+    await _repository.updatePassword(
+      newPassword: newPassword,
+      passwordConfirmation: passwordConfirmation,
+    );
+  }
+
   OfficerTask? get activeTask => tasks.isEmpty ? null : tasks.first;
   Future<void> setTaskStatus(String taskId, TaskStatus status) async {
     try {

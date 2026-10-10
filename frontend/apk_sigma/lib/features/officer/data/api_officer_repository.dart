@@ -172,4 +172,19 @@ class ApiOfficerRepository implements OfficerRepository {
   @override
   Future<void> acceptTask(String taskId) async =>
       _request('PATCH', '/tasks/$taskId/accept');
+
+  @override
+  Future<void> updatePassword({
+    required String newPassword,
+    required String passwordConfirmation,
+  }) async {
+    await _request(
+      'PATCH',
+      '/profile/password',
+      body: {
+        'password': newPassword,
+        'password_confirmation': passwordConfirmation,
+      },
+    );
+  }
 }
