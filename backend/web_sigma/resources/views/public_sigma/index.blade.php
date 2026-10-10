@@ -59,120 +59,6 @@
         </section>
 
 
-        {{-- ================= STATISTIK ================= --}}
-        <section class="statistics">
-
-            <div class="container">
-
-                <div class="section-heading">
-
-                    <span>
-                        DATA TERKINI
-                    </span>
-
-                    <h2>
-                        Situasi Karhutla
-                    </h2>
-
-                    <p>
-                        Informasi terkini mengenai kondisi kebakaran
-                        hutan dan lahan.
-                    </p>
-
-                </div>
-
-
-                <div class="stat-grid">
-
-                    <div class="stat-card">
-
-                        <div class="stat-icon red">
-                            🔥
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                {{ number_format($totalHotspot) }}
-                            </strong>
-
-                            <span>
-                                {{ $profile->total_hotspot_label ?? 'Total Hotspot' }}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat-card">
-
-                        <div class="stat-icon orange">
-                            ⚠
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                {{ number_format($totalIncident) }}
-                            </strong>
-
-                            <span>
-                                {{ $profile->total_incident_label ?? 'Total Insiden' }}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat-card">
-
-                        <div class="stat-icon blue">
-                            ●
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Aktif
-                            </strong>
-
-                            <span>
-                                Status Sistem
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="stat-card">
-
-                        <div class="stat-icon green">
-                            ✓
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                SIGMA
-                            </strong>
-
-                            <span>
-                                Platform Geospasial
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
                     {{-- ================= MONITORING ================= --}}
 
 <section id="monitoring" class="monitoring">
@@ -481,66 +367,79 @@
         </section>
 
 
-        {{-- ================= FOOTER ================= --}}
-        <footer class="public-footer">
+        
+{{-- ================= FOOTER ================= --}}
+<footer class="public-footer">
+    <div class="container">
 
-            <div class="container">
+        <div class="footer-grid">
 
-                <div class="footer-grid">
+            {{-- Identitas SIGMA --}}
+            <div class="footer-about">
+                <h3 class="footer-brand">
+                    {{ $profile->title ?? 'SIGMA' }}
+                </h3>
 
-                    <div>
+                <p>
+                    Sistem Intelijen Geospasial untuk Mitigasi
+                    Karhutla.
+                </p>
 
-                        <h3 class="footer-brand">
-                            {{ $profile->title ?? 'SIGMA' }}
-                        </h3>
-
-                        <p>
-                            {{ $profile->tagline ?? 'Sistem Intelijen Geospasial untuk Mitigasi Karhutla' }}
-                        </p>
-
-                    </div>
-
-
-                    <div>
-
-                        <h4>
-                            Kontak
-                        </h4>
-
-                        @if ($profile?->contact_email)
-                            <p>
-                                {{ $profile->contact_email }}
-                            </p>
-                        @endif
-
-
-                        @if ($profile?->contact_phone)
-                            <p>
-                                {{ $profile->contact_phone }}
-                            </p>
-                        @endif
-
-                    </div>
-
+                <div class="footer-tagline">
+                    Pantau <span>•</span>
+                    Analisis <span>•</span>
+                    Prediksi <span>•</span>
+                    Aksi
                 </div>
-
-
-                <div class="footer-bottom">
-
-                    <span>
-                        © {{ date('Y') }}
-                        {{ $profile->title ?? 'SIGMA' }}
-                    </span>
-
-                    <span>
-                        Sistem Informasi Karhutla
-                    </span>
-
-                </div>
-
             </div>
 
-        </footer>
+            {{-- Tentang SIGMA --}}
+            <div class="footer-information">
+                <h4>Tentang SIGMA</h4>
+
+                <p>
+                    Platform pendukung keputusan berbasis AI dan GIS
+                    untuk membantu pemantauan risiko, analisis dampak,
+                    dan penentuan prioritas penanganan karhutla.
+                </p>
+            </div>
+
+            {{-- Fitur --}}
+            <div class="footer-features">
+                <h4>Fitur Utama</h4>
+
+                <ul>
+                    <li>
+                        <a href="#monitoring">Monitoring Karhutla</a>
+                    </li>
+                    <li>Analisis Risiko dan Dampak</li>
+                    <li>Prioritas Penanganan</li>
+                    <li>Rekomendasi Tindakan</li>
+                    <li>
+                        <a href="#aspirasi">Laporan Masyarakat</a>
+                    </li>
+                </ul>
+            </div>
+            
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>
+                © {{ date('Y') }}
+                {{ $profile->title ?? 'SIGMA' }}.
+                Hak cipta dilindungi.
+            </span>
+
+            <span>
+                Sistem Intelijen Geospasial untuk Mitigasi Karhutla
+            </span>
+        </div>
+
+    </div>
+</footer>
+
+        
 
     </div>
 @endsection

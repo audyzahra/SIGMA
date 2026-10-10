@@ -17,7 +17,16 @@ class DashboardController extends Controller
     {
         // Statistik terbaru
         $statistics = FireStatistic::latest('statistic_date')->first();
+        $totalHotspots = Hotspot::count();
 
+        $activeIncidents = Incident::whereIn('fire_status', [
+            'detected',
+            'on_process',
+        ])->count();
+
+        $resolvedIncidents = IncidentStatusHistory::where('status', 'extinguished')
+        ->distinct('incident_id')
+        ->count('incident_id');
         /*
          * Dashboard TIDAK memakai config('sigma_data') sebagai sumber angka.
          * Semua nilai di bawah berasal dari tabel nyata (fire_statistics,
@@ -35,33 +44,21 @@ class DashboardController extends Controller
             $data['government_metrics'] = [
                 [
                     'label' => 'Total Hotspot',
-                    'value' => number_format($statistics->total_hotspots),
+                    'value' => number_format($totalHotspots),
                     'icon' => 'fire',
                     'accent' => 'danger',
                 ],
                 [
                     'label' => 'Insiden Aktif',
-                    'value' => number_format($statistics->active_incidents),
+                    'value' => number_format($activeIncidents),
                     'icon' => 'alert',
                     'accent' => 'orange',
                 ],
                 [
                     'label' => 'Insiden Selesai',
-                    'value' => number_format($statistics->resolved_incident),
+                    'value' => number_format($resolvedIncidents),
                     'icon' => 'check',
                     'accent' => 'success',
-                ],
-                [
-                    'label' => 'Luas Terdampak',
-                    'value' => number_format($statistics->affected_area) . ' Ha',
-                    'icon' => 'map',
-                    'accent' => 'warning',
-                ],
-                [
-                    'label' => 'Wilayah Terdampak',
-                    'value' => number_format($statistics->affected_region),
-                    'icon' => 'location',
-                    'accent' => 'info',
                 ],
             ];
         }
