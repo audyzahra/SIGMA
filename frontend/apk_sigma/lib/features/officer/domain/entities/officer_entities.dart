@@ -40,15 +40,33 @@ class OfficerTask {
     required this.incident,
     required this.status,
     required this.area,
+    this.teamName = '-',
+    this.riskScore = 0,
+    this.impactScore = 0,
+    this.priorityScore = 0,
+    this.rankingPosition,
   });
+
   final String id, area;
   final Incident incident;
   final TaskStatus status;
+
+  final String teamName;
+  final double riskScore;
+  final double impactScore;
+  final double priorityScore;
+  final int? rankingPosition;
+
   OfficerTask copyWith({TaskStatus? status}) => OfficerTask(
     id: id,
     incident: incident,
     status: status ?? this.status,
     area: area,
+    teamName: teamName,
+    riskScore: riskScore,
+    impactScore: impactScore,
+    priorityScore: priorityScore,
+    rankingPosition: rankingPosition,
   );
 }
 

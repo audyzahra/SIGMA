@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\Government\ResponseAssignmentController;
 use App\Http\Controllers\Web\Government\FieldTeamController;
 use App\Http\Controllers\Web\Government\AccountController;
 use App\Http\Controllers\Web\Government\NotificationController;
+use App\Http\Controllers\Web\Government\RecommendationHistoryController;
 
 use App\Http\Controllers\Web\public_sigma\AspirationController;
 use App\Http\Controllers\Web\SuperAdmin\AIModelController;
@@ -257,6 +258,17 @@ Route::middleware(['auth', 'role:government'])
             RecommendationController::class,
             'index'
         ])->name('recommendation');
+
+        // History
+        Route::get('/recommendation/history', [
+    RecommendationHistoryController::class,
+    'index'
+])->name('recommendation.history');
+
+Route::get('/recommendation/history/{assignment}', [
+    RecommendationHistoryController::class,
+    'show'
+])->name('recommendation.history.show');
 
         /*
         |--------------------------------------------------------------------------
