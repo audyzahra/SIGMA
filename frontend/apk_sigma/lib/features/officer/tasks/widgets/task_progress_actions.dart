@@ -27,6 +27,7 @@ class TaskProgressActions extends StatelessWidget {
     ];
 
     final currentIndex = _currentIndex(status);
+    final nextIndex = currentIndex + 1;
 
     return Wrap(
       spacing: 8,
@@ -35,37 +36,22 @@ class TaskProgressActions extends StatelessWidget {
         final index = entry.key;
         final step = entry.value;
 
-        if (index > currentIndex + 1) {
-          return TaskStepButton(
-            label: actionLabel(step),
-            icon: Icons.lock_outline,
-            enabled: false,
-            completed: false,
-            loading: false,
-            onPressed: null,
-          );
-        }
-
-        if (index <= currentIndex) {
-          return TaskStepButton(
-            label: actionLabel(step),
-            icon: Icons.check,
-            enabled: false,
-            completed: true,
-            loading: false,
-            onPressed: null,
-          );
-        }
+        final completed = index <= currentIndex;
+        final enabled = !loading && index == nextIndex;
 
         return TaskStepButton(
           label: actionLabel(step),
-          icon: _actionIcon(step),
-          enabled: !loading,
-          completed: false,
-          loading: loading,
-          onPressed: () {
-            onStatusSelected(step);
-          },
+          icon: completed
+              ? Icons.check_circle
+              : enabled
+                  ? _actionIcon(step)
+                  : Icons.lock_outline,
+          enabled: enabled,
+          completed: completed,
+          loading: enabled && loading,
+          onPressed: enabled
+              ? () => onStatusSelected(step)
+              : null,
         );
       }).toList(),
     );
