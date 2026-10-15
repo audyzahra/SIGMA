@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+
+    'nasa_firms' => [
+        'map_key' => env('NASA_FIRMS_MAP_KEY'),
+    ],
+
+
     /*
     |--------------------------------------------------------------------------
     | SIGMA AI Service (FastAPI)

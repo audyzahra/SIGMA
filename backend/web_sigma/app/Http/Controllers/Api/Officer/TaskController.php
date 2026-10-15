@@ -62,6 +62,7 @@ class TaskController extends Controller
             $task->update([
                 'accepted_by' => $request->user()->id,
                 'accepted_at' => now(),
+                'status' => 'accepted',
             ]);
 
             FieldAssignmentStatusHistory::create([
@@ -205,6 +206,22 @@ class TaskController extends Controller
 
 
         $previousStatus = $task->status;
+
+        $allowedTransitions = [
+            'accepted' => 'traveling',
+            'traveling' => 'arrived',
+            'arrived' => 'handling',
+            'handling' => 'completed',
+        ];
+
+        $expectedStatus = $allowedTransitions[$previousStatus] ?? null;
+
+        if ($expectedStatus !== $status) {
+            return response()->json([
+                'message' => 'Status tugas tidak valid atau sudah diperbarui.',
+                'current_status' => $previousStatus,
+            ], 422);
+        }
 
         $task->update([
             'status' => $status,

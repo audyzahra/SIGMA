@@ -27,7 +27,10 @@ class Hotspot extends Model
 
         'detected_at',
 
-        'status'
+        'status',
+
+        'data_origin',
+        'record_key',
 
     ];
 
@@ -35,15 +38,15 @@ class Hotspot extends Model
 
     protected $casts = [
 
-        'detected_at'=>'datetime',
+        'detected_at' => 'datetime',
 
-        'latitude'=>'float',
+        'latitude' => 'float',
 
-        'longitude'=>'float',
+        'longitude' => 'float',
 
-        'brightness_temperature'=>'float',
+        'brightness_temperature' => 'float',
 
-        'frp'=>'float',
+        'frp' => 'float',
 
     ];
 
@@ -60,8 +63,5 @@ class Hotspot extends Model
             'source_id'
 
         );
-
     }
-
-
 }

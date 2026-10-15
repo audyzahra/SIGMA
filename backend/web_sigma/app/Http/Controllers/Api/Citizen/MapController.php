@@ -16,22 +16,43 @@ class MapController extends Controller
 {
     public function __construct(private readonly CitizenReportService $reports) {}
 
+
     public function __invoke(Request $request): JsonResponse
     {
         return response()->json([
-            'hotspots' => Hotspot::query()->latest('detected_at')->get()->map(fn (Hotspot $hotspot): array => [
-                'id' => $hotspot->id,
-                'latitude' => (float) $hotspot->latitude,
-                'longitude' => (float) $hotspot->longitude,
-                'status' => $hotspot->status,
-                'confidence_level' => $hotspot->confidence_level,
-                'detected_at' => $hotspot->detected_at?->toIso8601String(),
-            ])->values(),
-            'incidents' => IncidentResource::collection(Incident::query()->latest('detected_at')->get())->resolve(),
-            'reports' => ReportResource::collection($this->reports->forUser($request->user()))->resolve(),
+
+            'hotspots' => Hotspot::query()
+                ->where('data_origin', 'nasa_firms_api')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->where('detected_at', '>=', now()->subDays(3))
+                ->latest('detected_at')
+                ->limit(100)
+                ->get()
+                ->map(fn(Hotspot $hotspot): array => [
+                    'id' => $hotspot->id,
+                    'latitude' => (float) $hotspot->latitude,
+                    'longitude' => (float) $hotspot->longitude,
+                    'status' => $hotspot->status,
+                    'confidence_level' => $hotspot->confidence_level,
+                    'detected_at' => $hotspot->detected_at?->toIso8601String(),
+                    'data_origin' => $hotspot->data_origin,
+                ])
+                ->values(),
+
+
+            'incidents' => IncidentResource::collection(
+                Incident::query()->latest('detected_at')->get()
+            )->resolve(),
+
+            'reports' => ReportResource::collection(
+                $this->reports->forUser($request->user())
+            )->resolve(),
+
             'risk' => $this->latestRisk(),
         ]);
     }
+
 
     /** @return array<string, mixed>|null */
     private function latestRisk(): ?array

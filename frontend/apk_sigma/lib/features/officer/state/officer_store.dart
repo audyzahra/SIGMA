@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../data/api_officer_repository.dart';
 import '../domain/entities/officer_entities.dart';
 import '../domain/repositories/officer_repository.dart';
+import '../tasks/task_status_helper.dart';
 
 class OfficerStore extends ChangeNotifier {
   OfficerStore({OfficerRepository? repository})
@@ -15,6 +16,8 @@ class OfficerStore extends ChangeNotifier {
   bool loaded = false;
   bool loading = false;
   String? errorMessage;
+
+  final Set<String> _updatingTaskIds = {};
 
   Future<void> load() async {
     loading = true;
@@ -52,20 +55,57 @@ class OfficerStore extends ChangeNotifier {
     );
   }
 
-  OfficerTask? get activeTask => tasks.isEmpty ? null : tasks.first;
-  Future<void> setTaskStatus(String taskId, TaskStatus status) async {
-    try {
-      if (status == TaskStatus.accepted) {
-        await _repository.acceptTask(taskId);
-      } else {
-        await _repository.updateTaskStatus(taskId, status);
-      }
-      await load();
-    } catch (_) {
-      errorMessage = 'Status tugas belum dapat diperbarui. Coba lagi.';
-      notifyListeners();
-    }
+  
+Future<void> setTaskStatus(
+  String taskId,
+  TaskStatus status,
+) async {
+  if (_updatingTaskIds.contains(taskId)) return;
+
+  final index = tasks.indexWhere((task) => task.id == taskId);
+  if (index == -1) {
+    errorMessage = 'Tugas tidak ditemukan.';
+    notifyListeners();
+    return;
   }
+
+  final previousTask = tasks[index];
+
+  // Hanya izinkan tahapan berikutnya.
+  if (nextStatus(previousTask.status) != status) return;
+
+  _updatingTaskIds.add(taskId);
+  errorMessage = null;
+  notifyListeners();
+
+  try {
+    // Tunggu server memastikan perubahan status berhasil.
+    if (status == TaskStatus.accepted) {
+      await _repository.acceptTask(taskId);
+    } else {
+      await _repository.updateTaskStatus(taskId, status);
+    }
+
+    // Perbarui status lokal agar tombol berikutnya langsung terbuka.
+    final updatedTasks = [...tasks];
+    final latestIndex = updatedTasks.indexWhere(
+      (task) => task.id == taskId,
+    );
+
+    if (latestIndex != -1) {
+      updatedTasks[latestIndex] =
+          updatedTasks[latestIndex].copyWith(status: status);
+      tasks = updatedTasks;
+    }
+  } catch (_) {
+    errorMessage =
+        'Status tugas belum dapat diperbarui. Coba lagi.';
+  } finally {
+    _updatingTaskIds.remove(taskId);
+    notifyListeners();
+  }
+}
+
 
   Future<bool> createReport(String taskId, String description) async {
     try {
