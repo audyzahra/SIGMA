@@ -134,10 +134,7 @@
         <div>
             <h3>Cari &amp; Saring Wilayah</h3>
 
-            <p>
-                Pencarian dan penyaringan dijalankan pada query database,
-                bukan penyaringan di sisi klien.
-            </p>
+        
         </div>
 
         @if ($hasFilter)
@@ -374,10 +371,7 @@
         <div>
             <h3>Transparansi Sumber Data</h3>
 
-            <p>
-                Status ketersediaan diperiksa langsung ke database, sehingga
-                dataset yang belum ada dilaporkan apa adanya.
-            </p>
+            
         </div>
 
     </div>
