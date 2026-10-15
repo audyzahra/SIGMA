@@ -28,3 +28,6 @@ ijson
 # Driver MySQL (database SIGMA memakai MySQL 8, bukan PostgreSQL)
 PyMySQL
 cryptography
+
+# ===== YOLO Object Detection =====
+ultralytics

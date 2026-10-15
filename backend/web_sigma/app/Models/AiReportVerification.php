@@ -6,24 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class AiReportVerification extends Model
 {
-
     protected $fillable = [
         'citizen_report_id',
         'model_id',
         'prediction_result',
         'confidence_score',
         'detected_objects',
+        'annotated_image_path',
         'verification_status',
-        'verified_at'
+        'verified_at',
     ];
-
 
     protected $casts = [
-        'detected_objects'=>'array',
-        'verified_at'=>'datetime',
+        'detected_objects' => 'array',
+        'verified_at' => 'datetime',
     ];
-
-
 
     public function citizenReport()
     {
@@ -32,7 +29,6 @@ class AiReportVerification extends Model
         );
     }
 
-
     public function model()
     {
         return $this->belongsTo(
@@ -40,5 +36,4 @@ class AiReportVerification extends Model
             'model_id'
         );
     }
-
 }

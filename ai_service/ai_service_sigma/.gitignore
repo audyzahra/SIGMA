@@ -22,3 +22,22 @@ logs/*.log
 # IDE
 .vscode/
 .idea/
+
+# Local YOLO training datasets (keep data.yaml and preparation scripts tracked)
+/dataset/yolo_fire/images/
+/dataset/yolo_fire/labels/
+/dataset/yolo_fire_smoke/images/
+/dataset/yolo_fire_smoke/labels/
+/downloads/fire_smoke/**/train/
+/downloads/fire_smoke/**/val/
+/downloads/fire_smoke/**/test/
+
+# Re-creatable inference outputs from local YOLO runs
+/runs/
+
+# Local samples and generic experiment checkpoint (not runtime model)
+/bus.jpg
+/test1.jpeg
+/test_fire.png
+/test_images/
+/yolo11n.pt

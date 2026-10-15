@@ -38,6 +38,7 @@
     @php
         $navigation = [
             ['government.dashboard', 'Dashboard', '▦'],
+            ['government.early-warnings', 'Peringatan Dini', '⚠'],
             ['government.fire-risk', 'Risiko Karhutla', '♨'],
             ['government.impact', 'Analisis Dampak', '◉'],
             ['government.priority', 'Prioritas Penanganan', '⌁'],

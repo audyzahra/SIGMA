@@ -25,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isEditing = false;
   bool _isSaving = false;
   String _currentName = '';
+  int? _selectedRegionId;
 
   @override
   void dispose() {
@@ -34,14 +35,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _startEditing(CitizenProfile profile) {
-  _currentName = profile.name;
-  _phoneController.text = profile.phone ?? '';
-  _regionController.text = profile.region ?? '';
+    _currentName = profile.name;
+    _phoneController.text = profile.phone ?? '';
+    _regionController.text = profile.region ?? '';
+    _selectedRegionId = profile.regionId;
 
-  setState(() {
-    _isEditing = true;
-  });
-}
+    setState(() {
+      _isEditing = true;
+    });
+  }
 
   void _cancelEditing() {
     setState(() {
@@ -58,10 +60,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     try {
       await widget.api.updateProfile(
-  name: _currentName,
-  phone: _phoneController.text.trim(),
-  region: _regionController.text.trim(),
-);
+        name: _currentName,
+        phone: _phoneController.text.trim(),
+        regionId: _selectedRegionId,
+      );
 
       if (!mounted) return;
 
@@ -71,18 +73,14 @@ class _ProfilePageState extends State<ProfilePage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil berhasil diperbarui'),
-        ),
+        const SnackBar(content: Text('Profil berhasil diperbarui')),
       );
     } catch (error) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            error.toString().replaceFirst('Exception: ', ''),
-          ),
+          content: Text(error.toString().replaceFirst('Exception: ', '')),
         ),
       );
     } finally {
@@ -93,6 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) => FutureBuilder<CitizenProfile>(
     future: _profile,
@@ -165,85 +164,87 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           CitizenSurface(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Data profil',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Data profil',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: profile.email,
-                enabled: false,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined),
-                  helperText: 'Email tidak dapat diubah',
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: _phoneController,
-                enabled: _isEditing,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: 'Nomor Telepon',
-                  prefixIcon: Icon(Icons.phone_outlined),
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: _regionController,
-                enabled: _isEditing,
-                decoration: const InputDecoration(
-                  labelText: 'Alamat',
-                  prefixIcon: Icon(Icons.location_on_outlined),
-                ),
-              ),
-              const SizedBox(height: 20),
-              if (!_isEditing)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _startEditing(profile),
-                    icon: const Icon(Icons.edit_outlined),
-                    label: const Text('Ubah data'),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: profile.email,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email_outlined),
+                    helperText: 'Email tidak dapat diubah',
                   ),
-                )
-              else
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _isSaving ? null : _cancelEditing,
-                        child: const Text('Batal'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _isSaving ? null : _saveProfile,
-                        child: _isSaving
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text('Simpan'),
-                      ),
-                    ),
-                  ],
                 ),
-            ],
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _phoneController,
+                  enabled: _isEditing,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: 'Nomor Telepon',
+                    prefixIcon: Icon(Icons.phone_outlined),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _regionController,
+                  readOnly: true,
+                  onTap: _isEditing ? () => _selectRegion(profile) : null,
+                  decoration: InputDecoration(
+                    labelText: 'Wilayah administratif',
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                    suffixIcon: Icon(Icons.search),
+                    helperText: profile.region == null
+                        ? 'Wilayah belum dipilih. Pilih provinsi, kabupaten/kota, dan kecamatan agar peringatan wilayah dapat diterima.'
+                        : 'Wilayah ini menentukan peringatan dini yang Anda terima.',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!_isEditing)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _startEditing(profile),
+                      icon: const Icon(Icons.edit_outlined),
+                      label: const Text('Ubah data'),
+                    ),
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _isSaving ? null : _cancelEditing,
+                          child: const Text('Batal'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _isSaving ? null : _saveProfile,
+                          child: _isSaving
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Simpan'),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
-        ),
-                    CitizenSurface(
+          CitizenSurface(
             child: ValueListenableBuilder<ThemeMode>(
               valueListenable: SigmaThemeController.mode,
               builder: (context, mode, _) {
@@ -290,15 +291,10 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           CitizenSurface(
             child: ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: SigmaColors.primary,
-              ),
+              leading: const Icon(Icons.logout, color: SigmaColors.primary),
               title: const Text(
                 'Keluar',
-                style: TextStyle(
-                  color: SigmaColors.primary,
-                ),
+                style: TextStyle(color: SigmaColors.primary),
               ),
               onTap: _logout,
             ),
@@ -307,6 +303,22 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     },
   );
+
+  Future<void> _selectRegion(CitizenProfile profile) async {
+    final region = await showDialog<CitizenRegion>(
+      context: context,
+      builder: (_) => _RegionPickerDialog(
+        api: widget.api,
+        hierarchy: profile.regionHierarchy,
+      ),
+    );
+    if (region == null || !mounted) return;
+    setState(() {
+      _selectedRegionId = region.id;
+      _regionController.text = region.name;
+    });
+  }
+
   Future<void> _logout() async {
     final token = await AuthStorage().getToken();
     if (token != null) {
@@ -321,4 +333,262 @@ class _ProfilePageState extends State<ProfilePage> {
         (_) => false,
       );
   }
+}
+
+class _RegionPickerDialog extends StatefulWidget {
+  const _RegionPickerDialog({required this.api, this.hierarchy});
+
+  final CitizenApi api;
+  final Map<String, dynamic>? hierarchy;
+
+  @override
+  State<_RegionPickerDialog> createState() => _RegionPickerDialogState();
+}
+
+class _RegionPickerDialogState extends State<_RegionPickerDialog> {
+  List<CitizenRegion> _provinces = const [];
+  List<CitizenRegion> _regencies = const [];
+  List<CitizenRegion> _districts = const [];
+  int? _provinceId;
+  int? _regencyId;
+  int? _districtId;
+  bool _loading = true;
+  String? _error;
+  int _regionRequest = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitial();
+  }
+
+  Future<void> _loadInitial() async {
+    final request = ++_regionRequest;
+    try {
+      final provinces = await widget.api.regions(level: 'province');
+      final hierarchy = widget.hierarchy;
+      List<CitizenRegion> regencies = const [], districts = const [];
+      int? provinceId, regencyId, districtId;
+      if (hierarchy != null) {
+        provinceId = (hierarchy['province_id'] as num?)?.toInt();
+        regencyId = (hierarchy['regency_id'] as num?)?.toInt();
+        districtId = (hierarchy['district_id'] as num?)?.toInt();
+        if (provinceId != null)
+          regencies = await widget.api.regions(
+            parentId: provinceId,
+            level: 'regency',
+          );
+        if (regencyId != null)
+          districts = await widget.api.regions(
+            parentId: regencyId,
+            level: 'district',
+          );
+      }
+      if (provinceId != null &&
+          !provinces.any((region) => region.id == provinceId)) {
+        provinceId = null;
+        regencyId = null;
+        districtId = null;
+        regencies = const [];
+        districts = const [];
+      }
+      if (regencyId != null &&
+          !regencies.any((region) => region.id == regencyId)) {
+        regencyId = null;
+        districtId = null;
+        districts = const [];
+      }
+      if (districtId != null &&
+          !districts.any((region) => region.id == districtId)) {
+        districtId = null;
+      }
+      if (!mounted || request != _regionRequest) return;
+      setState(() {
+        _provinces = provinces;
+        _regencies = regencies;
+        _districts = districts;
+        _provinceId = provinceId;
+        _regencyId = regencyId;
+        _districtId = districtId;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = 'Daftar wilayah gagal dimuat. Periksa koneksi lalu coba lagi.';
+      });
+    }
+  }
+
+  Future<void> _selectProvince(int? id) async {
+    final request = ++_regionRequest;
+    setState(() {
+      _provinceId = id;
+      _regencyId = null;
+      _districtId = null;
+      _regencies = const [];
+      _districts = const [];
+      _loading = true;
+      _error = null;
+    });
+    if (id == null) {
+      setState(() => _loading = false);
+      return;
+    }
+    try {
+      final items = await widget.api.regions(parentId: id, level: 'regency');
+      if (mounted && request == _regionRequest)
+        setState(() {
+          _regencies = items;
+          _loading = false;
+        });
+    } catch (_) {
+      if (mounted && request == _regionRequest)
+        setState(() {
+          _loading = false;
+          _error = 'Kabupaten/kota gagal dimuat. Coba lagi.';
+        });
+    }
+  }
+
+  Future<void> _selectRegency(int? id) async {
+    final request = ++_regionRequest;
+    setState(() {
+      _regencyId = id;
+      _districtId = null;
+      _districts = const [];
+      _loading = true;
+      _error = null;
+    });
+    if (id == null) {
+      setState(() => _loading = false);
+      return;
+    }
+    try {
+      final items = await widget.api.regions(parentId: id, level: 'district');
+      if (mounted && request == _regionRequest)
+        setState(() {
+          _districts = items;
+          _loading = false;
+        });
+    } catch (_) {
+      if (mounted && request == _regionRequest)
+        setState(() {
+          _loading = false;
+          _error = 'Kecamatan gagal dimuat. Coba lagi.';
+        });
+    }
+  }
+
+  void _retry() {
+    if (_regencyId != null) {
+      _selectRegency(_regencyId);
+    } else if (_provinceId != null) {
+      _selectProvince(_provinceId);
+    } else {
+      _loadInitial();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Pilih wilayah'),
+    content: SizedBox(
+      width: 420,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_loading) const LinearProgressIndicator(),
+          if (_error != null)
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+                TextButton(
+                  onPressed: _loading ? null : _retry,
+                  child: const Text('Coba lagi'),
+                ),
+              ],
+            ),
+          DropdownButtonFormField<int>(
+            key: ValueKey('province-$_provinceId'),
+            initialValue: _provinceId,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Provinsi'),
+            items: _provinces
+                .map(
+                  (r) => DropdownMenuItem(
+                    value: r.id,
+                    child: Text(r.name, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged: _loading ? null : _selectProvince,
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            key: ValueKey('regency-$_provinceId-$_regencyId'),
+            initialValue: _regencyId,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Kabupaten/kota'),
+            items: _regencies
+                .map(
+                  (r) => DropdownMenuItem(
+                    value: r.id,
+                    child: Text(r.name, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged: _loading || _provinceId == null ? null : _selectRegency,
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            key: ValueKey('district-$_regencyId-$_districtId'),
+            initialValue: _districtId,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Kecamatan'),
+            items: _districts
+                .map(
+                  (r) => DropdownMenuItem(
+                    value: r.id,
+                    child: Text(r.name, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged: _loading || _regencyId == null
+                ? null
+                : (id) => setState(() => _districtId = id),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Peringatan dini diterima berdasarkan kecamatan pada profil Anda.',
+            style: TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
+    ),
+    actionsAlignment: MainAxisAlignment.spaceBetween,
+    buttonPadding: const EdgeInsets.symmetric(horizontal: 16),
+    actionsOverflowButtonSpacing: 8,
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Batal'),
+      ),
+      FilledButton(
+        onPressed: _districtId == null
+            ? null
+            : () => Navigator.pop(
+                context,
+                _districts.firstWhere((r) => r.id == _districtId),
+              ),
+        child: const Text('Pilih'),
+      ),
+    ],
+  );
 }

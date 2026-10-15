@@ -1,0 +1,9 @@
+
+path: D:/laragon/www/SIGMA/ai_service/ai_service_sigma/dataset/yolo_fire
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: fire
+  1: smoke

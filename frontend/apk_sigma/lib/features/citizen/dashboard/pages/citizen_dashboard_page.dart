@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/sigma_theme.dart';
 import '../../data/models/citizen_models.dart';
 import '../../data/datasources/citizen_remote_data_source.dart';
 import '../../widgets/citizen_widgets.dart';
+import '../../early_warnings/pages/early_warning_pages.dart';
 
 class CitizenDashboardPage extends StatefulWidget {
   const CitizenDashboardPage({
@@ -20,6 +23,38 @@ class CitizenDashboardPage extends StatefulWidget {
 
 class _CitizenDashboardPageState extends State<CitizenDashboardPage> {
   late Future<CitizenDashboard> _dashboard = widget.api.dashboard();
+  late Future<List<CitizenEarlyWarning>> _warnings = widget.api.earlyWarnings();
+  Timer? _warningTimer;
+  bool _refreshingWarnings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _warningTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _refreshWarnings(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _warningTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _refreshWarnings() async {
+    if (_refreshingWarnings) return;
+    _refreshingWarnings = true;
+    try {
+      final warnings = await widget.api.earlyWarnings();
+      if (mounted) setState(() => _warnings = Future.value(warnings));
+    } catch (error) {
+      if (mounted) setState(() => _warnings = Future.error(error));
+    } finally {
+      _refreshingWarnings = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) => FutureBuilder<CitizenDashboard>(
     future: _dashboard,
@@ -42,6 +77,123 @@ class _CitizenDashboardPageState extends State<CitizenDashboardPage> {
         children: [
           const CitizenHeader(title: 'Beranda'),
           const SizedBox(height: 18),
+          FutureBuilder<List<CitizenEarlyWarning>>(
+            future: _warnings,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: CitizenSurface(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.wifi_off,
+                          color: SigmaColors.secondary,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text('Peringatan gagal diperbarui.'),
+                        ),
+                        IconButton(
+                          onPressed: _refreshWarnings,
+                          icon: const Icon(Icons.refresh),
+                        ),
+                        TextButton(
+                          onPressed: _openWarnings,
+                          child: const Text('Daftar'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              if (!snapshot.hasData) return const SizedBox.shrink();
+              if (snapshot.data!.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: CitizenSurface(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.notifications_none,
+                          color: SigmaColors.muted,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            profile.regionId == null
+                                ? 'Lengkapi kecamatan di Profil agar SIGMA dapat menampilkan peringatan untuk wilayah Anda.'
+                                : 'Tidak ada peringatan aktif untuk wilayah profil Anda.',
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: _openWarnings,
+                          child: const Text('Daftar'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              final warning = snapshot.data!.first;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: CitizenSurface(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.campaign_outlined,
+                            color: SigmaColors.secondary,
+                          ),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Peringatan dini aktif',
+                              style: TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          StatusBadge(
+                            label: warning.level.toUpperCase(),
+                            color: SigmaColors.secondary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        warning.area,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      Text(warning.reason),
+                      const SizedBox(height: 6),
+                      Text(
+                        warning.instructions,
+                        style: const TextStyle(color: SigmaColors.muted),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Terbit ${warning.issuedAt.toLocal()}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: SigmaColors.muted,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: _openWarnings,
+                          icon: const Icon(Icons.list_alt),
+                          label: Text('Lihat semua (${snapshot.data!.length})'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
           CitizenSurface(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,8 +300,7 @@ class _CitizenDashboardPageState extends State<CitizenDashboardPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () =>
-                      _showSos(context, dashboard.emergencyNumber),
+                  onPressed: () => _showSos(context, dashboard.emergencyNumber),
                   icon: const Icon(Icons.phone_in_talk_outlined),
                   label: Text('SOS ${dashboard.emergencyNumber}'),
                 ),
@@ -192,7 +343,9 @@ class _CitizenDashboardPageState extends State<CitizenDashboardPage> {
           ),
           const SizedBox(height: 8),
           if (dashboard.latestReports.isEmpty)
-            const CitizenSurface(child: Text('Belum ada laporan yang dikirim.')),
+            const CitizenSurface(
+              child: Text('Belum ada laporan yang dikirim.'),
+            ),
           ...dashboard.latestReports.map(
             (report) => CitizenSurface(
               child: ListTile(
@@ -211,6 +364,14 @@ class _CitizenDashboardPageState extends State<CitizenDashboardPage> {
       );
     },
   );
+
+  void _openWarnings() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => EarlyWarningListPage(api: widget.api)),
+    );
+  }
+
   Widget _metric(String value, String label) => Expanded(
     child: Container(
       margin: const EdgeInsets.only(right: 7),

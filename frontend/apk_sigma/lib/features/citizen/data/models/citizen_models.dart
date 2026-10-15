@@ -5,18 +5,27 @@ class CitizenProfile {
     required this.verified,
     this.phone,
     this.region,
+    this.regionId,
+    this.regionHierarchy,
   });
+
   factory CitizenProfile.fromJson(Map<String, dynamic> json) => CitizenProfile(
     name: json['name'] as String,
     email: json['email'] as String,
     verified: json['email_verified'] as bool? ?? false,
     phone: json['phone'] as String?,
     region: json['region'] as String?,
+    regionId: (json['region_id'] as num?)?.toInt(),
+    regionHierarchy: json['region_hierarchy'] as Map<String, dynamic>?,
   );
-  final String name, email;
+
+  final String name;
+  final String email;
   final bool verified;
   final String? phone;
   final String? region;
+  final int? regionId;
+  final Map<String, dynamic>? regionHierarchy;
 }
 
 class CitizenDashboard {
@@ -32,6 +41,7 @@ class CitizenDashboard {
 
   factory CitizenDashboard.fromJson(Map<String, dynamic> json) {
     final emergency = json['emergency'] as Map<String, dynamic>? ?? const {};
+
     return CitizenDashboard(
       profile: CitizenProfile.fromJson(json['profile'] as Map<String, dynamic>),
       statistics: CitizenReportStatistics.fromJson(
@@ -69,22 +79,28 @@ class CitizenReportStatistics {
     required this.process,
     required this.completed,
   });
+
   factory CitizenReportStatistics.fromJson(Map<String, dynamic> json) =>
       CitizenReportStatistics(
         total: (json['total'] as num?)?.toInt() ?? 0,
         process: (json['process'] as num?)?.toInt() ?? 0,
         completed: (json['completed'] as num?)?.toInt() ?? 0,
       );
-  final int total, process, completed;
+
+  final int total;
+  final int process;
+  final int completed;
 }
 
 class CitizenRisk {
   const CitizenRisk({required this.score, required this.level, this.region});
+
   factory CitizenRisk.fromJson(Map<String, dynamic> json) => CitizenRisk(
     score: double.tryParse(json['score']?.toString() ?? '') ?? 0,
     level: json['level']?.toString() ?? '',
     region: json['region'] as String?,
   );
+
   final double score;
   final String level;
   final String? region;
@@ -96,14 +112,17 @@ class CitizenIncident {
     required this.fireStatus,
     required this.severityLevel,
   });
+
   factory CitizenIncident.fromJson(Map<String, dynamic> json) =>
       CitizenIncident(
         locationDescription: json['location_description'] as String?,
         fireStatus: json['fire_status']?.toString() ?? '',
         severityLevel: json['severity_level']?.toString() ?? '',
       );
+
   final String? locationDescription;
-  final String fireStatus, severityLevel;
+  final String fireStatus;
+  final String severityLevel;
 }
 
 class CitizenReport {
@@ -117,29 +136,59 @@ class CitizenReport {
     required this.longitude,
     required this.createdAt,
     this.photoUrl,
+    this.annotatedPhotoUrl,
     this.history = const [],
   });
-  factory CitizenReport.fromJson(Map<String, dynamic> json) => CitizenReport(
-    id: json['id'].toString(),
-    number: json['number'] as String,
-    type: json['report_type'] as String,
-    status: json['status'] as String,
-    description: json['description'] as String? ?? '',
-    latitude: (json['latitude'] as num).toDouble(),
-    longitude: (json['longitude'] as num).toDouble(),
-    createdAt:
-        DateTime.tryParse(json['created_at'] as String? ?? '') ??
-        DateTime.now(),
-    photoUrl: json['photo_url'] as String?,
-    history: (json['history'] as List<dynamic>? ?? [])
-        .map((item) => ReportHistory.fromJson(item as Map<String, dynamic>))
-        .toList(),
-  );
-  final String id, number, type, status, description;
-  final double latitude, longitude;
+
+  factory CitizenReport.fromJson(Map<String, dynamic> json) {
+    final verification =
+        json['ai_verification'] as Map<String, dynamic>? ??
+        json['ai_report_verification'] as Map<String, dynamic>?;
+
+    final annotatedPhotoUrl =
+        json['annotated_photo_url'] as String? ??
+        json['annotated_image_url'] as String? ??
+        verification?['annotated_photo_url'] as String? ??
+        verification?['annotated_image_url'] as String?;
+
+    return CitizenReport(
+      id: json['id'].toString(),
+      number: json['number'] as String,
+      type: json['report_type'] as String,
+      status: json['status'] as String,
+      description: json['description'] as String? ?? '',
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      createdAt:
+          DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      photoUrl: json['photo_url'] as String?,
+      annotatedPhotoUrl: annotatedPhotoUrl,
+      history: (json['history'] as List<dynamic>? ?? [])
+          .map((item) => ReportHistory.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  final String id;
+  final String number;
+  final String type;
+  final String status;
+  final String description;
+  final double latitude;
+  final double longitude;
   final DateTime createdAt;
   final String? photoUrl;
+  final String? annotatedPhotoUrl;
   final List<ReportHistory> history;
+
+  String? get displayPhotoUrl {
+    if (annotatedPhotoUrl != null && annotatedPhotoUrl!.trim().isNotEmpty) {
+      return annotatedPhotoUrl;
+    }
+
+    return photoUrl;
+  }
 }
 
 class ReportHistory {
@@ -148,6 +197,7 @@ class ReportHistory {
     required this.description,
     required this.at,
   });
+
   factory ReportHistory.fromJson(Map<String, dynamic> json) => ReportHistory(
     status: json['status'] as String,
     description: json['description'] as String? ?? '',
@@ -155,7 +205,9 @@ class ReportHistory {
         DateTime.tryParse(json['updated_at'] as String? ?? '') ??
         DateTime.now(),
   );
-  final String status, description;
+
+  final String status;
+  final String description;
   final DateTime at;
 }
 
@@ -168,25 +220,99 @@ class CitizenNotification {
     this.readAt,
     this.reportId,
     this.status,
+    this.warningId,
+    this.warningLevel,
+    this.warningRegion,
   });
+
   factory CitizenNotification.fromJson(Map<String, dynamic> json) =>
       CitizenNotification(
         id: json['id'].toString(),
         title: json['title'] as String? ?? 'Notifikasi SIGMA',
         message: json['message'] as String? ?? '',
-        createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
+        createdAt:
+            DateTime.tryParse(json['created_at'] as String? ?? '') ??
             DateTime.now(),
         readAt: json['read_at'] == null
             ? null
             : DateTime.tryParse(json['read_at'] as String),
         reportId: json['report_id']?.toString(),
         status: json['status'] as String?,
+        warningId: (json['warning_id'] as num?)?.toInt(),
+        warningLevel: json['warning_level'] as String?,
+        warningRegion: json['warning_region'] as String?,
       );
-  final String id, title, message;
+
+  final String id;
+  final String title;
+  final String message;
   final DateTime createdAt;
   final DateTime? readAt;
-  final String? reportId, status;
+  final String? reportId;
+  final String? status;
+  final int? warningId;
+  final String? warningLevel;
+  final String? warningRegion;
+
   bool get isRead => readAt != null;
+}
+
+class CitizenEarlyWarning {
+  const CitizenEarlyWarning({
+    required this.id,
+    required this.level,
+    required this.area,
+    required this.reason,
+    required this.instructions,
+    required this.issuedAt,
+    required this.status,
+    this.region,
+    this.expiresAt,
+  });
+
+  factory CitizenEarlyWarning.fromJson(Map<String, dynamic> json) =>
+      CitizenEarlyWarning(
+        id: (json['id'] as num).toInt(),
+        level: json['level'] as String,
+        area: json['area'] as String,
+        reason: json['reason'] as String,
+        instructions: json['instructions'] as String,
+        issuedAt: DateTime.parse(json['issued_at'] as String),
+        status: json['status'] as String? ?? 'active',
+        region: json['region'] as String?,
+        expiresAt: DateTime.tryParse(json['expires_at'] as String? ?? ''),
+      );
+
+  final int id;
+  final String level;
+  final String area;
+  final String reason;
+  final String instructions;
+  final DateTime issuedAt;
+  final DateTime? expiresAt;
+  final String status;
+  final String? region;
+}
+
+class CitizenRegion {
+  const CitizenRegion({
+    required this.id,
+    required this.name,
+    required this.level,
+    this.parentId,
+  });
+
+  factory CitizenRegion.fromJson(Map<String, dynamic> json) => CitizenRegion(
+    id: (json['id'] as num).toInt(),
+    name: json['name'] as String,
+    level: json['level'] as String,
+    parentId: (json['parent_id'] as num?)?.toInt(),
+  );
+
+  final int id;
+  final String name;
+  final String level;
+  final int? parentId;
 }
 
 class MapItem {
@@ -197,6 +323,7 @@ class MapItem {
     required this.label,
     required this.state,
   });
+
   factory MapItem.hotspot(Map<String, dynamic> json) => MapItem(
     id: 'hotspot-${json['id']}',
     latitude: (json['latitude'] as num).toDouble(),
@@ -204,6 +331,7 @@ class MapItem {
     label: 'Titik panas',
     state: json['status'] as String,
   );
+
   factory MapItem.incident(Map<String, dynamic> json) => MapItem(
     id: 'incident-${json['id']}',
     latitude: (json['latitude'] as num).toDouble(),
@@ -211,6 +339,7 @@ class MapItem {
     label: json['location_description'] as String? ?? 'Kejadian',
     state: json['fire_status'] as String,
   );
+
   factory MapItem.report(Map<String, dynamic> json) => MapItem(
     id: 'report-${json['id']}',
     latitude: (json['latitude'] as num).toDouble(),
@@ -218,6 +347,10 @@ class MapItem {
     label: json['number'] as String,
     state: json['status'] as String,
   );
-  final String id, label, state;
-  final double latitude, longitude;
+
+  final String id;
+  final String label;
+  final String state;
+  final double latitude;
+  final double longitude;
 }

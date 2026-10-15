@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../../../auth/data/datasources/auth_storage.dart';
 import '../../data/models/citizen_models.dart';
 import '../../data/datasources/citizen_remote_data_source.dart';
@@ -70,12 +71,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
             final report = snapshot.data!;
 
             return ListView(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                16,
-                20,
-                32,
-              ),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               children: [
                 const CitizenHeader(
                   title: 'Detail laporan',
@@ -194,9 +190,10 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 
   Widget _buildPhoto(CitizenReport report) {
-    final photoUrl = report.photoUrl;
+    final photoUrl = report.displayPhotoUrl;
+    final annotatedPhotoUrl = report.annotatedPhotoUrl;
 
-    if (photoUrl == null || photoUrl.isEmpty) {
+    if (photoUrl == null || photoUrl.trim().isEmpty) {
       return CitizenSurface(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +238,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
     }
 
     if (_photoToken == null) {
-      return CitizenSurface(
+      return const CitizenSurface(
         child: SizedBox(
           height: 180,
           child: Center(
@@ -251,21 +248,34 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
       );
     }
 
+    final hasAnnotatedPhoto = annotatedPhotoUrl != null &&
+        annotatedPhotoUrl.trim().isNotEmpty;
+
     return CitizenSurface(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              16,
-              16,
-              16,
-              12,
-            ),
-            child: _sectionTitle(
-              Icons.photo_camera_outlined,
-              'Bukti foto',
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _sectionTitle(
+                  Icons.photo_camera_outlined,
+                  'Bukti foto',
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  hasAnnotatedPhoto
+                      ? 'Foto hasil deteksi AI YOLO'
+                      : 'Foto asli laporan',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+              ],
             ),
           ),
           GestureDetector(
@@ -274,7 +284,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                 MaterialPageRoute(
                   builder: (_) => _ReportPhotoViewer(
                     imageUrl: photoUrl,
-                    token: _photoToken,
+                    token: _photoToken!,
                   ),
                 ),
               );
@@ -340,9 +350,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(
-                          alpha: 0.65,
-                        ),
+                        color: Colors.black.withValues(alpha: 0.65),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Row(
@@ -463,12 +471,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              16,
-              16,
-              16,
-              12,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: _sectionTitle(
               Icons.location_on_outlined,
               'Lokasi kejadian',
@@ -492,78 +495,21 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                   TileLayer(
                     urlTemplate:
                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName:
-                        'com.sigma.apk_sigma',
+                    userAgentPackageName: 'com.sigma.apk_sigma',
                   ),
                   MarkerLayer(
                     markers: [
                       Marker(
                         point: point,
-                        width: 52,
-                        height: 52,
+                        width: 48,
+                        height: 48,
                         child: const Icon(
                           Icons.location_on,
-                          size: 48,
-                          color: Color(0xFFC82828),
+                          color: Color(0xFFDC2626),
+                          size: 42,
                         ),
                       ),
                     ],
-                  ),
-                  RichAttributionWidget(
-                    attributions: [
-                      TextSourceAttribution(
-                        'OpenStreetMap contributors',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFE2E8F0),
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.my_location_outlined,
-                    size: 20,
-                    color: Color(0xFFC82828),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Koordinat lokasi',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF64748B),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '${report.latitude.toStringAsFixed(6)}, '
-                          '${report.longitude.toStringAsFixed(6)}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF172033),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -575,99 +521,159 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 
   Widget _buildTimeline(CitizenReport report) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Perkembangan laporan',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF172033),
-          ),
-        ),
-        const SizedBox(height: 14),
-        if (report.history.isEmpty)
-          CitizenSurface(
-            child: const EmptyState(
-              message: 'Belum ada pembaruan laporan.',
-            ),
-          )
-        else
-          ...List.generate(
-            report.history.length,
-            (index) {
-              final entry = report.history[index];
-              final isLast =
-                  index == report.history.length - 1;
+    final history = report.history;
 
-              return _TimelineItem(
-                entry: entry,
-                isLast: isLast,
-              );
-            },
+    return CitizenSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle(
+            Icons.timeline_outlined,
+            'Riwayat laporan',
           ),
-      ],
+          const SizedBox(height: 18),
+          if (history.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFE2E8F0),
+                ),
+              ),
+              child: const Text(
+                'Belum ada riwayat perubahan status laporan.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF64748B),
+                ),
+              ),
+            )
+          else
+            ...List.generate(history.length, (index) {
+              final item = history[index];
+              final isLast = index == history.length - 1;
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 28,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: statusColor(item.status),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        if (!isLast)
+                          Container(
+                            width: 2,
+                            height: 72,
+                            color: const Color(0xFFE2E8F0),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            statusLabel(item.status),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF172033),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _formatDate(item.at),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                          if (item.description.trim().isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              item.description,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                height: 1.4,
+                                color: Color(0xFF475569),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+        ],
+      ),
     );
   }
 
   Widget _buildCurrentStatus(CitizenReport report) {
-    final color = statusColor(report.status);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withValues(alpha: 0.20),
-        ),
-      ),
-      child: Row(
+    return CitizenSurface(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.14),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _statusIcon(report.status),
-              color: color,
-              size: 21,
-            ),
+          _sectionTitle(
+            Icons.fact_check_outlined,
+            'Status terkini',
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: statusColor(report.status).withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: statusColor(report.status).withValues(alpha: 0.25),
+              ),
+            ),
+            child: Row(
               children: [
-                const Text(
-                  'Status saat ini',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF64748B),
-                  ),
+                Icon(
+                  Icons.info_outline,
+                  color: statusColor(report.status),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  statusLabel(report.status),
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  _statusDescription(report.status),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    height: 1.45,
-                    color: Color(0xFF475569),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        statusLabel(report.status),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: statusColor(report.status),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Status laporan mengikuti pembaruan penanganan oleh petugas.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.4,
+                          color: Color(0xFF475569),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -678,24 +684,31 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
     );
   }
 
-  Widget _sectionTitle(
-    IconData icon,
-    String title,
-  ) {
+  Widget _sectionTitle(IconData icon, String title) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: const Color(0xFFC82828),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFEF2F2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: const Color(0xFFDC2626),
+          ),
         ),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF172033),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF172033),
+            ),
           ),
         ),
       ],
@@ -710,18 +723,10 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF1F1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            size: 19,
-            color: const Color(0xFFC82828),
-          ),
+        Icon(
+          icon,
+          size: 20,
+          color: const Color(0xFF64748B),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -740,7 +745,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                 value,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF172033),
                 ),
               ),
@@ -752,35 +757,6 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 
   String _formatDate(DateTime date) {
-    final local = date.toLocal();
-
-    return '${_twoDigits(local.day)} '
-        '${_monthName(local.month)} '
-        '${local.year} • '
-        '${_twoDigits(local.hour)}:'
-        '${_twoDigits(local.minute)} WIB';
-  }
-
-  String _formatDateOnly(DateTime date) {
-    final local = date.toLocal();
-
-    return '${_twoDigits(local.day)} '
-        '${_monthName(local.month)} '
-        '${local.year}';
-  }
-
-  String _formatTime(DateTime date) {
-    final local = date.toLocal();
-
-    return '${_twoDigits(local.hour)}:'
-        '${_twoDigits(local.minute)} WIB';
-  }
-
-  String _twoDigits(int value) {
-    return value.toString().padLeft(2, '0');
-  }
-
-  String _monthName(int month) {
     const months = [
       'Januari',
       'Februari',
@@ -796,198 +772,34 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
       'Desember',
     ];
 
-    return months[month - 1];
+    return '${date.day} ${months[date.month - 1]} ${date.year}, '
+        '${_formatTime(date)}';
   }
 
-  IconData _statusIcon(String status) {
-    switch (status) {
-      case 'verified':
-        return Icons.verified_outlined;
-      case 'rejected':
-        return Icons.cancel_outlined;
-      case 'process':
-        return Icons.sync_outlined;
-      case 'completed':
-        return Icons.task_alt_outlined;
-      default:
-        return Icons.schedule_outlined;
-    }
-  }
-
-  String _statusDescription(String status) {
-    switch (status) {
-      case 'verified':
-        return 'Laporan telah diverifikasi oleh Pemerintah SIGMA.';
-      case 'rejected':
-        return 'Laporan tidak dapat diteruskan berdasarkan hasil verifikasi.';
-      case 'process':
-        return 'Laporan sedang dalam proses penanganan.';
-      case 'completed':
-        return 'Penanganan laporan telah diselesaikan.';
-      default:
-        return 'Laporan telah diterima oleh sistem SIGMA dan menunggu proses berikutnya.';
-    }
-  }
-}
-
-class _TimelineItem extends StatelessWidget {
-  const _TimelineItem({
-    required this.entry,
-    required this.isLast,
-  });
-
-  final ReportHistory entry;
-  final bool isLast;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = statusColor(entry.status);
-
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 34,
-            child: Column(
-              children: [
-                Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: color.withValues(
-                      alpha: 0.12,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _timelineIcon(entry.status),
-                    size: 17,
-                    color: color,
-                  ),
-                ),
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 2,
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 4,
-                      ),
-                      color: const Color(0xFFE2E8F0),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(
-                bottom: 14,
-              ),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xFFE2E8F0),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          statusLabel(entry.status),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF172033),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _formatTimelineDate(entry.at),
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF94A3B8),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    entry.description.isEmpty
-                        ? 'Status diperbarui.'
-                        : entry.description,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      height: 1.45,
-                      color: Color(0xFF64748B),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  IconData _timelineIcon(String status) {
-    switch (status) {
-      case 'verified':
-        return Icons.verified;
-      case 'rejected':
-        return Icons.close;
-      case 'process':
-        return Icons.sync;
-      case 'completed':
-        return Icons.check;
-      default:
-        return Icons.check;
-    }
-  }
-
-  String _formatTimelineDate(DateTime date) {
-    final local = date.toLocal();
-
-    return '${_twoDigits(local.day)} '
-        '${_monthName(local.month)} '
-        '${local.year}\n'
-        '${_twoDigits(local.hour)}:'
-        '${_twoDigits(local.minute)} WIB';
-  }
-
-  String _twoDigits(int value) {
-    return value.toString().padLeft(2, '0');
-  }
-
-  String _monthName(int month) {
+  String _formatDateOnly(DateTime date) {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
       'Mei',
-      'Jun',
-      'Jul',
-      'Agu',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
 
-    return months[month - 1];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  String _formatTime(DateTime date) {
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+
+    return '$hour:$minute WIB';
   }
 }
 
@@ -998,7 +810,7 @@ class _ReportPhotoViewer extends StatelessWidget {
   });
 
   final String imageUrl;
-  final String? token;
+  final String token;
 
   @override
   Widget build(BuildContext context) {
@@ -1007,39 +819,50 @@ class _ReportPhotoViewer extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: const Text('Bukti foto'),
+        title: const Text('Bukti foto laporan'),
       ),
       body: Center(
         child: InteractiveViewer(
-          minScale: 0.8,
-          maxScale: 4,
+          minScale: 0.5,
+          maxScale: 5,
           child: Image.network(
             imageUrl,
-            headers: token != null
-                ? {
-                    'Authorization': 'Bearer $token',
-                    'Accept': 'application/json',
-                  }
-                : null,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Accept': 'application/json',
+            },
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
-              return const Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.broken_image_outlined,
-                    size: 56,
-                    color: Colors.white54,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Foto tidak dapat dimuat',
-                    style: TextStyle(
+              return const Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.broken_image_outlined,
                       color: Colors.white70,
+                      size: 48,
                     ),
-                  ),
-                ],
+                    SizedBox(height: 12),
+                    Text(
+                      'Foto tidak dapat dimuat.',
+                      style: TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) {
+                return child;
+              }
+
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               );
             },
           ),

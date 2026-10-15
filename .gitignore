@@ -18,12 +18,9 @@ backend/web_sigma/bootstrap/cache/*
 # Database
 # =====================
 
-# SQLite lokal
-*.sqlite
-*.sqlite3
-
-# Backup database
-*.sql
+# SQLite lokal untuk backend
+/backend/web_sigma/database/*.sqlite
+/backend/web_sigma/database/*.sqlite3
 
 
 # =====================
@@ -32,8 +29,6 @@ backend/web_sigma/bootstrap/cache/*
 
 frontend/apk_sigma/.dart_tool/
 frontend/apk_sigma/.packages
-frontend/apk_sigma/pubspec.lock
-
 frontend/apk_sigma/build/
 
 
@@ -60,13 +55,13 @@ Thumbs.db
 # AI datasets
 ai_service/ai_service_sigma/dataset/raw/
 
-# Geospatial / raster datasets
-*.geojson
-*.tif
-*.tiff
+# Geospatial / raster inputs local to the AI raw-data area
+/ai_service/ai_service_sigma/dataset/raw/**/*.geojson
+/ai_service/ai_service_sigma/dataset/raw/**/*.tif
+/ai_service/ai_service_sigma/dataset/raw/**/*.tiff
 
 # Local ingestion logs
-_tmp_*.log
+/_tmp_*.log
 
 # Node
 backend/web_sigma/node_modules/

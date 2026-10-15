@@ -4,6 +4,7 @@ import '../../../../core/theme/sigma_theme.dart';
 import '../../data/models/citizen_models.dart';
 import '../../data/datasources/citizen_remote_data_source.dart';
 import '../../reports/pages/report_detail_page.dart';
+import '../../early_warnings/pages/early_warning_pages.dart';
 import '../citizen_notification_store.dart';
 
 class NotificationPage extends StatelessWidget {
@@ -17,7 +18,7 @@ class NotificationPage extends StatelessWidget {
           child: AnimatedBuilder(
             animation: store,
             builder: (context, _) {
-              if (store.loading && store.items.isEmpty) {
+              if (store.loading && store.items.isEmpty && !store.loadedOnce) {
                 return const Center(child: CircularProgressIndicator());
               }
               return RefreshIndicator(
@@ -43,6 +44,14 @@ class NotificationPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 18),
+                    if (store.error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: MaterialBanner(
+                          content: Text(store.error!),
+                          actions: [TextButton(onPressed: store.load, child: const Text('Coba lagi'))],
+                        ),
+                      ),
                     if (store.unreadCount > 0)
                       Align(
                         alignment: Alignment.centerRight,
@@ -52,14 +61,14 @@ class NotificationPage extends StatelessWidget {
                           label: const Text('Tandai semua dibaca'),
                         ),
                       ),
-                    if (store.items.isEmpty)
+                    if (store.items.isEmpty && store.error == null)
                       const Padding(
                         padding: EdgeInsets.all(28),
                         child: Center(
                           child: Text('Belum ada notifikasi untuk Anda.'),
                         ),
                       )
-                    else
+                    else if (store.items.isNotEmpty)
                       ...store.items.map((item) => _NotificationTile(
                             item: item,
                             onTap: () async {
@@ -67,6 +76,10 @@ class NotificationPage extends StatelessWidget {
                               if (context.mounted && item.reportId != null) {
                                 Navigator.push(context, MaterialPageRoute(
                                   builder: (_) => ReportDetailPage(api: api, id: item.reportId!),
+                                ));
+                              } else if (context.mounted && item.warningId != null) {
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (_) => EarlyWarningDetailPage(api: api, warningId: item.warningId!),
                                 ));
                               }
                             },
@@ -92,6 +105,9 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final severityPrefix = item.warningLevel == null
+        ? ''
+        : '${item.warningLevel!.toUpperCase()} · ';
 
     return Semantics(
       button: true,
@@ -136,7 +152,7 @@ class _NotificationTile extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-              '${item.message}\n${_relative(item.createdAt)}',
+              '$severityPrefix${item.message}\n${_relative(item.createdAt)}',
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
               ),

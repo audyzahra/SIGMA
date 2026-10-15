@@ -18,20 +18,20 @@ class NotificationStreamController extends Controller
         $user = $request->user();
 
         return response()->stream(function () use ($user): void {
-            $latestId = $user->notifications()->latest()->value('id');
+            $notificationCount = $user->notifications()->count();
             $endsAt = now()->addSeconds(25);
 
             echo "event: notification\n";
-            echo 'data: '.json_encode(['id' => $latestId], JSON_THROW_ON_ERROR)."\n\n";
+            echo "data: {}\n\n";
             @ob_flush();
             flush();
 
             while (! connection_aborted() && now()->lessThan($endsAt)) {
-                $newest = $user->notifications()->latest()->value('id');
-                if ($newest && $newest !== $latestId) {
+                $newCount = $user->notifications()->count();
+                if ($newCount > $notificationCount) {
                     echo "event: notification\n";
-                    echo 'data: '.json_encode(['id' => $newest], JSON_THROW_ON_ERROR)."\n\n";
-                    $latestId = $newest;
+                    echo "data: {}\n\n";
+                    $notificationCount = $newCount;
                     @ob_flush();
                     flush();
                 }

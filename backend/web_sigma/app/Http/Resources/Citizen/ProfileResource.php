@@ -15,7 +15,31 @@ class ProfileResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified' => $this->hasVerifiedEmail(),
-            'region' => null,
+            'region_id' => $this->region_id,
+            'region' => $this->region
+                ? collect([$this->region->name, $this->region->parent?->name, $this->region->parent?->parent?->name])->filter()->implode(', ')
+                : null,
+            'region_hierarchy' => $this->region ? [
+                'level' => $this->region->level,
+                'district_id' => $this->region->level === 'district' ? $this->region->id : null,
+                'district' => $this->region->level === 'district' ? $this->region->name : null,
+                'regency_id' => $this->region->level === 'district'
+                    ? $this->region->parent?->id
+                    : ($this->region->level === 'regency' ? $this->region->id : null),
+                'regency' => $this->region->level === 'district'
+                    ? $this->region->parent?->name
+                    : ($this->region->level === 'regency' ? $this->region->name : null),
+                'province_id' => match ($this->region->level) {
+                    'province' => $this->region->id,
+                    'regency' => $this->region->parent?->id,
+                    default => $this->region->parent?->parent?->id,
+                },
+                'province' => match ($this->region->level) {
+                    'province' => $this->region->name,
+                    'regency' => $this->region->parent?->name,
+                    default => $this->region->parent?->parent?->name,
+                },
+            ] : null,
             'organization' => null,
         ];
     }

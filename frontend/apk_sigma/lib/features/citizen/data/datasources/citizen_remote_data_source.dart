@@ -20,8 +20,8 @@ class CitizenApiException implements Exception {
 
 class CitizenApi {
   CitizenApi({AuthStorage? storage})
-      : _storage = storage ?? AuthStorage(),
-        _client = ApiClient();
+    : _storage = storage ?? AuthStorage(),
+      _client = ApiClient();
 
   final AuthStorage _storage;
   final ApiClient _client;
@@ -60,9 +60,7 @@ class CitizenApi {
             ? '${response.body.substring(0, 2000)}…'
             : response.body;
 
-        debugPrint(
-          'Citizen API $method $uri → HTTP ${response.statusCode}',
-        );
+        debugPrint('Citizen API $method $uri → HTTP ${response.statusCode}');
         debugPrint('Citizen API response: $responseBody');
       }
 
@@ -71,8 +69,7 @@ class CitizenApi {
       try {
         final decoded = jsonDecode(response.body);
         json = decoded is Map<String, dynamic> ? decoded : null;
-      } on FormatException {
-      }
+      } on FormatException {}
 
       if (response.statusCode >= 400) {
         final message = json?['message'] as String?;
@@ -81,7 +78,7 @@ class CitizenApi {
           response.statusCode,
           response.statusCode == 401 || response.statusCode == 403
               ? 'Sesi masuk tidak valid atau tidak memiliki akses. '
-                  'Silakan masuk kembali.'
+                    'Silakan masuk kembali.'
               : message ?? 'Layanan belum dapat memuat data. Coba lagi.',
         );
       }
@@ -130,10 +127,7 @@ class CitizenApi {
     final uri = _client.uri('/citizen$path');
 
     try {
-      final request = http.MultipartRequest(
-        method,
-        uri,
-      );
+      final request = http.MultipartRequest(method, uri);
 
       request.headers.addAll({
         'Accept': 'application/json',
@@ -146,28 +140,20 @@ class CitizenApi {
         final bytes = await photo.readAsBytes();
 
         request.files.add(
-          http.MultipartFile.fromBytes(
-            'photo',
-            bytes,
-            filename: photo.name,
-          ),
+          http.MultipartFile.fromBytes('photo', bytes, filename: photo.name),
         );
       }
 
       final streamedResponse = await request.send();
 
-      final response = await http.Response.fromStream(
-        streamedResponse,
-      );
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (kDebugMode) {
         final responseBody = response.body.length > 2000
             ? '${response.body.substring(0, 2000)}…'
             : response.body;
 
-        debugPrint(
-          'Citizen API $method $uri → HTTP ${response.statusCode}',
-        );
+        debugPrint('Citizen API $method $uri → HTTP ${response.statusCode}');
         debugPrint('Citizen API response: $responseBody');
       }
 
@@ -176,8 +162,7 @@ class CitizenApi {
       try {
         final decoded = jsonDecode(response.body);
         json = decoded is Map<String, dynamic> ? decoded : null;
-      } on FormatException {
-      }
+      } on FormatException {}
 
       if (response.statusCode >= 400) {
         final message = json?['message'] as String?;
@@ -186,7 +171,7 @@ class CitizenApi {
           response.statusCode,
           response.statusCode == 401 || response.statusCode == 403
               ? 'Sesi masuk tidak valid atau tidak memiliki akses. '
-                  'Silakan masuk kembali.'
+                    'Silakan masuk kembali.'
               : message ?? 'Laporan gagal dikirim. Coba lagi.',
         );
       }
@@ -201,9 +186,7 @@ class CitizenApi {
       return json;
     } catch (error, stackTrace) {
       if (kDebugMode) {
-        debugPrint(
-          'Citizen API failed: $method $uri — $error',
-        );
+        debugPrint('Citizen API failed: $method $uri — $error');
         debugPrintStack(stackTrace: stackTrace);
       }
 
@@ -220,18 +203,13 @@ class CitizenApi {
   }
 
   Future<CitizenDashboard> dashboard() async =>
-      CitizenDashboard.fromJson(
-        await _request('GET', '/dashboard'),
-      );
+      CitizenDashboard.fromJson(await _request('GET', '/dashboard'));
 
-  Future<Map<String, dynamic>> reports() =>
-      _request('GET', '/reports');
+  Future<Map<String, dynamic>> reports() => _request('GET', '/reports');
 
-  Future<CitizenReport> report(String id) async =>
-      CitizenReport.fromJson(
-        (await _request('GET', '/reports/$id'))['report']
-            as Map<String, dynamic>,
-      );
+  Future<CitizenReport> report(String id) async => CitizenReport.fromJson(
+    (await _request('GET', '/reports/$id'))['report'] as Map<String, dynamic>,
+  );
 
   Future<CitizenReport> submit({
     required String type,
@@ -252,81 +230,86 @@ class CitizenApi {
       photo: photo,
     );
 
-    return CitizenReport.fromJson(
-      data['report'] as Map<String, dynamic>,
-    );
+    return CitizenReport.fromJson(data['report'] as Map<String, dynamic>);
   }
 
-  Future<Map<String, dynamic>> map() =>
-      _request('GET', '/map');
+  Future<Map<String, dynamic>> map() => _request('GET', '/map');
 
-  Future<CitizenProfile> profile() async =>
-      CitizenProfile.fromJson(
-        (await _request('GET', '/profile'))['profile']
-            as Map<String, dynamic>,
-      );
+  Future<CitizenProfile> profile() async => CitizenProfile.fromJson(
+    (await _request('GET', '/profile'))['profile'] as Map<String, dynamic>,
+  );
 
   Future<CitizenProfile> updateName(String name) async =>
       CitizenProfile.fromJson(
-        (await _request(
-          'PATCH',
-          '/profile',
-          body: {'name': name},
-        ))['profile'] as Map<String, dynamic>,
+        (await _request('PATCH', '/profile', body: {'name': name}))['profile']
+            as Map<String, dynamic>,
       );
 
   Future<CitizenProfile> updateProfile({
     required String name,
     required String phone,
-    required String region,
-  }) async =>
-      CitizenProfile.fromJson(
-        (await _request(
+    required int? regionId,
+  }) async => CitizenProfile.fromJson(
+    (await _request(
           'PATCH',
           '/profile',
-          body: {
-            'name': name,
-            'phone': phone,
-            'region': region,
-          },
-        ))['profile'] as Map<String, dynamic>,
-      );
+          body: {'name': name, 'phone': phone, 'region_id': regionId},
+        ))['profile']
+        as Map<String, dynamic>,
+  );
+
+  Future<List<CitizenRegion>> regions({int? parentId, String? level}) async {
+    final params = <String, String>{};
+    if (parentId != null) params['parent_id'] = parentId.toString();
+    if (level != null) params['level'] = level;
+    final query = params.isEmpty
+        ? ''
+        : '?${Uri(queryParameters: params).query}';
+    final data = await _request('GET', '/regions$query');
+    return (data['regions'] as List<dynamic>)
+        .map((item) => CitizenRegion.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
 
   Future<List<CitizenNotification>> notifications() async {
-    final data = await _request(
-      'GET',
-      '/notifications',
-    );
+    final data = await _request('GET', '/notifications');
 
     return (data['notifications'] as List<dynamic>)
         .map(
-          (item) => CitizenNotification.fromJson(
-            item as Map<String, dynamic>,
-          ),
+          (item) => CitizenNotification.fromJson(item as Map<String, dynamic>),
         )
         .toList();
   }
 
+  Future<List<CitizenEarlyWarning>> earlyWarnings() async {
+    final data = await _request('GET', '/early-warnings');
+    return (data['data'] as List<dynamic>)
+        .map(
+          (item) => CitizenEarlyWarning.fromJson(item as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
+  Future<CitizenEarlyWarning> earlyWarning(int id) async {
+    final data = await _request('GET', '/early-warnings/$id');
+    return CitizenEarlyWarning.fromJson(
+      data['warning'] as Map<String, dynamic>,
+    );
+  }
+
   Future<int> unreadNotificationCount() async =>
-      ((await _request(
-        'GET',
-        '/notifications/unread-count',
-      ))['unread_count'] as num)
+      ((await _request('GET', '/notifications/unread-count'))['unread_count']
+              as num)
           .toInt();
 
   Future<void> markNotificationRead(String id) async =>
-      _request(
-        'PATCH',
-        '/notifications/$id/read',
-      );
+      _request('PATCH', '/notifications/$id/read');
 
   Future<void> markAllNotificationsRead() async =>
-      _request(
-        'PATCH',
-        '/notifications/read-all',
-      );
+      _request('PATCH', '/notifications/read-all');
 
   Stream<void> notificationEvents() async* {
+    var retryDelaySeconds = 1;
     while (true) {
       final token = await _storage.getToken();
 
@@ -342,16 +325,26 @@ class CitizenApi {
           },
         );
 
-        if (response.statusCode >= 400) return;
+        if (response.statusCode == 401 || response.statusCode == 403) return;
+        if (response.statusCode >= 400) {
+          await Future<void>.delayed(Duration(seconds: retryDelaySeconds));
+          retryDelaySeconds = (retryDelaySeconds * 2).clamp(1, 30).toInt();
+          continue;
+        }
 
-        await for (final line in response.stream
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())) {
+        await for (final line
+            in response.stream
+                .transform(utf8.decoder)
+                .transform(const LineSplitter())) {
           if (line == 'event: notification') {
             yield null;
           }
         }
+        retryDelaySeconds = 1;
+        await Future<void>.delayed(const Duration(seconds: 1));
       } catch (_) {
+        await Future<void>.delayed(Duration(seconds: retryDelaySeconds));
+        retryDelaySeconds = (retryDelaySeconds * 2).clamp(1, 30).toInt();
       }
     }
   }

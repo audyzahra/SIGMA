@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Citizen\DashboardController;
+use App\Http\Controllers\Api\Citizen\EarlyWarningController;
 use App\Http\Controllers\Api\Citizen\MapController;
 use App\Http\Controllers\Api\Citizen\NotificationController;
 use App\Http\Controllers\Api\Citizen\NotificationStreamController;
@@ -15,11 +16,14 @@ Route::middleware('role:citizen')->prefix('citizen')->group(function (): void {
     Route::get('/reports/{report}/photo', [ReportController::class, 'photo']);
     Route::get('/reports/{report}', [ReportController::class, 'show']);
     Route::get('/map', MapController::class);
+    Route::get('/early-warnings', [EarlyWarningController::class, 'index']);
+    Route::get('/early-warnings/{warning}', [EarlyWarningController::class, 'show']);
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::get('/notifications/stream', NotificationStreamController::class);
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllRead']);
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markRead']);
     Route::get('/profile', [ProfileController::class, 'show']);
+    Route::get('/regions', [ProfileController::class, 'regions']);
     Route::patch('/profile', [ProfileController::class, 'update']);
 });
