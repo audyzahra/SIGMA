@@ -53,8 +53,7 @@ class ImpactAnalysisService
 
     public function __construct(
         protected RegionGeometry $geometry = new RegionGeometry()
-    ) {
-    }
+    ) {}
 
     /* ==================================================================
      | KONFIGURASI
@@ -161,7 +160,6 @@ class ImpactAnalysisService
         if ($seconds <= 0) {
 
             return $this->run($center, $radiusKm, $input);
-
         }
 
         $key = sprintf(
@@ -176,7 +174,7 @@ class ImpactAnalysisService
         return Cache::remember(
             $key,
             $seconds,
-            fn () => $this->run($center, $radiusKm, $input)
+            fn() => $this->run($center, $radiusKm, $input)
         );
     }
 
@@ -224,7 +222,7 @@ class ImpactAnalysisService
             ['incident_id' => $incident->id]
         );
     }
-/* ==================================================================
+    /* ==================================================================
      | RESOLVE TITIK ANALISIS
      | ================================================================== */
 
@@ -243,7 +241,6 @@ class ImpactAnalysisService
                     'region' => $this->regionAt((float) $incident->latitude, (float) $incident->longitude),
                 ];
             }
-
         }
 
         if (! empty($input['hotspot_id'])) {
@@ -259,7 +256,6 @@ class ImpactAnalysisService
                     'region' => $this->regionAt((float) $hotspot->latitude, (float) $hotspot->longitude),
                 ];
             }
-
         }
 
         if (! empty($input['region_id'])) {
@@ -282,12 +278,13 @@ class ImpactAnalysisService
                 'source' => 'region_centroid',
                 'region' => $region,
             ];
-
         }
 
-        if (isset($input['latitude'], $input['longitude'])
+        if (
+            isset($input['latitude'], $input['longitude'])
             && is_numeric($input['latitude'])
-            && is_numeric($input['longitude'])) {
+            && is_numeric($input['longitude'])
+        ) {
 
             $latitude = (float) $input['latitude'];
             $longitude = (float) $input['longitude'];
@@ -298,7 +295,6 @@ class ImpactAnalysisService
                 'source' => 'coordinate',
                 'region' => $this->regionAt($latitude, $longitude),
             ];
-
         }
 
         return null;
@@ -324,9 +320,12 @@ class ImpactAnalysisService
                         AND ST_Contains(geometry, ST_SRID(POINT(?, ?), 4326)) = 1 LIMIT 1) AS province_id
                 ',
                 [
-                    $longitude, $latitude,
-                    $longitude, $latitude,
-                    $longitude, $latitude,
+                    $longitude,
+                    $latitude,
+                    $longitude,
+                    $latitude,
+                    $longitude,
+                    $latitude,
                 ]
             );
 
@@ -337,7 +336,6 @@ class ImpactAnalysisService
             $regionId = $row->district_id ?? $row->regency_id ?? $row->province_id;
 
             return $regionId ? Region::find($regionId) : null;
-
         } catch (\Throwable $e) {
 
             Log::warning('Gagal menentukan wilayah dari titik', [
@@ -347,7 +345,6 @@ class ImpactAnalysisService
             ]);
 
             return null;
-
         }
     }
 /* ==================================================================
@@ -452,7 +449,7 @@ class ImpactAnalysisService
             'data_sources' => $this->dataSources(),
         ];
     }
-/**
+    /**
      * Wilayah administratif yang beririsan dengan zona analisis.
      *
      * Memakai ST_Intersects + ST_Intersection (MySQL 8, SRID 4326).
@@ -505,7 +502,6 @@ class ImpactAnalysisService
                 ORDER BY FIELD(r.level, 'district', 'regency', 'province')
                 LIMIT 300
             ", [$geojson, $geojson]);
-
         } catch (\Throwable $e) {
 
             Log::error('Analisis spatial wilayah gagal', [
@@ -524,7 +520,6 @@ class ImpactAnalysisService
                 'area_km2' => 0.0,
                 'area_hectares' => 0.0,
             ];
-
         }
 
         $byLevel = ['province' => [], 'regency' => [], 'district' => []];
@@ -558,16 +553,14 @@ class ImpactAnalysisService
                 /* geometri hasil klip dengan zona analisis (untuk layer peta) */
                 'geometry' => $geometry,
             ];
-
         }
 
         /* urutkan tiap level dari irisan terbesar */
         foreach ($byLevel as $level => $entries) {
 
-            usort($entries, fn ($a, $b) => $b['intersect_km2'] <=> $a['intersect_km2']);
+            usort($entries, fn($a, $b) => $b['intersect_km2'] <=> $a['intersect_km2']);
 
             $byLevel[$level] = $entries;
-
         }
 
         /*
@@ -588,9 +581,7 @@ class ImpactAnalysisService
                 }
 
                 break;
-
             }
-
         }
 
         return [
@@ -608,7 +599,7 @@ class ImpactAnalysisService
             'area_hectares' => round($totalIntersectKm2 * 100, 2),
         ];
     }
-/**
+    /**
      * Luas GeoJSON (km2) berbasis rumus spherical excess.
      *
      * Dipakai untuk menghitung luas hasil ST_Intersection di PHP, karena
@@ -632,7 +623,6 @@ class ImpactAnalysisService
         if ($type === 'Polygon') {
 
             return self::polygonAreaKm2($geojson['coordinates'] ?? []);
-
         }
 
         if ($type === 'MultiPolygon') {
@@ -644,7 +634,6 @@ class ImpactAnalysisService
             }
 
             return $total;
-
         }
 
         if ($type === 'GeometryCollection') {
@@ -656,7 +645,6 @@ class ImpactAnalysisService
             }
 
             return $total;
-
         }
 
         /* LineString / Point tidak memiliki luas */
@@ -709,7 +697,6 @@ class ImpactAnalysisService
 
             $total += deg2rad((float) $next[0] - (float) $current[0])
                 * (2 + sin(deg2rad((float) $current[1])) + sin(deg2rad((float) $next[1])));
-
         }
 
         return abs($total * $earthRadius * $earthRadius / 2);
@@ -801,7 +788,6 @@ class ImpactAnalysisService
                 'calculated_at' => optional($risk->calculated_at)->toDateTimeString(),
                 'intersect_km2' => round($weight, 4),
             ];
-
         }
 
         return [
@@ -849,7 +835,8 @@ class ImpactAnalysisService
     protected function hotspotContext(float $latitude, float $longitude, float $radiusKm): array
     {
         $points = $this->pointsWithinRadius(
-            Hotspot::query(),
+            Hotspot::query()
+                ->where('data_origin', '!=', 'nasa_firms_csv'),
             'latitude',
             'longitude',
             $latitude,
@@ -898,10 +885,9 @@ class ImpactAnalysisService
                 'detected_at' => optional($hotspot->detected_at)->toDateTimeString(),
                 'distance_km' => $item['distance_km'],
             ];
-
         }
 
-        usort($list, fn ($a, $b) => $a['distance_km'] <=> $b['distance_km']);
+        usort($list, fn($a, $b) => $a['distance_km'] <=> $b['distance_km']);
 
         return [
             'available' => true,
@@ -914,7 +900,7 @@ class ImpactAnalysisService
             'items' => $list,
         ];
     }
-/**
+    /**
      * Insiden di dalam radius analisis.
      */
     protected function incidentContext(float $latitude, float $longitude, float $radiusKm): array
@@ -954,10 +940,9 @@ class ImpactAnalysisService
                 'detected_at' => optional($incident->detected_at)->toDateTimeString(),
                 'distance_km' => $item['distance_km'],
             ];
-
         }
 
-        usort($list, fn ($a, $b) => $a['distance_km'] <=> $b['distance_km']);
+        usort($list, fn($a, $b) => $a['distance_km'] <=> $b['distance_km']);
 
         /* insiden yang belum selesai dianggap masih berjalan */
         $ongoing = ($byStatus['detected'] ?? 0) + ($byStatus['on_process'] ?? 0);
@@ -1009,10 +994,9 @@ class ImpactAnalysisService
                 'description' => $report->description,
                 'distance_km' => $item['distance_km'],
             ];
-
         }
 
-        usort($list, fn ($a, $b) => $a['distance_km'] <=> $b['distance_km']);
+        usort($list, fn($a, $b) => $a['distance_km'] <=> $b['distance_km']);
 
         return [
             'available' => true,
@@ -1066,7 +1050,6 @@ class ImpactAnalysisService
                     'distance_km' => round($distance, 4),
                 ];
             }
-
         }
 
         return $result;
@@ -1329,7 +1312,6 @@ class ImpactAnalysisService
                  GROUP BY category',
                 [$circleGeoJson]
             );
-
         } catch (\Throwable $e) {
 
             Log::error('Analisis fasilitas dalam radius gagal', [
@@ -1488,7 +1470,7 @@ class ImpactAnalysisService
         ];
     }
 
-/**
+    /**
      * Gabungkan komponen menjadi skor akhir 0-100.
      */
     protected function combineComponents(array $components, array $weights): array
@@ -1520,7 +1502,6 @@ class ImpactAnalysisService
             $usedWeight += $weight;
 
             $sum += (float) $component['normalized'] * $weight;
-
         }
 
         $score = $usedWeight > 0
@@ -1538,7 +1519,6 @@ class ImpactAnalysisService
             $component['contribution'] = ($usedWeight > 0 && $component['available'])
                 ? round((float) $component['normalized'] * $weight / $usedWeight, 2)
                 : 0.0;
-
         }
 
         unset($component);
@@ -1554,7 +1534,6 @@ class ImpactAnalysisService
                 'reason' => $source['note'] ?? 'Dataset belum tersedia.',
                 'weight' => 0.0,
             ];
-
         }
 
         return [
@@ -1626,7 +1605,6 @@ class ImpactAnalysisService
                 'reason' => $reason ?? ($sources[$source]['note'] ?? 'Dataset belum tersedia.'),
                 'source' => $source,
             ];
-
         };
 
         return [
