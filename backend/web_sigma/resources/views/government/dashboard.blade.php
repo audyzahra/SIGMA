@@ -97,22 +97,6 @@
     <div id="sigma-map"></div>
 
 
-    <div class="map-legend">
-
-        <span class="success">
-            ● Rendah
-        </span>
-
-        <span class="warning">
-            ● Sedang
-        </span>
-
-        <span class="orange-text">
-            ● Tinggi
-        </span>
-
-    </div>
-
 </div>
 
     </section>

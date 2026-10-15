@@ -48,7 +48,12 @@ class SigmaChip extends StatelessWidget {
     ),
     child: Text(
       text,
-      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color),
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        color: color,
+        decoration: TextDecoration.none,
+      ),
     ),
   );
 }
@@ -126,6 +131,7 @@ class SigmaHeader extends StatelessWidget {
                 fontWeight: FontWeight.w900,
                 fontSize: back ? 20 : 14,
                 color: back ? sigmaNavy : sigmaRed,
+                decoration: TextDecoration.none,
               ),
             ),
             Text(
@@ -134,6 +140,7 @@ class SigmaHeader extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 fontSize: back ? 12 : 20,
                 color: sigmaNavy,
+                decoration: TextDecoration.none,
               ),
             ),
           ],
@@ -288,7 +295,12 @@ class OfficerInfoCard extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(height: 1.4, color: sigmaNavy),
+            style: const TextStyle(
+              fontSize: 11,
+              height: 1.4,
+              color: sigmaNavy,
+              decoration: TextDecoration.none,
+            ),
           ),
         ),
       ],

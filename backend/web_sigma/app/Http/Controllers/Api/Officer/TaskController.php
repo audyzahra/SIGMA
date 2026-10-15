@@ -10,6 +10,7 @@ use App\Notifications\OfficerTaskUpdated;
 use App\Services\Officer\OfficerTaskService;
 use App\Models\ReportStatusHistory;
 use App\Models\CitizenReport;
+use App\Models\FieldAssignmentStatusHistory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -56,11 +57,19 @@ class TaskController extends Controller
     |--------------------------------------------------------------------------
     */
 
-        if (!$task->accepted_at) {
 
+        if (!$task->accepted_at) {
             $task->update([
                 'accepted_by' => $request->user()->id,
                 'accepted_at' => now(),
+                'status' => 'accepted',
+            ]);
+
+            FieldAssignmentStatusHistory::create([
+                'field_assignment_id' => $task->id,
+                'status' => 'accepted',
+                'description' => 'Petugas telah menerima tugas penanganan.',
+                'updated_by' => $request->user()->id,
             ]);
 
             Log::info('TASK ACCEPTED', [
@@ -69,6 +78,7 @@ class TaskController extends Controller
                 'accepted_at' => $task->accepted_at,
             ]);
         }
+
 
         /*
     |--------------------------------------------------------------------------
@@ -159,6 +169,7 @@ class TaskController extends Controller
 
         $task->load([
             'incident.statusHistories',
+            'statusHistories.updater',
             'team.organization',
             'acceptor',
         ]);
@@ -193,12 +204,50 @@ class TaskController extends Controller
     |--------------------------------------------------------------------------
     */
 
+
+        $previousStatus = $task->status;
+
+        $allowedTransitions = [
+            'accepted' => 'traveling',
+            'traveling' => 'arrived',
+            'arrived' => 'handling',
+            'handling' => 'completed',
+        ];
+
+        $expectedStatus = $allowedTransitions[$previousStatus] ?? null;
+
+        if ($expectedStatus !== $status) {
+            return response()->json([
+                'message' => 'Status tugas tidak valid atau sudah diperbarui.',
+                'current_status' => $previousStatus,
+            ], 422);
+        }
+
         $task->update([
             'status' => $status,
             'completed_at' => $status === 'completed'
                 ? now()
-                : null,
+                : $task->completed_at,
         ]);
+
+        if ($previousStatus !== $status) {
+            $statusDescriptions = [
+                'assigned' => 'Tugas telah diberikan kepada tim petugas.',
+                'traveling' => 'Petugas sedang dalam perjalanan menuju lokasi kejadian.',
+                'arrived' => 'Petugas telah tiba di lokasi kejadian.',
+                'handling' => 'Petugas mulai melakukan penanganan di lokasi.',
+                'completed' => 'Petugas telah menyelesaikan penanganan kejadian.',
+                'cancelled' => 'Penugasan dibatalkan.',
+            ];
+
+            FieldAssignmentStatusHistory::create([
+                'field_assignment_id' => $task->id,
+                'status' => $status,
+                'description' => $statusDescriptions[$status]
+                    ?? 'Status penugasan diperbarui menjadi ' . $status . '.',
+                'updated_by' => $request->user()->id,
+            ]);
+        }
 
         /*
     |--------------------------------------------------------------------------

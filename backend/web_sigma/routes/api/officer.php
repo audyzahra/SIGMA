@@ -21,4 +21,5 @@ Route::middleware('role:officer')->prefix('officer')->group(function (): void {
     Route::post('/tasks/{task}/reports', [ReportController::class, 'store']);
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::post('/profile/heartbeat', [ProfileController::class, 'heartbeat']);
+    Route::patch('/profile/password', [ProfileController::class, 'updatePassword']);
 });

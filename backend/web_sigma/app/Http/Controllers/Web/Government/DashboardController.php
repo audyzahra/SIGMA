@@ -17,7 +17,16 @@ class DashboardController extends Controller
     {
         // Statistik terbaru
         $statistics = FireStatistic::latest('statistic_date')->first();
+        $totalHotspots = Hotspot::count();
 
+        $activeIncidents = Incident::whereIn('fire_status', [
+            'detected',
+            'on_process',
+        ])->count();
+
+        $resolvedIncidents = IncidentStatusHistory::where('status', 'extinguished')
+            ->distinct('incident_id')
+            ->count('incident_id');
         /*
          * Dashboard TIDAK memakai config('sigma_data') sebagai sumber angka.
          * Semua nilai di bawah berasal dari tabel nyata (fire_statistics,
@@ -35,33 +44,21 @@ class DashboardController extends Controller
             $data['government_metrics'] = [
                 [
                     'label' => 'Total Hotspot',
-                    'value' => number_format($statistics->total_hotspots),
+                    'value' => number_format($totalHotspots),
                     'icon' => 'fire',
                     'accent' => 'danger',
                 ],
                 [
                     'label' => 'Insiden Aktif',
-                    'value' => number_format($statistics->active_incidents),
+                    'value' => number_format($activeIncidents),
                     'icon' => 'alert',
                     'accent' => 'orange',
                 ],
                 [
                     'label' => 'Insiden Selesai',
-                    'value' => number_format($statistics->resolved_incident),
+                    'value' => number_format($resolvedIncidents),
                     'icon' => 'check',
                     'accent' => 'success',
-                ],
-                [
-                    'label' => 'Luas Terdampak',
-                    'value' => number_format($statistics->affected_area) . ' Ha',
-                    'icon' => 'map',
-                    'accent' => 'warning',
-                ],
-                [
-                    'label' => 'Wilayah Terdampak',
-                    'value' => number_format($statistics->affected_region),
-                    'icon' => 'location',
-                    'accent' => 'info',
                 ],
             ];
         }
@@ -94,14 +91,15 @@ class DashboardController extends Controller
 
         // Hotspot aktif
         $hotspots = Hotspot::where('status', 'active')
+            ->where('data_origin', '!=', 'nasa_firms_csv')
             ->latest('detected_at')
             ->get();
 
         // Insiden aktif
         $incidents = Incident::whereIn('fire_status', [
-                'detected',
-                'on_process',
-            ])
+            'detected',
+            'on_process',
+        ])
             ->latest('detected_at')
             ->get();
 
@@ -111,76 +109,74 @@ class DashboardController extends Controller
             ->get();
 
 
-            $regions = Region::query()
-    ->whereIn('level', [
-        'province',
-        'regency',
-        'district'
-    ])
-    ->select([
-        'id',
-        'parent_id',
-        'name',
-        'code',
-        'level'
-    ])
-    ->orderBy('level')
-    ->orderBy('name')
-    ->get();
+        $regions = Region::query()
+            ->whereIn('level', [
+                'province',
+                'regency',
+                'district'
+            ])
+            ->select([
+                'id',
+                'parent_id',
+                'name',
+                'code',
+                'level'
+            ])
+            ->orderBy('level')
+            ->orderBy('name')
+            ->get();
 
 
-$geometryData = DB::table('regions')
-    ->whereIn('level', [
-        'province',
-        'regency',
-        'district'
-    ])
-    ->select([
-        'id'
-    ])
-    ->selectRaw('ST_AsGeoJSON(geometry) AS geometry_json')
-    ->get()
-    ->keyBy('id');
+        $geometryData = DB::table('regions')
+            ->whereIn('level', [
+                'province',
+                'regency',
+                'district'
+            ])
+            ->select([
+                'id'
+            ])
+            ->selectRaw('ST_AsGeoJSON(geometry) AS geometry_json')
+            ->get()
+            ->keyBy('id');
 
 
-$regions->each(function ($region) use ($geometryData) {
+        $regions->each(function ($region) use ($geometryData) {
 
-    $data = $geometryData->get($region->id);
+            $data = $geometryData->get($region->id);
 
-    $region->setAttribute(
-        'gis_geometry',
-        $data?->geometry_json
-    );
-
-});
-
-
-$riskByRegion = $fireRisks->keyBy('region_id');
+            $region->setAttribute(
+                'gis_geometry',
+                $data?->geometry_json
+            );
+        });
 
 
-$sigmaRegions = $regions->map(function ($region) use ($riskByRegion) {
+        $riskByRegion = $fireRisks->keyBy('region_id');
 
-    $risk = $riskByRegion->get($region->id);
 
-    return [
-        'id' => $region->id,
-        'name' => $region->name,
-        'code' => $region->code,
-        'level' => $region->level,
-        'parent_id' => $region->parent_id,
+        $sigmaRegions = $regions->map(function ($region) use ($riskByRegion) {
 
-        'geometry' => $region->gis_geometry,
+            $risk = $riskByRegion->get($region->id);
 
-        'risk_score' => $risk?->risk_score ?? 0,
-        'risk_level' => $risk?->risk_level ?? 'LOW',
+            return [
+                'id' => $region->id,
+                'name' => $region->name,
+                'code' => $region->code,
+                'level' => $region->level,
+                'parent_id' => $region->parent_id,
 
-        'temperature' => $risk?->temperature,
-        'humidity' => $risk?->humidity,
-        'wind_speed' => $risk?->wind_speed,
-        'rainfall' => $risk?->rainfall,
-    ];
+                'geometry' => $region->gis_geometry,
 
-})->values();
+                'risk_score' => $risk?->risk_score ?? 0,
+                'risk_level' => $risk?->risk_level ?? 'LOW',
+
+                'temperature' => $risk?->temperature,
+                'humidity' => $risk?->humidity,
+                'wind_speed' => $risk?->wind_speed,
+                'rainfall' => $risk?->rainfall,
+            ];
+        })->values();
 
         return view('government.dashboard', compact(
             'data',

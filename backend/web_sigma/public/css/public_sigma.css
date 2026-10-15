@@ -1416,142 +1416,182 @@
 }
 
 
+
 /* =========================================================
-   FOOTER
+   FOOTER SIGMA
 ========================================================= */
 
 .public_sigma .public-footer {
-
-    padding-top:
-        55px;
-
-    background:
-        var(--sigma-dark);
-
-    color:
-        white;
-
+    padding: 55px 0 22px;
+    background: #172136;
+    color: #ffffff;
 }
-
 
 .public_sigma .footer-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        2fr 1fr 1fr;
-
-    gap:
-        60px;
-
-    padding-bottom:
-        40px;
-
+    display: grid;
+    grid-template-columns: 1.25fr 1.2fr 0.8fr;
+    gap: 64px;
+    align-items: start;
+    padding-bottom: 38px;
 }
 
+/* Identitas SIGMA */
+.public_sigma .footer-about {
+    max-width: 350px;
+}
 
 .public_sigma .footer-brand {
-
-    margin-bottom:
-        8px;
-
-    color:
-        white;
-
-    font-size:
-        25px;
-
-    font-weight:
-        800;
-
+    margin: 0 0 16px;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
-
-.public_sigma .footer-grid p {
-
-    max-width:
-        340px;
-
-    color:
-        #AAB2C0;
-
-    font-size:
-        14px;
-
+.public_sigma .footer-about p,
+.public_sigma .footer-information p {
+    margin: 0;
+    color: #c5cede;
+    font-size: 13px;
+    line-height: 1.9;
 }
 
+.public_sigma .footer-tagline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 9px;
+    margin-top: 18px;
+    color: #ff8a70;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.9;
+}
 
+.public_sigma .footer-tagline span {
+    color: #ef5138;
+}
+
+/* Judul kolom */
 .public_sigma .footer-grid h4 {
-
-    margin-bottom:
-        15px;
-
-    color:
-        white;
-
-    font-size:
-        14px;
-
+    margin: 4px 0 18px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
 }
 
-
-.public_sigma .footer-grid a {
-
-    display:
-        block;
-
-    margin:
-        9px 0;
-
-    color:
-        #AAB2C0;
-
-    font-size:
-        14px;
-
-    transition:
-        .2s;
-
+/* Tentang SIGMA */
+.public_sigma .footer-information {
+    max-width: 390px;
 }
 
-
-.public_sigma .footer-grid a:hover {
-
-    color:
-        white;
-
+/* Fitur Utama */
+.public_sigma .footer-features ul {
+    display: grid;
+    gap: 11px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
+.public_sigma .footer-features li {
+    position: relative;
+    padding-left: 17px;
+    color: #c5cede;
+    font-size: 13px;
+    line-height: 1.7;
+}
 
+.public_sigma .footer-features li::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ef5138;
+}
+
+.public_sigma .footer-features a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.public_sigma .footer-features a:hover {
+    color: #ff8a70;
+}
+
+/* Bagian bawah footer */
 .public_sigma .footer-bottom {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        20px;
-
-    padding:
-        20px 0;
-
-    border-top:
-        1px solid
-        rgba(255,255,255,.1);
-
-    color:
-        #8992A3;
-
-    font-size:
-        12px;
-
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #364258;
 }
+
+.public_sigma .footer-bottom span {
+    color: #aab6c9;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+    .public_sigma .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 35px 40px;
+    }
+
+    .public_sigma .footer-about {
+        max-width: 100%;
+    }
+
+    .public_sigma .footer-information {
+        max-width: 100%;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+    .public_sigma .public-footer {
+        padding: 40px 0 20px;
+    }
+
+    .public_sigma .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding-bottom: 28px;
+    }
+
+    .public_sigma .footer-brand {
+        font-size: 26px;
+    }
+
+    .public_sigma .footer-grid h4 {
+        margin-bottom: 12px;
+    }
+
+    .public_sigma .footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .public_sigma .footer-bottom span {
+        display: block;
+    }
+}
+
 
 
 /* =========================================================

@@ -18,6 +18,7 @@ class HotspotController extends Controller
 
         $hotspots = Hotspot::whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->where('data_origin', '!=', 'nasa_firms_csv')
             ->latest('detected_at')
             ->limit(1000)
             ->get();
@@ -27,67 +28,61 @@ class HotspotController extends Controller
         return response()->json([
 
 
-            'success'=>true,
+            'success' => true,
 
 
-            'total'=>$hotspots->count(),
+            'total' => $hotspots->count(),
 
 
-            'data'=>$hotspots->map(function($hotspot){
+            'data' => $hotspots->map(function ($hotspot) {
 
 
                 return [
 
 
-                    'id'=>$hotspot->id,
+                    'id' => $hotspot->id,
 
 
-                    'latitude'=>$hotspot->latitude,
+                    'latitude' => $hotspot->latitude,
 
 
-                    'longitude'=>$hotspot->longitude,
+                    'longitude' => $hotspot->longitude,
 
 
-                    'satellite'=>$hotspot->satellite_name,
+                    'satellite' => $hotspot->satellite_name,
 
 
-                    'brightness_temperature'=>
-                        $hotspot->brightness_temperature,
+                    'brightness_temperature' =>
+                    $hotspot->brightness_temperature,
 
 
-                    'confidence'=>
-                        $hotspot->confidence_level,
+                    'confidence' =>
+                    $hotspot->confidence_level,
 
 
-                    'frp'=>
-                        $hotspot->frp,
+                    'frp' =>
+                    $hotspot->frp,
 
 
-                    'detected_at'=>
+                    'detected_at' =>
 
-                        $hotspot->detected_at
+                    $hotspot->detected_at
                         ?
                         $hotspot->detected_at
-                            ->format('Y-m-d H:i:s')
+                        ->format('Y-m-d H:i:s')
                         :
                         null,
 
 
-                    'status'=>
-                        $hotspot->status,
+                    'status' =>
+                    $hotspot->status,
 
 
                 ];
-
-
             })
 
 
 
         ]);
-
-
     }
-
-
 }

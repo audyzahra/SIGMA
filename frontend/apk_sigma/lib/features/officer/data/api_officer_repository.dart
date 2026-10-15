@@ -45,38 +45,96 @@ class ApiOfficerRepository implements OfficerRepository {
     }
   }
 
-  OfficerTask _task(Map<String, dynamic> json) {
-    final incident = json['incident'];
-    if (incident is! Map<String, dynamic>) {
-      throw Exception('Data insiden untuk tugas tidak tersedia.');
-    }
-    final latitude = incident['latitude'];
-    final longitude = incident['longitude'];
-    if (latitude is! num || longitude is! num) {
-      throw Exception('Koordinat insiden tidak tersedia.');
-    }
-    final location =
-        incident['location_description']?.toString() ?? 'Lokasi belum tersedia';
-    return OfficerTask(
-      id: json['id'].toString(),
-      area: location,
-      status: _status(json['status']?.toString()),
-      incident: Incident(
-        id: incident['id'].toString(),
-        incidentCode: 'INS-${incident['id']}',
-        title: location,
-        location: location,
-        latitude: latitude.toDouble(),
-        longitude: longitude.toDouble(),
-        riskIndex: 0,
-        priority: json['priority_level']?.toString() ?? 'normal',
-        distanceKm: 0,
-        estimatedMinutes: 0,
-        wind: '',
-        waterSource: '',
-      ),
-    );
+  
+OfficerTask _task(Map<String, dynamic> json) {
+  final incidentData = json['incident'];
+  final incident = incidentData is Map<String, dynamic>
+      ? incidentData
+      : <String, dynamic>{};
+
+  final regionData = json['region'];
+  final region = regionData is Map<String, dynamic>
+      ? regionData
+      : <String, dynamic>{};
+
+  final teamData = json['team'];
+  final team = teamData is Map<String, dynamic>
+      ? teamData
+      : <String, dynamic>{};
+
+  final scoresData = json['scores'];
+  final scores = scoresData is Map<String, dynamic>
+      ? scoresData
+      : <String, dynamic>{};
+
+  final rawLatitude = incident['latitude'] ?? json['latitude'];
+  final rawLongitude = incident['longitude'] ?? json['longitude'];
+
+  final latitude = rawLatitude is num
+      ? rawLatitude.toDouble()
+      : 0.0;
+
+  final longitude = rawLongitude is num
+      ? rawLongitude.toDouble()
+      : 0.0;
+
+  final incidentId = incident['id']?.toString() ?? '';
+
+  final candidates = [
+    incident['location_description'],
+    json['location_description'],
+    region['name'],
+    region['region_name'],
+  ];
+
+  final location = candidates
+      .whereType<String>()
+      .map((value) => value.trim())
+      .firstWhere(
+        (value) =>
+            value.isNotEmpty &&
+            value.toLowerCase() !=
+                'lokasi insiden belum ditentukan',
+        orElse: () => 'Lokasi wilayah belum tersedia',
+      );
+
+  double readScore(dynamic value) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
+
+  final priority = json['priority_level']?.toString() ?? 'normal';
+
+  return OfficerTask(
+    id: json['id']?.toString() ?? '',
+    area: location,
+    status: _status(json['status']?.toString()),
+    teamName: team['name']?.toString() ?? '-',
+    riskScore: readScore(scores['risk_score']),
+    impactScore: readScore(scores['impact_score']),
+    priorityScore: readScore(scores['priority_score']),
+    rankingPosition: scores['ranking_position'] is num
+        ? (scores['ranking_position'] as num).toInt()
+        : null,
+    incident: Incident(
+      id: incidentId,
+      incidentCode: incidentId.isEmpty
+          ? 'Penugasan #${json['id']}'
+          : 'INS-$incidentId',
+      title: location,
+      location: location,
+      latitude: latitude,
+      longitude: longitude,
+      riskIndex: readScore(scores['risk_score']).round(),
+      priority: priority,
+      distanceKm: 0,
+      estimatedMinutes: 0,
+      wind: '',
+      waterSource: '',
+    ),
+  );
+}
+
 
   TaskStatus _status(String? value) =>
       {
@@ -172,4 +230,19 @@ class ApiOfficerRepository implements OfficerRepository {
   @override
   Future<void> acceptTask(String taskId) async =>
       _request('PATCH', '/tasks/$taskId/accept');
+
+  @override
+  Future<void> updatePassword({
+    required String newPassword,
+    required String passwordConfirmation,
+  }) async {
+    await _request(
+      'PATCH',
+      '/profile/password',
+      body: {
+        'password': newPassword,
+        'password_confirmation': passwordConfirmation,
+      },
+    );
+  }
 }

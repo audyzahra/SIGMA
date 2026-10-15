@@ -131,13 +131,13 @@
 
                     {{ match ($report->report_type) {
                         'fire' => 'Kebakaran',
-                    
+
                         'smoke' => 'Asap',
-                    
+
                         'burning_activity' => 'Aktivitas Pembakaran',
-                    
+
                         'other' => 'Lainnya',
-                    
+
                         default => ucfirst(str_replace('_', ' ', $report->report_type ?? '-')),
                     } }}
 
@@ -301,24 +301,24 @@
 
                         {{ match (true) {
                             $history->status === 'submitted' => 'Laporan Dikirim',
-                        
+
                             $history->status === 'pending' => 'Menunggu Verifikasi',
-                        
+
                             $history->status === 'verified' => 'Laporan Diterima',
-                        
+
                             $history->status === 'rejected' => 'Laporan Ditolak',
-                        
+
                             $history->status === 'process' && str_contains(strtolower($history->description ?? ''), 'menerima tugas')
                                 => 'Tugas Diterima Petugas',
-                        
+
                             $history->status === 'process' &&
                                 str_contains(strtolower($history->description ?? ''), 'mulai melakukan penanganan')
                                 => 'Penanganan Dimulai',
-                        
+
                             $history->status === 'process' => 'Laporan Diproses',
-                        
+
                             $history->status === 'completed' => 'Penanganan Selesai',
-                        
+
                             default => ucfirst($history->status),
                         } }}
                     </strong>

@@ -8,6 +8,7 @@ use App\Models\PriorityResult;
 use App\Models\Region;
 use App\Models\ResponseAction;
 use App\Services\AI\AIRecommendationService;
+use App\Models\FieldAssignment;
 
 class RecommendationController extends Controller
 {
@@ -35,22 +36,60 @@ class RecommendationController extends Controller
         |
         */
 
-        $priorities = PriorityResult::query()
-            ->with('region')
-            ->whereIn(
-                'priority_level',
-                ['critical', 'high']
-            )
-            ->orderByRaw("
-                CASE priority_level
-                    WHEN 'critical' THEN 1
-                    WHEN 'high' THEN 2
-                    ELSE 3
-                END
-            ")
-            ->orderByDesc('priority_score')
-            ->orderBy('ranking_position')
-            ->get();
+        /*
+|--------------------------------------------------------------------------
+| WILAYAH YANG SUDAH DITANGANI
+|--------------------------------------------------------------------------
+|
+| Priority yang sudah dikirim ke petugas tidak boleh muncul
+| lagi sebagai prioritas aktif maupun di queue.
+|
+*/
+$handledRegionIds = FieldAssignment::query()
+    ->whereNotNull('region_id')
+    ->whereIn('status', [
+        'assigned',
+        'traveling',
+        'arrived',
+        'handling',
+        'completed',
+    ])
+    ->pluck('region_id')
+    ->unique()
+    ->values();
+
+
+/*
+|--------------------------------------------------------------------------
+| AMBIL HASIL PRIORITAS WILAYAH
+|--------------------------------------------------------------------------
+*/
+
+$priorities = PriorityResult::query()
+    ->with('region')
+    ->whereIn(
+        'priority_level',
+        ['critical', 'high']
+    )
+    ->when(
+        $handledRegionIds->isNotEmpty(),
+        function ($query) use ($handledRegionIds) {
+            $query->whereNotIn(
+                'region_id',
+                $handledRegionIds
+            );
+        }
+    )
+    ->orderByRaw("
+        CASE priority_level
+            WHEN 'critical' THEN 1
+            WHEN 'high' THEN 2
+            ELSE 3
+        END
+    ")
+    ->orderByDesc('priority_score')
+    ->orderBy('ranking_position')
+    ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -88,6 +127,7 @@ class RecommendationController extends Controller
 
         $queue = $priorities
             ->slice(1)
+            ->take(10)
             ->values();
 
         /*
