@@ -52,7 +52,11 @@ class _CitizenShellState extends State<CitizenShell> {
       store: _notifications,
       api: _api,
       child: Scaffold(
-        body: SafeArea(child: pages[_index]),
+        body: SafeArea(
+  child: SizedBox.expand(
+    child: pages[_index],
+  ),
+),
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
             height: 70,

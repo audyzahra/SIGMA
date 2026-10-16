@@ -27,7 +27,7 @@ class MapController extends Controller
                 ->whereNotNull('longitude')
                 ->where('detected_at', '>=', now()->subDays(3))
                 ->latest('detected_at')
-                ->limit(100)
+                ->limit(25)
                 ->get()
                 ->map(fn(Hotspot $hotspot): array => [
                     'id' => $hotspot->id,
